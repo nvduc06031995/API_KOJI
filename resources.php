@@ -22,6 +22,7 @@ class resources
 
     function getConstructionList()
     {
+    echo '1';
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {

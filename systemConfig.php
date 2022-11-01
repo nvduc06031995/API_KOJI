@@ -69,6 +69,8 @@ class systemConfig
             504 => 'Gateway Timeout',
             505 => 'HTTP Version Not Supported',
             506 => 'データが取得できませんでした。アプリを再起動してください。',
+            507 => 'データ登録ができませんでした。',
+            508 => 'データが取得できませんでした。アプリを再起動してください。'
         );
 
         return (isset($codes[$status])) ? $codes[$status] : '';

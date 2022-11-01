@@ -22,7 +22,6 @@ class resources
 
     function getConstructionList()
     {
-    echo '1';
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
@@ -258,6 +257,151 @@ class resources
                 $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+            }
+        }
+    }
+
+    function postPostCountTirasi()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            //$_POST['loginId']: required
+            //$_POST['date']: required
+            if(isset($_POST['loginId']) && isset($_POST['date'])) {
+                $loginId = $_POST['loginId'];
+                $selectionDate = $_POST['date'];
+                $sql = 'SELECT YMD, RENKEI_YMD, KOJI_TIRASISU, UPD_PGID, UPD_TANTCD, UPD_YMD FROM T_TIRASI WHERE TANT_CD="'. $loginId . '" AND YMD="'.$selectionDate.'"';
+                // var_dump($sql); die;
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if($this->result->num_rows > 0){
+                    // output data of each row
+                    while($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                    foreach($resultSet as $key => $value) {
+                        //Edit Key Array
+                        $this->changeKey = new systemEditor();
+                        $oldKeyArr = [
+                            'YMD', 
+                            'RENKEI_YMD',
+                            'KOJI_TIRASISU',
+                            'UPD_PGID',
+                            'UPD_TANTCD',
+                            'UPD_YMD',
+                        ];
+                        $newKeyArr = [
+                            'login_id', 
+                            'execution_dt',
+                            'koji_tirashisu',
+                            'update_pgid',
+                            'update_tantcd',
+                            'update_ymd',
+                        ];
+                        $resultSet[$key] = $this->changeKey->change_key($value, $oldKeyArr, $newKeyArr);
+
+                        //Add Message
+                        $resultSet[$key]['message'] = 'OK';
+                    }
+                }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
+            }
+        }
+    }
+
+    function postPostCountKoji()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            // $_POST['setsaki_address']: required
+            // $_POST['koji_ymd']: required
+            // $_POST['koji_st']: required
+            if( isset($_POST['setsaki_address']) && 
+                isset($_POST['koji_ymd']) && 
+                isset($_POST['koji_st']) && 
+                $_POST['koji_st'] == '2' ) {
+
+                $setsakiAddress = $_POST['setsaki_address'];
+                $kojiYmd = $_POST['koji_ymd'];
+                $kojiSt = $_POST['koji_st'];
+
+                $sql = ' SELECT SYUYAKU_JYUCYU_ID, UPD_PGID, UPD_TANTCD, UPD_YMD FROM T_KOJI WHERE SETSAKI_ADDRESS="'.$setsakiAddress.'" AND KOJI_YMD="'.$kojiYmd.'" AND KOJI_ST="'.$kojiSt.'" AND DEL_FLG="0" ';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if($this->result->num_rows > 0){
+                    // output data of each row
+                    while($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                    foreach($resultSet as $key => $value) {
+                        //Edit Key Array
+                        $this->changeKey = new systemEditor();
+                        $oldKeyArr = [
+                            'SYUYAKU_JYUCYU_ID', 
+                            'UPD_PGID',
+                            'UPD_TANTCD',
+                            'UPD_YMD',
+                        ];
+                        $newKeyArr = [
+                            'syuyaku_jyucyu_id', 
+                            'update_pgid',
+                            'update_id',
+                            'update_dt',
+                        ];
+                        $resultSet[$key] = $this->changeKey->change_key($value, $oldKeyArr, $newKeyArr);
+
+                        //Add Message
+                        $resultSet[$key]['message'] = 'OK';
+                    }
+                }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
+            }
+        }
+    }
+
+    function getPhotoConfirm() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            // $_POST['koji_filepath_id']: required
+            // $_POST['koji_filepath_file_kbn_cd']: required
+            if( isset($_POST['koji_filepath_id']) && 
+                isset($_POST['koji_filepath_file_kbn_cd']) && 
+                $_POST['koji_filepath_file_kbn_cd'] == '5' ) {
+                    
+                $kojiFilepathId = $_POST['koji_filepath_id'];
+                $kojiFilepathFileKbnCd = $_POST['koji_filepath_file_kbn_cd'];
+
+                $sql = ' SELECT FILEPATH FROM T_KOJI_FILEPATH WHERE FILEPATH_ID="'.$kojiFilepathId.'" AND FILE_KBN_CD="'.$kojiFilepathFileKbnCd.'"';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if($this->result->num_rows > 0){
+                    // output data of each row
+                    while($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
     }

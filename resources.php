@@ -2006,4 +2006,165 @@ class resources
             }
         }
     }
+
+    function getNewComment()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['ADD_TANTCD'])
+            ) {
+                $ADD_TANTCD = $_GET['ADD_TANTCD'];
+                $sql = 'SELECT COMMENT FROM T_KOJI WHERE ADD_TANTCD=' . $ADD_TANTCD . ' AND COMMENT IS NOT NULL AND READ_FLG IS NULL';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getNoticeInStock()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['SOKO_CD'])
+            ) {
+                $SOKO_CD = $_GET['SOKO_CD'];
+                $sql = 'SELECT COUNT(*) FROM T_NYUKOYOTEI WHERE SOKO_CD=' . $SOKO_CD . ' AND NYUKO_YOTEI_YMD> CURRENT_DATE() AND NYUKO_FLG= 0';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getNoticeCompletionReport()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['ADD_TANTCD'])
+            ) {
+                $ADD_TANTCD = $_GET['ADD_TANTCD'];
+                $sql = 'SELECT COUNT(*) FROM T_KOJI WHERE ADD_TANTCD=' . $ADD_TANTCD . ' AND KOJI_YMD> CURRENT_DATE() AND REPORT_FLG= 02';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getNoticePreliminaryInspection()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['ADD_TANTCD'])
+            ) {
+                $ADD_TANTCD = $_GET['ADD_TANTCD'];
+                $sql = 'SELECT COUNT(*) FROM T_KOJI WHERE ADD_TANTCD=' . $ADD_TANTCD . ' AND SITAMI_YMD> CURRENT_DATE() AND REPORT_FLG= 01';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+    
+    function getNoticeMaterialsOrderApplication()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['SYOZOKU_CD'])
+            ) {
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+                $sql = 'SELECT COUNT(*) FROM T_BUZAIHACYU WHERE SYOZOKU_CD=' . $SYOZOKU_CD . ' AND HACYU_OKFLG= 01';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getPressTheNewCommentAlreadyReadButton(){
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['JYUCYU_ID'])
+            ) {
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
+                $sql = 'SELECT READ_FLG FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
 }

@@ -1577,7 +1577,7 @@ class resources
                 SETSAKI_NAME,
                 SITAMIAPO_KBN,
                 KBNMSAI_NAME 
-                FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.KBN_CD=M_KBN.TAG_CD
+                FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.TAG_CD=M_KBN.KBN_CD
                 WHERE SITAMI_YMD>="' . $start_date . '" 
                     AND SITAMI_YMD<="' . $end_date . '" 
                     AND HOMON_TANT_CD4="' . $HOMON_TANT_CD . '" 

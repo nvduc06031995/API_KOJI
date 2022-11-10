@@ -1717,6 +1717,7 @@ class resources
         }
     }
 
+    //【営業工事・営業下見（営業所欄）】
     function getSaleConstructionPreviewSalesOffice()
     {
         $this->dbReference = new systemConfig();
@@ -1762,6 +1763,7 @@ class resources
         }
     }
 
+    // 【営業工事・営業下見（担当者欄）】
     function getSaleConstructionPreviewPersonInCharge()
     {
         $this->dbReference = new systemConfig();
@@ -1807,6 +1809,7 @@ class resources
         }
     }
 
+    //【メモ（担当者欄）】
     function getMemoPersonInCharge()
     {
         $this->dbReference = new systemConfig();
@@ -1897,6 +1900,7 @@ class resources
         }
     }
 
+    //【日予実】
     function getNikkiMinoru()
     {
         $this->dbReference = new systemConfig();
@@ -1952,6 +1956,8 @@ class resources
         }
     }
 
+
+    //【計予実】
     function getEstimatedActual()
     {
         $this->dbReference = new systemConfig();

@@ -30,14 +30,13 @@ class resources
             if (isset($_GET['SITAMI_YMD']) && isset($_GET['KOJI_YMD'])) {
                 $SITAMI_YMD = $_GET['SITAMI_YMD'];
                 $KOJI_YMD = $_GET['KOJI_YMD'];
-                $sql = 'SELECT SITAMIHOMONJIKAN,
-                HOMON_SBT,
-                JYUCYU_ID,
-                SITAMI_JININ,
-                SITAMI_JIKAN,
-                KOJI_ITEM,
-                SETSAKI_ADDRESS,
-                SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $SITAMI_YMD . '" AND KOJI_YMD="' . $KOJI_YMD . '" AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG IS NULL';
+                $sql = 'SELECT SITAMIHOMONJIKAN, HOMON_SBT, JYUCYU_ID, SITAMI_JININ, SITAMI_JIKAN, KOJI_ITEM,
+                            SETSAKI_ADDRESS, SETSAKI_NAME 
+                        FROM T_KOJI 
+                        WHERE SITAMI_YMD="' . $SITAMI_YMD . '" 
+                            AND KOJI_YMD="' . $KOJI_YMD . '" 
+                            AND SYUYAKU_JYUCYU_ID IS NOT NULL 
+                            AND DEL_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -97,8 +96,10 @@ class resources
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $FILEPATH_ID = $_GET['FILEPATH_ID'];
                 $FILE_KBN_CD = $_GET['FILE_KBN_CD'];
-                $sql = 'SELECT SITAMIIRAISYO_FILEPATH,
-                FILEPATH FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID WHERE JYUCYU_ID= ' . $JYUCYU_ID . ' AND FILEPATH_ID=' . $FILEPATH_ID . ' AND FILE_KBN_CD=' . $FILE_KBN_CD . ' AND T_KOJI.DEL_FLG IS NULL AND T_KOJI_FILEPATH.DEL_FLG IS NULL';
+                $sql = 'SELECT SITAMIIRAISYO_FILEPATH, FILEPATH 
+                    FROM T_KOJI 
+                    LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                    WHERE JYUCYU_ID= ' . $JYUCYU_ID . ' AND FILEPATH_ID=' . $FILEPATH_ID . ' AND FILE_KBN_CD=' . $FILE_KBN_CD . ' AND T_KOJI.DEL_FLG IS NULL AND T_KOJI_FILEPATH.DEL_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -374,10 +375,13 @@ class resources
             if (isset($_POST['loginId']) && isset($_POST['date'])) {
                 $loginId = $_POST['loginId'];
                 $selectionDate = $_POST['date'];
-                $sql = 'SELECT YMD, RENKEI_YMD, KOJI_TIRASISU, UPD_PGID, UPD_TANTCD, UPD_YMD FROM T_TIRASI WHERE TANT_CD="' . $loginId . '" AND YMD="' . $selectionDate . '"';
-                // var_dump($sql); die;
+                $sql = 'SELECT YMD AS login_id, RENKEI_YMD AS execution_dt, KOJI_TIRASISU AS koji_tirashisu, 
+                        UPD_PGID AS update_pgid, UPD_TANTCD AS update_tantcd, UPD_YMD AS update_ymd 
+                    FROM T_TIRASI 
+                    WHERE TANT_CD="' . $loginId . '" 
+                        AND YMD="' . $selectionDate . '"';
                 $this->result = $this->dbConnect->query($sql);
-
+    
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
@@ -385,38 +389,18 @@ class resources
                         $resultSet[] = $row;
                     }
                     foreach ($resultSet as $key => $value) {
-                        //Edit Key Array
-                        $this->changeKey = new systemEditor();
-                        $oldKeyArr = [
-                            'YMD',
-                            'RENKEI_YMD',
-                            'KOJI_TIRASISU',
-                            'UPD_PGID',
-                            'UPD_TANTCD',
-                            'UPD_YMD',
-                        ];
-                        $newKeyArr = [
-                            'login_id',
-                            'execution_dt',
-                            'koji_tirashisu',
-                            'update_pgid',
-                            'update_tantcd',
-                            'update_ymd',
-                        ];
-                        $resultSet[$key] = $this->changeKey->change_key($value, $oldKeyArr, $newKeyArr);
-
                         //Add Message
                         $resultSet[$key]['message'] = 'OK';
                     }
                 }
-
+    
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
             }
         }
     }
-
+    
     function postPostCountKoji()
     {
         $this->dbReference = new systemConfig();
@@ -433,14 +417,20 @@ class resources
                 isset($_POST['koji_st']) &&
                 $_POST['koji_st'] == '2'
             ) {
-
+    
                 $setsakiAddress = $_POST['setsaki_address'];
                 $kojiYmd = $_POST['koji_ymd'];
                 $kojiSt = $_POST['koji_st'];
-
-                $sql = ' SELECT SYUYAKU_JYUCYU_ID, UPD_PGID, UPD_TANTCD, UPD_YMD FROM T_KOJI WHERE SETSAKI_ADDRESS="' . $setsakiAddress . '" AND KOJI_YMD="' . $kojiYmd . '" AND KOJI_ST="' . $kojiSt . '" AND DEL_FLG="0" ';
+    
+                $sql = 'SELECT SYUYAKU_JYUCYU_ID AS syuyaku_jyucyu_id, UPD_PGID AS update_pgid, 
+                        UPD_TANTCD AS update_id, UPD_YMD AS update_dt 
+                        FROM T_KOJI 
+                        WHERE SETSAKI_ADDRESS="' . $setsakiAddress . '" 
+                                AND KOJI_YMD="' . $kojiYmd . '" 
+                                AND KOJI_ST="' . $kojiSt . '" 
+                                AND DEL_FLG="0"';
                 $this->result = $this->dbConnect->query($sql);
-
+    
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
@@ -448,27 +438,11 @@ class resources
                         $resultSet[] = $row;
                     }
                     foreach ($resultSet as $key => $value) {
-                        //Edit Key Array
-                        $this->changeKey = new systemEditor();
-                        $oldKeyArr = [
-                            'SYUYAKU_JYUCYU_ID',
-                            'UPD_PGID',
-                            'UPD_TANTCD',
-                            'UPD_YMD',
-                        ];
-                        $newKeyArr = [
-                            'syuyaku_jyucyu_id',
-                            'update_pgid',
-                            'update_id',
-                            'update_dt',
-                        ];
-                        $resultSet[$key] = $this->changeKey->change_key($value, $oldKeyArr, $newKeyArr);
-
                         //Add Message
                         $resultSet[$key]['message'] = 'OK';
                     }
                 }
-
+    
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
@@ -494,7 +468,10 @@ class resources
                 $kojiFilepathId = $_POST['koji_filepath_id'];
                 $kojiFilepathFileKbnCd = $_POST['koji_filepath_file_kbn_cd'];
 
-                $sql = ' SELECT FILEPATH FROM T_KOJI_FILEPATH WHERE FILEPATH_ID="' . $kojiFilepathId . '" AND FILE_KBN_CD="' . $kojiFilepathFileKbnCd . '"';
+                $sql = 'SELECT FILEPATH 
+                        FROM T_KOJI_FILEPATH 
+                        WHERE FILEPATH_ID="' . $kojiFilepathId . '" 
+                            AND FILE_KBN_CD="' . $kojiFilepathFileKbnCd . '"';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();
@@ -1377,178 +1354,178 @@ class resources
         }
     }
 
-        // Net construction net preview contents
-        function getNetPreviewContents()
-        {
-            $this->dbReference = new systemConfig();
-            $this->dbConnect = $this->dbReference->connectDB();
-            if ($this->dbConnect == NULL) {
-                $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-            } else {
-                if (
-                    isset($_GET['koji_jyucyu_id']) && 
-                    isset($_GET['kbn_kbn_cd']) && 
-                    isset($_GET['kbn_kbnmsai_cd']) && 
-                    isset($_GET['koji_filepath_id']) && 
-                    isset($_GET['koji_filepath_file_kbn_cd']) && 
-                    $_GET['koji_filepath_file_kbn_cd'] == '3' || 
-                    $_GET['koji_filepath_file_kbn_cd'] == '4' || 
-                    $_GET['koji_filepath_file_kbn_cd'] == '5' || 
-                    $_GET['kbn_kbn_cd'] == '5'
-                ) {
-                    $kojiJyuCyuId = $_GET['koji_jyucyu_id'];
-                    $kbnKbnCd = $_GET['kbn_kbn_cd'];
-                    $kbnKbnmsaiCd = $_GET['kbn_kbnmsai_cd'];
-                    $kojiFilepathId = $_GET['koji_filepath_id'];
-                    $kojiFilePathFileKbnCd = $_GET['koji_filepath_file_kbn_cd'];
-    
-                    //Get data T_KOJI
-                    $sql = 'SELECT JYUCYU_ID, KOJI_JININ, KOJIHOMONJIKAN, KOJIHOMONJIKAN_END, KOJI_JIKAN, SETSAKI_ADDRESS, 
-                                KOJI_ITEM, SETSAKI_NAME, HOMON_TANT_NAME1, HOMON_TANT_NAME2, HOMON_TANT_NAME3, HOMON_TANT_NAME4, 
-                                ADD_TANTNM, T_KOJI.ADD_YMD, T_KOJI.UPD_TANTNM, T_KOJI.UPD_YMD, SITAMIIRAISYO_FILEPATH, MEMO, COMMENT, 
-                                M_KBN.KBNMSAI_NAME, T_KOJI_FILEPATH.FILEPATH 
-                            FROM T_KOJI 
-                            CROSS JOIN M_KBN
-                            ON T_KOJI.TAG_KBN = M_KBN.KBN_CD 
-                            CROSS JOIN T_KOJI_FILEPATH
-                            ON T_KOJI.JYUCYU_ID = T_KOJI_FILEPATH.ID 
-                            WHERE T_KOJI.JYUCYU_ID="' . $kojiJyuCyuId . '" 
-                                AND M_KBN.KBN_CD="'. $kbnKbnCd .'" 
-                                AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
-                                AND T_KOJI_FILEPATH.ID="'.$kojiFilepathId.'" 
-                                AND T_KOJI_FILEPATH.FILE_KBN_CD="'.$kojiFilePathFileKbnCd.'" 
-                                AND T_KOJI.DEL_FLG="0"';
-                    $this->result = $this->dbConnect->query($sql);
-    
-                    $resultSet = array();
-                    if ($this->result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $resultSet[] = $row;
-                        }
+    // Net construction net preview contents
+    function getNetPreviewContents()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['koji_jyucyu_id']) && 
+                isset($_GET['kbn_kbn_cd']) && 
+                isset($_GET['kbn_kbnmsai_cd']) && 
+                isset($_GET['koji_filepath_id']) && 
+                isset($_GET['koji_filepath_file_kbn_cd']) && 
+                $_GET['koji_filepath_file_kbn_cd'] == '3' || 
+                $_GET['koji_filepath_file_kbn_cd'] == '4' || 
+                $_GET['koji_filepath_file_kbn_cd'] == '5' || 
+                $_GET['kbn_kbn_cd'] == '5'
+            ) {
+                $kojiJyuCyuId = $_GET['koji_jyucyu_id'];
+                $kbnKbnCd = $_GET['kbn_kbn_cd'];
+                $kbnKbnmsaiCd = $_GET['kbn_kbnmsai_cd'];
+                $kojiFilepathId = $_GET['koji_filepath_id'];
+                $kojiFilePathFileKbnCd = $_GET['koji_filepath_file_kbn_cd'];
+
+                //Get data T_KOJI
+                $sql = 'SELECT JYUCYU_ID, KOJI_JININ, KOJIHOMONJIKAN, KOJIHOMONJIKAN_END, KOJI_JIKAN, SETSAKI_ADDRESS, 
+                            KOJI_ITEM, SETSAKI_NAME, HOMON_TANT_NAME1, HOMON_TANT_NAME2, HOMON_TANT_NAME3, HOMON_TANT_NAME4, 
+                            ADD_TANTNM, T_KOJI.ADD_YMD, T_KOJI.UPD_TANTNM, T_KOJI.UPD_YMD, SITAMIIRAISYO_FILEPATH, MEMO, COMMENT, 
+                            M_KBN.KBNMSAI_NAME, T_KOJI_FILEPATH.FILEPATH 
+                        FROM T_KOJI 
+                        CROSS JOIN M_KBN
+                        ON T_KOJI.TAG_KBN = M_KBN.KBN_CD 
+                        CROSS JOIN T_KOJI_FILEPATH
+                        ON T_KOJI.JYUCYU_ID = T_KOJI_FILEPATH.ID 
+                        WHERE T_KOJI.JYUCYU_ID="' . $kojiJyuCyuId . '" 
+                            AND M_KBN.KBN_CD="'. $kbnKbnCd .'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            AND T_KOJI_FILEPATH.ID="'.$kojiFilepathId.'" 
+                            AND T_KOJI_FILEPATH.FILE_KBN_CD="'.$kojiFilePathFileKbnCd.'" 
+                            AND T_KOJI.DEL_FLG="0"';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
                     }
-    
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
                 }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
-        
-        // Memo registration
-        function getMemoRegistration()
-        {
-            $this->dbReference = new systemConfig();
-            $this->dbConnect = $this->dbReference->connectDB();
-            if ($this->dbConnect == NULL) {
-                $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-            } else {
-                if (
-                    isset($_GET['tan_cal_id'])
-                ) {
-                    $tanCalId = $_GET['tan_cal_id'];
+    }
     
-                    //Get data T_KOJI
-                    $sql = 'SELECT MEMO_CD, YMD, START_TIME, END_TIME, NAIYO 
-                            FROM T_TBETUCALENDAR 
-                            WHERE TAN_CAL_ID="' . $tanCalId . '" 
-                                AND DEL_FLG="0"';
-                    $this->result = $this->dbConnect->query($sql);
-    
-                    $resultSet = array();
-                    if ($this->result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $resultSet[] = $row;
-                        }
+    // Memo registration
+    function getMemoRegistration()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['tan_cal_id'])
+            ) {
+                $tanCalId = $_GET['tan_cal_id'];
+
+                //Get data T_KOJI
+                $sql = 'SELECT MEMO_CD, YMD, START_TIME, END_TIME, NAIYO 
+                        FROM T_TBETUCALENDAR 
+                        WHERE TAN_CAL_ID="' . $tanCalId . '" 
+                            AND DEL_FLG="0"';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
                     }
-    
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
                 }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
-    
-        // Memo update
-        function postMemoUpdate()
-        {
-            $this->dbReference = new systemConfig();
-            $this->dbConnect = $this->dbReference->connectDB();
-            if ($this->dbConnect == NULL) {
-                $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-            } else {
-                if (
-                    isset($_POST['JYOKEN_CD']) && 
-                    isset($_POST['JYOKEN_SYBET_FLG']) && 
-                    isset($_POST['YMD'])
-                ) {
-                    $jyokenCd = $_POST['JYOKEN_CD'];
-                    $jyokenSybetFlg = $_POST['JYOKEN_SYBET_FLG'];
-                    $ymd = $_POST['YMD'];
-    
-                    //Get data T_KOJI
-                    $sql = 'SELECT TAN_CAL_ID, JYOKEN_CD, JYOKEN_SYBET_FLG, YMD, TAG_KBN, START_TIME, END_TIME, 
-                            MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, ADD_PGID, ADD_TANTCD, ADD_YMD, 
-                            UPD_PGID, UPD_TANTCD, UPD_YMD 
-                            FROM T_TBETUCALENDAR 
-                            WHERE JYOKEN_CD="' . $jyokenCd . '" 
-                                AND JYOKEN_SYBET_FLG="'. $jyokenSybetFlg .'" 
-                                AND YMD="'. $ymd .'"';
-                    $this->result = $this->dbConnect->query($sql);
-    
-                    $resultSet = array();
-                    if ($this->result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $resultSet[] = $row;
-                        }
+    }
+
+    // Memo update
+    function postMemoUpdate()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_POST['JYOKEN_CD']) && 
+                isset($_POST['JYOKEN_SYBET_FLG']) && 
+                isset($_POST['YMD'])
+            ) {
+                $jyokenCd = $_POST['JYOKEN_CD'];
+                $jyokenSybetFlg = $_POST['JYOKEN_SYBET_FLG'];
+                $ymd = $_POST['YMD'];
+
+                //Get data T_KOJI
+                $sql = 'SELECT TAN_CAL_ID, JYOKEN_CD, JYOKEN_SYBET_FLG, YMD, TAG_KBN, START_TIME, END_TIME, 
+                        MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, ADD_PGID, ADD_TANTCD, ADD_YMD, 
+                        UPD_PGID, UPD_TANTCD, UPD_YMD 
+                        FROM T_TBETUCALENDAR 
+                        WHERE JYOKEN_CD="' . $jyokenCd . '" 
+                            AND JYOKEN_SYBET_FLG="'. $jyokenSybetFlg .'" 
+                            AND YMD="'. $ymd .'"';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
                     }
-    
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
                 }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
-    
-        // Show holiday
-        function getShowHoliday()
-        {
-            $this->dbReference = new systemConfig();
-            $this->dbConnect = $this->dbReference->connectDB();
-            if ($this->dbConnect == NULL) {
-                $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-            } else {
-                if (
-                    isset($_GET['TANT_CD']) && 
-                    isset($_GET['HOLIDAY_YEAR'])
-                ) {
-                    $tantCd = $_GET['TANT_CD'];
-                    $holidayYear = $_GET['HOLIDAY_YEAR'];
-    
-                    //Get data T_KOJI
-                    $sql = 'SELECT HOLIDAY_JAN, HOLIDAY_FEB, HOIDAY_MAR, HOIDAY_APR, HOIDAY_MAY, HOIDAY_JUN, 
-                            HOIDAY_JUL, HOIDAY_AUG, HOIDAY_SEP, HOIDAY_OCT, HOIDAY_NOV, HOIDAY_DEC 
-                            FROM T_TBETUCALENDAR 
-                            WHERE TANT_CD="' . $tantCd . '" 
-                                AND HOLIDAY_YEAR="'. $holidayYear .'"';
-                    $this->result = $this->dbConnect->query($sql);
-    
-                    $resultSet = array();
-                    if ($this->result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $resultSet[] = $row;
-                        }
+    }
+
+    // Show holiday
+    function getShowHoliday()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['TANT_CD']) && 
+                isset($_GET['HOLIDAY_YEAR'])
+            ) {
+                $tantCd = $_GET['TANT_CD'];
+                $holidayYear = $_GET['HOLIDAY_YEAR'];
+
+                //Get data T_KOJI
+                $sql = 'SELECT HOLIDAY_JAN, HOLIDAY_FEB, HOIDAY_MAR, HOIDAY_APR, HOIDAY_MAY, HOIDAY_JUN, 
+                        HOIDAY_JUL, HOIDAY_AUG, HOIDAY_SEP, HOIDAY_OCT, HOIDAY_NOV, HOIDAY_DEC 
+                        FROM T_TBETUCALENDAR 
+                        WHERE TANT_CD="' . $tantCd . '" 
+                            AND HOLIDAY_YEAR="'. $holidayYear .'"';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
                     }
-    
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
                 }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
+    }
 
     // Default Page
     function getOnlinePreview(){
@@ -1606,6 +1583,290 @@ class resources
                 SETSAKI_NAME,
                 KOJIAPO_KBN,
                 KBNMSAI_NAME FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD WHERE KOJI_YMD="' . $KOJI_YMD . '" AND (HOMON_TANT_CD1= '.$HOMON_TANT_CD.' OR HOMON_TANT_CD2= '.$HOMON_TANT_CD.' OR HOMON_TANT_CD3= '.$HOMON_TANT_CD.') AND M_KBN.KBNMSAI_CD='.$KBNMSAI_CD.' AND KBN_CD= 05';
+                $this->result = $this->dbConnect->query($sql);                
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }                   
+                }              
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getSaleConstructionPreviewSalesOffice(){
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['YMD']) && 
+                isset($_GET['JYOKEN_CD']) && 
+                isset($_GET['JYOKEN_SYBET_FLG']) && 
+                isset($_GET['KBN_CD']) && 
+                isset($_GET['KBNMSAI_CD']) && 
+                $_GET['JYOKEN_SYBET_FLG'] == 0 && 
+                $_GET['KBN_CD'] == 10 
+            ) {
+                $eigyoAnkenYmd = $_GET['YMD'];
+                $eigyoAnkenJyokenCd = $_GET['JYOKEN_CD'];
+                $eigyoAnkenJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
+                $kbnKbnCd = $_GET['KBN_CD'];
+                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
+                $sql = ' SELECT START_TIME, END_TIME, GUEST_NAME, KBNMSAI_NAME, YOBIKOMOKU1
+                        FROM T_EIGYO_ANKEN 
+                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD 
+                        WHERE T_EIGYO_ANKEN.YMD="' . $eigyoAnkenYmd . '" 
+                            AND T_EIGYO_ANKEN.JYOKEN_CD="'.$eigyoAnkenJyokenCd.'" 
+                            AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="'.$eigyoAnkenJyokenSybetFlg.'" 
+                            AND M_KBN.KBN_CD="'.$kbnKbnCd.'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            ';
+                $this->result = $this->dbConnect->query($sql);                
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }                   
+                }              
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getSaleConstructionPreviewPersonInCharge(){
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['YMD']) && 
+                isset($_GET['JYOKEN_CD']) && 
+                isset($_GET['JYOKEN_SYBET_FLG']) && 
+                isset($_GET['KBN_CD']) && 
+                isset($_GET['KBNMSAI_CD']) && 
+                $_GET['JYOKEN_SYBET_FLG'] == 1 && 
+                $_GET['KBN_CD'] == 10 
+            ) {
+                $eigyoAnkenYmd = $_GET['YMD'];
+                $eigyoAnkenJyokenCd = $_GET['JYOKEN_CD'];
+                $eigyoAnkenJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
+                $kbnKbnCd = $_GET['KBN_CD'];
+                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
+                $sql = ' SELECT START_TIME, END_TIME, GUEST_NAME, KBNMSAI_NAME, YOBIKOMOKU1
+                        FROM T_EIGYO_ANKEN 
+                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD 
+                        WHERE T_EIGYO_ANKEN.YMD="' . $eigyoAnkenYmd . '" 
+                            AND T_EIGYO_ANKEN.JYOKEN_CD="'.$eigyoAnkenJyokenCd.'" 
+                            AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="'.$eigyoAnkenJyokenSybetFlg.'" 
+                            AND M_KBN.KBN_CD="'.$kbnKbnCd.'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            ';
+                $this->result = $this->dbConnect->query($sql);                
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }                   
+                }              
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getMemoPersonInCharge() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['YMD']) && 
+                isset($_GET['JYOKEN_CD']) && 
+                isset($_GET['JYOKEN_SYBET_FLG']) && 
+                isset($_GET['KBN_CD']) && 
+                isset($_GET['KBNMSAI_CD']) && 
+                $_GET['JYOKEN_SYBET_FLG'] == 0 && 
+                $_GET['KBN_CD'] == 6 
+            ) {
+                $tbetucalendarYmd = $_GET['YMD'];
+                $tbetucalendarJyokenCd = $_GET['JYOKEN_CD'];
+                $tbetucalendarJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
+                $kbnKbnCd = $_GET['KBN_CD'];
+                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
+                $sql = ' SELECT START_TIME, END_TIME, NAIYO, KBNMSAI_NAME, YOBIKOMOKU1
+                        FROM T_TBETUCALENDAR 
+                        CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD 
+                        WHERE T_TBETUCALENDAR.YMD="' . $tbetucalendarYmd . '" 
+                            AND T_TBETUCALENDAR.JYOKEN_CD="'.$tbetucalendarJyokenCd.'" 
+                            AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="'.$tbetucalendarJyokenSybetFlg.'" 
+                            AND M_KBN.KBN_CD="'.$kbnKbnCd.'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            ';
+                $this->result = $this->dbConnect->query($sql);                
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }                   
+                }              
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getMemoBusinessOffice() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['YMD']) && 
+                isset($_GET['JYOKEN_CD']) && 
+                isset($_GET['JYOKEN_SYBET_FLG']) && 
+                isset($_GET['KBN_CD']) && 
+                isset($_GET['KBNMSAI_CD']) && 
+                $_GET['JYOKEN_SYBET_FLG'] == 1 && 
+                $_GET['KBN_CD'] == 6 
+            ) {
+                $tbetucalendarYmd = $_GET['YMD'];
+                $tbetucalendarJyokenCd = $_GET['JYOKEN_CD'];
+                $tbetucalendarJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
+                $kbnKbnCd = $_GET['KBN_CD'];
+                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
+                $sql = ' SELECT START_TIME, END_TIME, NAIYO, KBNMSAI_NAME, YOBIKOMOKU1
+                        FROM T_TBETUCALENDAR 
+                        CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD 
+                        WHERE T_TBETUCALENDAR.YMD="' . $tbetucalendarYmd . '" 
+                            AND T_TBETUCALENDAR.JYOKEN_CD="'.$tbetucalendarJyokenCd.'" 
+                            AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="'.$tbetucalendarJyokenSybetFlg.'" 
+                            AND M_KBN.KBN_CD="'.$kbnKbnCd.'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            ';
+                $this->result = $this->dbConnect->query($sql);                
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }                   
+                }              
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getNikkiMinoru() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['KOJI_YMD']) && 
+                isset($_GET['HOMON_TANT_CD1']) && 
+                isset($_GET['HOMON_TANT_CD2']) && 
+                isset($_GET['HOMON_TANT_CD3']) && 
+                isset($_GET['HOMON_TANT_CD4']) && 
+                isset($_GET['TANT_CD']) && 
+                isset($_GET['KBN_CD']) && 
+                isset($_GET['KBNMSAI_CD']) && 
+                $_GET['KBN_CD'] == 16 && 
+                $_GET['KBNMSAI_CD'] == 1 
+            ) {
+                $kojiKojiYmd = $_GET['KOJI_YMD'];
+                $kojiHomonTantCd1 = $_GET['HOMON_TANT_CD1'];
+                $kojiHomonTantCd2 = $_GET['HOMON_TANT_CD2'];
+                $kojiHomonTantCd3 = $_GET['HOMON_TANT_CD3'];
+                $kojiHomonTantCd4 = $_GET['HOMON_TANT_CD4'];
+                $tantTantCd = $_GET['TANT_CD'];
+                $kbnKbnCd = $_GET['KBN_CD'];
+                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
+                $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, M_TANT.DAYLY_SALES, M_KBN.KBN_CD, M_KBN.KBNMSAI_CD
+                        FROM T_KOJI 
+                        CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD 
+                        CROSS JOIN M_TANT ON M_KBN.ADD_TANTCD=M_TANT.TANT_CD 
+                        WHERE T_KOJI.KOJI_YMD="' . $kojiKojiYmd . '" 
+                            AND T_KOJI.HOMON_TANT_CD1="'.$kojiHomonTantCd1.'" 
+                            AND T_KOJI.HOMON_TANT_CD2="'.$kojiHomonTantCd2.'" 
+                            AND T_KOJI.HOMON_TANT_CD3="'.$kojiHomonTantCd3.'" 
+                            AND T_KOJI.HOMON_TANT_CD4="'.$kojiHomonTantCd4.'" 
+                            AND M_TANT.TANT_CD="'.$tantTantCd.'" 
+                            AND M_KBN.KBN_CD="'.$kbnKbnCd.'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            ';
+                $this->result = $this->dbConnect->query($sql);                
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }                   
+                }              
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    function getEstimatedActual() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['KOJI_YMD']) && 
+                isset($_GET['HOMON_TANT_CD1']) && 
+                isset($_GET['HOMON_TANT_CD2']) && 
+                isset($_GET['HOMON_TANT_CD3']) && 
+                isset($_GET['HOMON_TANT_CD4']) && 
+                isset($_GET['TANT_CD']) && 
+                isset($_GET['KBN_CD']) && 
+                isset($_GET['KBNMSAI_CD']) && 
+                $_GET['KBN_CD'] == 16 && 
+                $_GET['KBNMSAI_CD'] == 1 
+            ) {
+                $kojiKojiYmd = $_GET['KOJI_YMD'];
+                $kojiHomonTantCd1 = $_GET['HOMON_TANT_CD1'];
+                $kojiHomonTantCd2 = $_GET['HOMON_TANT_CD2'];
+                $kojiHomonTantCd3 = $_GET['HOMON_TANT_CD3'];
+                $kojiHomonTantCd4 = $_GET['HOMON_TANT_CD4'];
+                $tantTantCd = $_GET['TANT_CD'];
+                $kbnKbnCd = $_GET['KBN_CD'];
+                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
+                $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, M_TANT.MONTHLY_SALES, M_KBN.KBN_CD, M_KBN.KBNMSAI_CD
+                        FROM T_KOJI 
+                        CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD 
+                        CROSS JOIN M_TANT ON M_KBN.ADD_TANTCD=M_TANT.TANT_CD 
+                        WHERE T_KOJI.KOJI_YMD="' . $kojiKojiYmd . '" 
+                            AND T_KOJI.HOMON_TANT_CD1="'.$kojiHomonTantCd1.'" 
+                            AND T_KOJI.HOMON_TANT_CD2="'.$kojiHomonTantCd2.'" 
+                            AND T_KOJI.HOMON_TANT_CD3="'.$kojiHomonTantCd3.'" 
+                            AND T_KOJI.HOMON_TANT_CD4="'.$kojiHomonTantCd4.'" 
+                            AND M_TANT.TANT_CD="'.$tantTantCd.'" 
+                            AND M_KBN.KBN_CD="'.$kbnKbnCd.'" 
+                            AND M_KBN.KBNMSAI_CD="'.$kbnKbnmsaiCd.'" 
+                            ';
                 $this->result = $this->dbConnect->query($sql);                
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {

@@ -1561,10 +1561,11 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['SITAMI_YMD'])) {
+            if (isset($_GET['SITAMI_YMD']) && isset($_GET['SYOZOKU_CD'])) {
                 $SITAMI_YMD = $_GET['SITAMI_YMD'];
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($SITAMI_YMD)));
                 $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($SITAMI_YMD)));
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
                 $sql = ' SELECT JYUCYU_ID,
                 T_KOJI.SITAMIHOMONJIKAN,
                 T_KOJI.SITAMIHOMONJIKAN_END,
@@ -1575,7 +1576,8 @@ class resources
                 M_KBN.KBNMSAI_NAME,
                 M_TANT.TANT_CD,
                 M_TANT.TANT_NAME,
-                T_KOJI.SITAMI_YMD
+                T_KOJI.SITAMI_YMD,
+                M_TANT.SYOZOKU_CD
                 FROM T_KOJI 
                 LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
                 LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
@@ -1583,7 +1585,9 @@ class resources
                     AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
                     AND M_TANT.TANT_CD IS NOT NULL 
                     AND M_KBN.KBN_CD="05"
+                    AND M_TANT.SYOZOKU_CD="'.$SYOZOKU_CD.'"
                 ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
+                // echo $sql; die;
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -1603,8 +1607,6 @@ class resources
                         $resultSet[$TANT_CD][$SITAMI_YMD][] = $data;
                     }
                 }
-                echo '<pre>',print_r($resultSet,1),'</pre>';
-                die;                
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
@@ -1619,34 +1621,95 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['KOJI_YMD']) && isset($_GET['HOMON_TANT_CD']) && isset($_GET['KBNMSAI_CD'])
-            ) {
+            if (isset($_GET['KOJI_YMD']) && isset($_GET['SYOZOKU_CD'])) {
                 $KOJI_YMD = $_GET['KOJI_YMD'];
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($KOJI_YMD)));
                 $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($KOJI_YMD)));
-                $HOMON_TANT_CD = $_GET['HOMON_TANT_CD'];
-                $KBNMSAI_CD = $_GET['KBNMSAI_CD'];
-                $sql = ' SELECT JYUCYU_ID,
-                KOJIHOMONJIKAN,
-                KOJIHOMONJIKAN_END,
-                SETSAKI_ADDRESS,
-                KOJI_ITEM,
-                SETSAKI_NAME,
-                KOJIAPO_KBN,
-                KBNMSAI_NAME 
-                FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD  
-                WHERE KOJI_YMD>="' . $start_date . '"  
-                    AND KOJI_YMD<="' . $end_date . '" 
-                    AND (HOMON_TANT_CD1= ' . $HOMON_TANT_CD . ' OR HOMON_TANT_CD2= ' . $HOMON_TANT_CD . ' OR HOMON_TANT_CD3= ' . $HOMON_TANT_CD . ') 
-                    AND M_KBN.KBNMSAI_CD=' . $KBNMSAI_CD . ' AND KBN_CD= 5';
+                $sql = ' SELECT T_KOJI.JYUCYU_ID,
+                T_KOJI.KOJIHOMONJIKAN,
+                T_KOJI.KOJIHOMONJIKAN_END,
+                T_KOJI.SETSAKI_ADDRESS,
+                T_KOJI.KOJI_ITEM,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.KOJIAPO_KBN,            
+                M_KBN.KBNMSAI_NAME,
+                M_TANT1.TANT_CD AS TANT_CD1,
+                M_TANT1.TANT_NAME AS TANT_NAME1,
+                M_TANT2.TANT_CD AS TANT_CD2,
+                M_TANT2.TANT_NAME AS TANT_NAME2,
+                M_TANT3.TANT_CD AS TANT_CD3,
+                M_TANT3.TANT_NAME AS TANT_NAME3,
+                T_KOJI.KOJI_YMD
+                FROM T_KOJI 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
+                LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
+                    AND (T_KOJI.HOMON_TANT_CD1 IS NOT NULL OR T_KOJI.HOMON_TANT_CD2 IS NOT NULL OR T_KOJI.HOMON_TANT_CD3 IS NOT NULL)                     
+                    AND (M_TANT1.TANT_CD IS NOT NULL OR M_TANT2.TANT_CD IS NOT NULL OR M_TANT3.TANT_CD IS NOT NULL  )
+                    AND M_KBN.KBN_CD="05"
+                    AND (M_TANT1.SYOZOKU_CD="'.$SYOZOKU_CD.'" OR M_TANT2.SYOZOKU_CD="'.$SYOZOKU_CD.'" OR M_TANT3.SYOZOKU_CD="'.$SYOZOKU_CD.'")
+                ORDER BY TANT_CD1 ASC, TANT_CD2 ASC , TANT_CD3 ASC ,T_KOJI.SITAMI_YMD ASC';          
+                // echo $sql; die;  
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $TANT_CD1 = $row['TANT_CD1'];
+                        $TANT_CD2 = $row['TANT_CD2'];
+                        $TANT_CD3 = $row['TANT_CD3'];
+                        if (!empty($TANT_CD1)) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $resultSet[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $resultSet[$TANT_CD1][$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($TANT_CD2)) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $resultSet[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $resultSet[$TANT_CD2][$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($TANT_CD3)) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $resultSet[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $resultSet[$TANT_CD3][$KOJI_YMD][] = $data;
+                        }                        
+                        // $resultSet[] = $row;
                     }
+                    echo '<pre>', print_r($resultSet, 1), '</pre>';
+                    die;
                 }
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -2092,7 +2155,7 @@ class resources
             }
         }
     }
-    
+
     function getNoticeMaterialsOrderApplication()
     {
         $this->dbReference = new systemConfig();
@@ -2120,7 +2183,8 @@ class resources
         }
     }
 
-    function getPressTheNewCommentAlreadyReadButton(){
+    function getPressTheNewCommentAlreadyReadButton()
+    {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {

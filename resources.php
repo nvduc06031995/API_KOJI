@@ -1561,35 +1561,50 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['SITAMI_YMD']) && isset($_GET['HOMON_TANT_CD']) && isset($_GET['KBNMSAI_CD'])
-            ) {
+            if (isset($_GET['SITAMI_YMD'])) {
                 $SITAMI_YMD = $_GET['SITAMI_YMD'];
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($SITAMI_YMD)));
                 $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($SITAMI_YMD)));
-                $HOMON_TANT_CD = $_GET['HOMON_TANT_CD'];
-                $KBNMSAI_CD = $_GET['KBNMSAI_CD'];
                 $sql = ' SELECT JYUCYU_ID,
-                SITAMIHOMONJIKAN,
-                SITAMIHOMONJIKAN_END,
-                SETSAKI_ADDRESS,
-                KOJI_ITEM,
-                SETSAKI_NAME,
-                SITAMIAPO_KBN,
-                KBNMSAI_NAME 
-                FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
-                WHERE SITAMI_YMD>="' . $start_date . '" 
-                    AND SITAMI_YMD<="' . $end_date . '" 
-                    AND HOMON_TANT_CD4="' . $HOMON_TANT_CD . '" 
-                    AND M_KBN.KBNMSAI_CD="' . $KBNMSAI_CD . '"';
+                T_KOJI.SITAMIHOMONJIKAN,
+                T_KOJI.SITAMIHOMONJIKAN_END,
+                T_KOJI.SETSAKI_ADDRESS,
+                T_KOJI.KOJI_ITEM,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.SITAMIAPO_KBN,
+                M_KBN.KBNMSAI_NAME,
+                M_TANT.TANT_CD,
+                M_TANT.TANT_NAME,
+                T_KOJI.SITAMI_YMD
+                FROM T_KOJI 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
+                LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
+                    AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
+                    AND M_TANT.TANT_CD IS NOT NULL 
+                    AND M_KBN.KBN_CD="05"
+                ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $TANT_CD = $row['TANT_CD'];
+                        $SITAMI_YMD = $row['SITAMI_YMD'];
+                        $resultSet[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
+                        $data = array();
+                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $resultSet[$TANT_CD][$SITAMI_YMD][] = $data;
                     }
                 }
+                echo '<pre>',print_r($resultSet,1),'</pre>';
+                die;                
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
@@ -1620,11 +1635,11 @@ class resources
                 SETSAKI_NAME,
                 KOJIAPO_KBN,
                 KBNMSAI_NAME 
-                FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.ADD_TANTCD=M_KBN.ADD_TANTCD 
+                FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD  
                 WHERE KOJI_YMD>="' . $start_date . '"  
                     AND KOJI_YMD<="' . $end_date . '" 
                     AND (HOMON_TANT_CD1= ' . $HOMON_TANT_CD . ' OR HOMON_TANT_CD2= ' . $HOMON_TANT_CD . ' OR HOMON_TANT_CD3= ' . $HOMON_TANT_CD . ') 
-                    AND M_KBN.KBNMSAI_CD=' . $KBNMSAI_CD . ' AND KBN_CD= 05';
+                    AND M_KBN.KBNMSAI_CD=' . $KBNMSAI_CD . ' AND KBN_CD= 5';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {

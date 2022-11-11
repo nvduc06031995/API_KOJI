@@ -72,6 +72,7 @@ class resources
         }
     }
 
+    //依頼書
     function getRequestForm()
     {
         $this->dbReference = new systemConfig();
@@ -79,12 +80,30 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['FILEPATH_ID']) && isset($_GET['FILE_KBN_CD'])) {
+            if (isset($_GET['JYUCYU_ID'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $FILEPATH_ID = $_GET['FILEPATH_ID'];
-                $FILE_KBN_CD = $_GET['FILE_KBN_CD'];
-                $sql = 'SELECT SITAMIIRAISYO_FILEPATH,
-                FILEPATH FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID WHERE JYUCYU_ID= ' . $JYUCYU_ID . ' AND FILEPATH_ID=' . $FILEPATH_ID . ' AND FILE_KBN_CD=' . $FILE_KBN_CD . ' AND T_KOJI.DEL_FLG IS NULL AND T_KOJI_FILEPATH.DEL_FLG IS NULL';
+                $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
+                T_KOJI_FILEPATH.FILEPATH 
+                FROM T_KOJI 
+                LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                WHERE JYUCYU_ID= ' . $JYUCYU_ID . '                 
+                AND T_KOJI.DEL_FLG IS NULL 
+                AND T_KOJI_FILEPATH.DEL_FLG IS NULL';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row                    
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
+                FILEPATH 
+                FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                WHERE SYUYAKU_JYUCYU_ID= ' . $SYUYAKU_JYUCYU_ID . '                
+                AND T_KOJI.DEL_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -111,16 +130,7 @@ class resources
                 $SYUYAKU_JYUCYU_ID = $_GET['SYUYAKU_JYUCYU_ID'];
                 $FILEPATH_ID = $_GET['FILEPATH_ID'];
                 $FILE_KBN_CD = $_GET['FILE_KBN_CD'];
-                $sql = 'SELECT KOJIIRAISYO_FILEPATH,
-                FILEPATH FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.SYUYAKU_JYUCYU_ID=T_KOJI_FILEPATH.ID WHERE SYUYAKU_JYUCYU_ID= ' . $SYUYAKU_JYUCYU_ID . ' AND FILEPATH_ID=' . $FILEPATH_ID . ' AND FILE_KBN_CD=' . $FILE_KBN_CD . '  AND T_KOJI.DEL_FLG IS NULL';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
+
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');

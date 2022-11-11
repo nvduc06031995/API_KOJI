@@ -465,6 +465,7 @@ class resources
         }
     }
 
+    //写真確認
     function getPhotoConfirm()
     {
         $this->dbReference = new systemConfig();
@@ -472,18 +473,19 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            // $_POST['koji_filepath_id']: required
-            // $_POST['koji_filepath_file_kbn_cd']: required
+            // $_GET['koji_filepath_id']: required
+            // $_GET['koji_filepath_file_kbn_cd']: required
             if (
-                isset($_POST['koji_filepath_id']) &&
-                isset($_POST['koji_filepath_file_kbn_cd']) &&
-                $_POST['koji_filepath_file_kbn_cd'] == '5'
+                isset($_GET['koji_filepath_id'])
             ) {
 
-                $kojiFilepathId = $_POST['koji_filepath_id'];
-                $kojiFilepathFileKbnCd = $_POST['koji_filepath_file_kbn_cd'];
+                $kojiFilepathId = $_GET['koji_filepath_id'];
 
-                $sql = ' SELECT FILEPATH FROM T_KOJI_FILEPATH WHERE FILEPATH_ID="' . $kojiFilepathId . '" AND FILE_KBN_CD="' . $kojiFilepathFileKbnCd . '"';
+                $sql = ' SELECT FILEPATH 
+                    FROM T_KOJI_FILEPATH 
+                    WHERE FILEPATH_ID="' . $kojiFilepathId . '" 
+                        AND FILE_KBN_CD="05"
+                    ';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();

@@ -42,6 +42,7 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
+                        $row['TYPE'] = 'SITAMI';
                         $resultSet[] = $row;
                     }
                 }
@@ -59,12 +60,14 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet2[] = $row;
+                        $row['TYPE'] = 'KOJI';
+                        $resultSet2 = $row;
                     }
                 }
-                $data = [];
-                $data['SITAMI'][] = $resultSet;
-                $data['KOJI'][] = $resultSet2;
+                $data = array();
+                array_push($data , $resultSet);
+                array_push($data , $resultSet2);
+                
                 $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
@@ -1548,12 +1551,12 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (isset($_GET['YMD'])) {
-                $data = [];
+                $data_general = [];
                 //【ネット下見】
                 $YMD = $_GET['YMD'];
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
                 $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($YMD)));
-                $sql = ' SELECT JYUCYU_ID,
+                $sql = ' SELECT T_KOJI.JYUCYU_ID,
                 T_KOJI.SITAMIHOMONJIKAN,
                 T_KOJI.SITAMIHOMONJIKAN_END,
                 T_KOJI.SETSAKI_ADDRESS,
@@ -1589,6 +1592,7 @@ class resources
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                         $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['TYPE'] = 1;
                         $resultSet[$TANT_CD][$SITAMI_YMD][] = $data;
                     }
                 }
@@ -1620,7 +1624,7 @@ class resources
                     AND M_KBN.KBN_CD="05"
                 ORDER BY TANT_CD1 ASC, TANT_CD2 ASC , TANT_CD3 ASC ,T_KOJI.SITAMI_YMD ASC';
                 $this->result = $this->dbConnect->query($sql2);
-                $resultSet2 = array();
+                //$resultSet2 = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -1629,7 +1633,6 @@ class resources
                         $TANT_CD3 = $row['TANT_CD3'];
                         if (!empty($TANT_CD1)) {
                             $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet2[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1639,12 +1642,15 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $resultSet2[$TANT_CD1][$KOJI_YMD][] = $data;
+                            $data['TYPE'] = 2;                            
+                            if(empty($resultSet[$TANT_CD1])){
+                                $resultSet[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1']; 
+                            }
+                            $resultSet[$TANT_CD1][$KOJI_YMD][] = $data;
                         }
 
                         if (!empty($TANT_CD2)) {
                             $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet2[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1654,12 +1660,16 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $resultSet2[$TANT_CD2][$KOJI_YMD][] = $data;
+                            $data['TYPE'] = 2;
+                            if(empty($resultSet[$TANT_CD2])){
+                                $resultSet[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2']; 
+                            }
+                            $resultSet[$TANT_CD2][$KOJI_YMD][] = $data;
                         }
 
                         if (!empty($TANT_CD3)) {
                             $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet2[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
+                            //$resultSet2[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1669,12 +1679,22 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $resultSet2[$TANT_CD3][$KOJI_YMD][] = $data;
+                            $data['TYPE'] = 2;
+                            if(empty($resultSet[$TANT_CD3])){
+                                $resultSet[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3']; 
+                            }
+                            $resultSet[$TANT_CD3][$KOJI_YMD][] = $data;
                         }
                     }
                 }
-                $data['user_Id']['date']['type1'];
-                $data['user_Id']['date']['type2'];
+
+            //     echo '<pre>',print_r($resultSet,1),'</pre>';
+            //     // echo '<pre>',print_r($resultSet2,1),'</pre>';
+            //     die;
+
+
+            //    // array_push($data_general , $resultSet);
+            //    // array_push($data_general , $resultSet2);
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');

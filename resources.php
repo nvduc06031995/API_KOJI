@@ -1775,6 +1775,7 @@ class resources
         }
     }
 
+    //【営業工事・営業下見（営業所欄）】
     function getSaleConstructionPreviewSalesOffice()
     {
         $this->dbReference = new systemConfig();
@@ -1784,26 +1785,17 @@ class resources
         } else {
             if (
                 isset($_GET['YMD']) &&
-                isset($_GET['JYOKEN_CD']) &&
-                isset($_GET['JYOKEN_SYBET_FLG']) &&
-                isset($_GET['KBN_CD']) &&
-                isset($_GET['KBNMSAI_CD']) &&
-                $_GET['JYOKEN_SYBET_FLG'] == 0 &&
-                $_GET['KBN_CD'] == 10
+                isset($_GET['JYOKEN_CD'])
             ) {
                 $eigyoAnkenYmd = $_GET['YMD'];
                 $eigyoAnkenJyokenCd = $_GET['JYOKEN_CD'];
-                $eigyoAnkenJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
-                $kbnKbnCd = $_GET['KBN_CD'];
-                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
                 $sql = ' SELECT START_TIME, END_TIME, GUEST_NAME, KBNMSAI_NAME, YOBIKOMOKU1
                         FROM T_EIGYO_ANKEN 
-                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD 
+                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD 
                         WHERE T_EIGYO_ANKEN.YMD="' . $eigyoAnkenYmd . '" 
                             AND T_EIGYO_ANKEN.JYOKEN_CD="' . $eigyoAnkenJyokenCd . '" 
-                            AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="' . $eigyoAnkenJyokenSybetFlg . '" 
-                            AND M_KBN.KBN_CD="' . $kbnKbnCd . '" 
-                            AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
+                            AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
+                            AND M_KBN.KBN_CD="10"
                             ';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
@@ -1820,6 +1812,7 @@ class resources
         }
     }
 
+    // 【営業工事・営業下見（担当者欄）】
     function getSaleConstructionPreviewPersonInCharge()
     {
         $this->dbReference = new systemConfig();
@@ -1829,26 +1822,17 @@ class resources
         } else {
             if (
                 isset($_GET['YMD']) &&
-                isset($_GET['JYOKEN_CD']) &&
-                isset($_GET['JYOKEN_SYBET_FLG']) &&
-                isset($_GET['KBN_CD']) &&
-                isset($_GET['KBNMSAI_CD']) &&
-                $_GET['JYOKEN_SYBET_FLG'] == 1 &&
-                $_GET['KBN_CD'] == 10
+                isset($_GET['JYOKEN_CD'])
             ) {
                 $eigyoAnkenYmd = $_GET['YMD'];
                 $eigyoAnkenJyokenCd = $_GET['JYOKEN_CD'];
-                $eigyoAnkenJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
-                $kbnKbnCd = $_GET['KBN_CD'];
-                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
                 $sql = ' SELECT START_TIME, END_TIME, GUEST_NAME, KBNMSAI_NAME, YOBIKOMOKU1
                         FROM T_EIGYO_ANKEN 
-                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD 
+                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD 
                         WHERE T_EIGYO_ANKEN.YMD="' . $eigyoAnkenYmd . '" 
                             AND T_EIGYO_ANKEN.JYOKEN_CD="' . $eigyoAnkenJyokenCd . '" 
-                            AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="' . $eigyoAnkenJyokenSybetFlg . '" 
-                            AND M_KBN.KBN_CD="' . $kbnKbnCd . '" 
-                            AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
+                            AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
+                            AND M_KBN.KBN_CD="10" 
                             ';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
@@ -1865,6 +1849,7 @@ class resources
         }
     }
 
+    //【メモ（担当者欄）】
     function getMemoPersonInCharge()
     {
         $this->dbReference = new systemConfig();
@@ -1874,26 +1859,17 @@ class resources
         } else {
             if (
                 isset($_GET['YMD']) &&
-                isset($_GET['JYOKEN_CD']) &&
-                isset($_GET['JYOKEN_SYBET_FLG']) &&
-                isset($_GET['KBN_CD']) &&
-                isset($_GET['KBNMSAI_CD']) &&
-                $_GET['JYOKEN_SYBET_FLG'] == 0 &&
-                $_GET['KBN_CD'] == 6
+                isset($_GET['JYOKEN_CD'])
             ) {
                 $tbetucalendarYmd = $_GET['YMD'];
                 $tbetucalendarJyokenCd = $_GET['JYOKEN_CD'];
-                $tbetucalendarJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
-                $kbnKbnCd = $_GET['KBN_CD'];
-                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
                 $sql = ' SELECT START_TIME, END_TIME, NAIYO, KBNMSAI_NAME, YOBIKOMOKU1
                         FROM T_TBETUCALENDAR 
-                        CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD 
+                        CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD 
                         WHERE T_TBETUCALENDAR.YMD="' . $tbetucalendarYmd . '" 
                             AND T_TBETUCALENDAR.JYOKEN_CD="' . $tbetucalendarJyokenCd . '" 
-                            AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="' . $tbetucalendarJyokenSybetFlg . '" 
-                            AND M_KBN.KBN_CD="' . $kbnKbnCd . '" 
-                            AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
+                            AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="0" 
+                            AND M_KBN.KBN_CD="6" 
                             ';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
@@ -1910,6 +1886,7 @@ class resources
         }
     }
 
+    // 【メモ（営業所欄）】
     function getMemoBusinessOffice()
     {
         $this->dbReference = new systemConfig();
@@ -1919,26 +1896,17 @@ class resources
         } else {
             if (
                 isset($_GET['YMD']) &&
-                isset($_GET['JYOKEN_CD']) &&
-                isset($_GET['JYOKEN_SYBET_FLG']) &&
-                isset($_GET['KBN_CD']) &&
-                isset($_GET['KBNMSAI_CD']) &&
-                $_GET['JYOKEN_SYBET_FLG'] == 1 &&
-                $_GET['KBN_CD'] == 6
+                isset($_GET['JYOKEN_CD'])
             ) {
                 $tbetucalendarYmd = $_GET['YMD'];
                 $tbetucalendarJyokenCd = $_GET['JYOKEN_CD'];
-                $tbetucalendarJyokenSybetFlg = $_GET['JYOKEN_SYBET_FLG'];
-                $kbnKbnCd = $_GET['KBN_CD'];
-                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
                 $sql = ' SELECT START_TIME, END_TIME, NAIYO, KBNMSAI_NAME, YOBIKOMOKU1
                         FROM T_TBETUCALENDAR 
-                        CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD 
+                        CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD 
                         WHERE T_TBETUCALENDAR.YMD="' . $tbetucalendarYmd . '" 
                             AND T_TBETUCALENDAR.JYOKEN_CD="' . $tbetucalendarJyokenCd . '" 
-                            AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="' . $tbetucalendarJyokenSybetFlg . '" 
-                            AND M_KBN.KBN_CD="' . $kbnKbnCd . '" 
-                            AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
+                            AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="1" 
+                            AND M_KBN.KBN_CD="6" 
                             ';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
@@ -1955,6 +1923,7 @@ class resources
         }
     }
 
+    //【日予実】
     function getNikkiMinoru()
     {
         $this->dbReference = new systemConfig();
@@ -1964,15 +1933,15 @@ class resources
         } else {
             if (
                 isset($_GET['KOJI_YMD']) &&
-                isset($_GET['HOMON_TANT_CD1']) &&
-                isset($_GET['HOMON_TANT_CD2']) &&
-                isset($_GET['HOMON_TANT_CD3']) &&
-                isset($_GET['HOMON_TANT_CD4']) &&
+                (
+                    isset($_GET['HOMON_TANT_CD1']) ||
+                    isset($_GET['HOMON_TANT_CD2']) ||
+                    isset($_GET['HOMON_TANT_CD3']) ||
+                    isset($_GET['HOMON_TANT_CD4'])
+                ) &&
                 isset($_GET['TANT_CD']) &&
                 isset($_GET['KBN_CD']) &&
-                isset($_GET['KBNMSAI_CD']) &&
-                $_GET['KBN_CD'] == 16 &&
-                $_GET['KBNMSAI_CD'] == 1
+                isset($_GET['KBNMSAI_CD'])
             ) {
                 $kojiKojiYmd = $_GET['KOJI_YMD'];
                 $kojiHomonTantCd1 = $_GET['HOMON_TANT_CD1'];
@@ -1987,13 +1956,13 @@ class resources
                         CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD 
                         CROSS JOIN M_TANT ON M_KBN.ADD_TANTCD=M_TANT.TANT_CD 
                         WHERE T_KOJI.KOJI_YMD="' . $kojiKojiYmd . '" 
-                            AND T_KOJI.HOMON_TANT_CD1="' . $kojiHomonTantCd1 . '" 
-                            AND T_KOJI.HOMON_TANT_CD2="' . $kojiHomonTantCd2 . '" 
-                            AND T_KOJI.HOMON_TANT_CD3="' . $kojiHomonTantCd3 . '" 
-                            AND T_KOJI.HOMON_TANT_CD4="' . $kojiHomonTantCd4 . '" 
+                            AND (T_KOJI.HOMON_TANT_CD1 IS NOT NULL 
+                            OR T_KOJI.HOMON_TANT_CD2 IS NOT NULL 
+                            OR T_KOJI.HOMON_TANT_CD3 IS NOT NULL 
+                            OR T_KOJI.HOMON_TANT_CD4 IS NOT NULL) 
                             AND M_TANT.TANT_CD="' . $tantTantCd . '" 
-                            AND M_KBN.KBN_CD="' . $kbnKbnCd . '" 
-                            AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
+                            AND M_KBN.KBN_CD="16" 
+                            AND M_KBN.KBNMSAI_CD="1" 
                             ';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
@@ -2010,6 +1979,8 @@ class resources
         }
     }
 
+
+    //【計予実】
     function getEstimatedActual()
     {
         $this->dbReference = new systemConfig();
@@ -2019,36 +1990,28 @@ class resources
         } else {
             if (
                 isset($_GET['KOJI_YMD']) &&
-                isset($_GET['HOMON_TANT_CD1']) &&
-                isset($_GET['HOMON_TANT_CD2']) &&
-                isset($_GET['HOMON_TANT_CD3']) &&
-                isset($_GET['HOMON_TANT_CD4']) &&
-                isset($_GET['TANT_CD']) &&
-                isset($_GET['KBN_CD']) &&
-                isset($_GET['KBNMSAI_CD']) &&
-                $_GET['KBN_CD'] == 16 &&
-                $_GET['KBNMSAI_CD'] == 1
+                (
+                    isset($_GET['HOMON_TANT_CD1']) ||
+                    isset($_GET['HOMON_TANT_CD2']) ||
+                    isset($_GET['HOMON_TANT_CD3']) ||
+                    isset($_GET['HOMON_TANT_CD4'])
+                ) &&
+                isset($_GET['TANT_CD'])
             ) {
                 $kojiKojiYmd = $_GET['KOJI_YMD'];
-                $kojiHomonTantCd1 = $_GET['HOMON_TANT_CD1'];
-                $kojiHomonTantCd2 = $_GET['HOMON_TANT_CD2'];
-                $kojiHomonTantCd3 = $_GET['HOMON_TANT_CD3'];
-                $kojiHomonTantCd4 = $_GET['HOMON_TANT_CD4'];
                 $tantTantCd = $_GET['TANT_CD'];
-                $kbnKbnCd = $_GET['KBN_CD'];
-                $kbnKbnmsaiCd = $_GET['KBNMSAI_CD'];
                 $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, M_TANT.MONTHLY_SALES, M_KBN.KBN_CD, M_KBN.KBNMSAI_CD
                         FROM T_KOJI 
                         CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD 
                         CROSS JOIN M_TANT ON M_KBN.ADD_TANTCD=M_TANT.TANT_CD 
                         WHERE T_KOJI.KOJI_YMD="' . $kojiKojiYmd . '" 
-                            AND T_KOJI.HOMON_TANT_CD1="' . $kojiHomonTantCd1 . '" 
-                            AND T_KOJI.HOMON_TANT_CD2="' . $kojiHomonTantCd2 . '" 
-                            AND T_KOJI.HOMON_TANT_CD3="' . $kojiHomonTantCd3 . '" 
-                            AND T_KOJI.HOMON_TANT_CD4="' . $kojiHomonTantCd4 . '" 
+                            AND (T_KOJI.HOMON_TANT_CD1 IS NOT NULL 
+                            OR T_KOJI.HOMON_TANT_CD2 IS NOT NULL 
+                            OR T_KOJI.HOMON_TANT_CD3 IS NOT NULL 
+                            OR T_KOJI.HOMON_TANT_CD4 IS NOT NULL) 
                             AND M_TANT.TANT_CD="' . $tantTantCd . '" 
-                            AND M_KBN.KBN_CD="' . $kbnKbnCd . '" 
-                            AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
+                            AND M_KBN.KBN_CD="16" 
+                            AND M_KBN.KBNMSAI_CD="1" 
                             ';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();

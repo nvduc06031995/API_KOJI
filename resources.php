@@ -19,7 +19,7 @@ class resources
     function __destruct()
     {
     }
-
+    //工事一覧
     function getConstructionList()
     {
         $this->dbReference = new systemConfig();
@@ -27,9 +27,8 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['SITAMI_YMD']) && isset($_GET['KOJI_YMD'])) {
-                $SITAMI_YMD = $_GET['SITAMI_YMD'];
-                $KOJI_YMD = $_GET['KOJI_YMD'];
+            if (isset($_GET['YMD'])) {
+                $YMD = $_GET['YMD'];
                 $sql = 'SELECT SITAMIHOMONJIKAN,
                 HOMON_SBT,
                 JYUCYU_ID,
@@ -37,7 +36,7 @@ class resources
                 SITAMI_JIKAN,
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
-                SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $SITAMI_YMD . '" AND KOJI_YMD="' . $KOJI_YMD . '" AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG IS NULL';
+                SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -46,40 +45,27 @@ class resources
                         $resultSet[] = $row;
                     }
                 }
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-            }
-        }
-    }
-
-    function getConstructionList2()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_GET['KOJI_YMD']) && isset($_GET['user_id'])) {
-                $KOJI_YMD = $_GET['KOJI_YMD'];
-                $user_id = $_GET['user_id'];
-                $sql = 'SELECT KOJIHOMONJIKAN,
+                
+                $sql2 = 'SELECT KOJIHOMONJIKAN,
                 HOMON_SBT,
                 JYUCYU_ID,
                 KOJI_JININ,
                 KOJI_JIKAN,
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
-                SETSAKI_NAME FROM T_KOJI WHERE KOJI_YMD="' . $KOJI_YMD . '" AND (HOMON_TANT_CD1=' . $user_id . ' OR HOMON_TANT_CD2=' . $user_id . ' OR HOMON_TANT_CD3=' . $user_id . ') AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG IS NULL';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
+                SETSAKI_NAME FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '" AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG= 0';
+                $this->result = $this->dbConnect->query($sql2);
+                $resultSet2 = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet2[] = $row;
                     }
                 }
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $data = [];
+                $data['SITAMI'][] = $resultSet;
+                $data['KOJI'][] = $resultSet2;
+                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
             }
@@ -1553,7 +1539,7 @@ class resources
     }
 
     // Default Page
-    //【ネット下見】
+    
     function getOnlinePreview()
     {
         $this->dbReference = new systemConfig();
@@ -1561,11 +1547,12 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['SITAMI_YMD']) && isset($_GET['SYOZOKU_CD'])) {
-                $SITAMI_YMD = $_GET['SITAMI_YMD'];
-                $start_date = date("Y-m-d", strtotime('monday this week', strtotime($SITAMI_YMD)));
-                $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($SITAMI_YMD)));
-                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+            if (isset($_GET['YMD'])) {
+                $data = [];
+                //【ネット下見】
+                $YMD = $_GET['YMD'];
+                $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
+                $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($YMD)));
                 $sql = ' SELECT JYUCYU_ID,
                 T_KOJI.SITAMIHOMONJIKAN,
                 T_KOJI.SITAMIHOMONJIKAN_END,
@@ -1585,9 +1572,7 @@ class resources
                     AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
                     AND M_TANT.TANT_CD IS NOT NULL 
                     AND M_KBN.KBN_CD="05"
-                    AND M_TANT.SYOZOKU_CD="'.$SYOZOKU_CD.'"
                 ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
-                // echo $sql; die;
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -1607,26 +1592,8 @@ class resources
                         $resultSet[$TANT_CD][$SITAMI_YMD][] = $data;
                     }
                 }
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
-    //【ネット工事】
-    function getNetConstruction()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_GET['KOJI_YMD']) && isset($_GET['SYOZOKU_CD'])) {
-                $KOJI_YMD = $_GET['KOJI_YMD'];
-                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
-                $start_date = date("Y-m-d", strtotime('monday this week', strtotime($KOJI_YMD)));
-                $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($KOJI_YMD)));
-                $sql = ' SELECT T_KOJI.JYUCYU_ID,
+                //【ネット工事】
+                $sql2 = ' SELECT T_KOJI.JYUCYU_ID,
                 T_KOJI.KOJIHOMONJIKAN,
                 T_KOJI.KOJIHOMONJIKAN_END,
                 T_KOJI.SETSAKI_ADDRESS,
@@ -1651,11 +1618,9 @@ class resources
                     AND (T_KOJI.HOMON_TANT_CD1 IS NOT NULL OR T_KOJI.HOMON_TANT_CD2 IS NOT NULL OR T_KOJI.HOMON_TANT_CD3 IS NOT NULL)                     
                     AND (M_TANT1.TANT_CD IS NOT NULL OR M_TANT2.TANT_CD IS NOT NULL OR M_TANT3.TANT_CD IS NOT NULL  )
                     AND M_KBN.KBN_CD="05"
-                    AND (M_TANT1.SYOZOKU_CD="'.$SYOZOKU_CD.'" OR M_TANT2.SYOZOKU_CD="'.$SYOZOKU_CD.'" OR M_TANT3.SYOZOKU_CD="'.$SYOZOKU_CD.'")
-                ORDER BY TANT_CD1 ASC, TANT_CD2 ASC , TANT_CD3 ASC ,T_KOJI.SITAMI_YMD ASC';          
-                // echo $sql; die;  
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
+                ORDER BY TANT_CD1 ASC, TANT_CD2 ASC , TANT_CD3 ASC ,T_KOJI.SITAMI_YMD ASC';
+                $this->result = $this->dbConnect->query($sql2);
+                $resultSet2 = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -1664,7 +1629,7 @@ class resources
                         $TANT_CD3 = $row['TANT_CD3'];
                         if (!empty($TANT_CD1)) {
                             $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
+                            $resultSet2[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1674,12 +1639,12 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $resultSet[$TANT_CD1][$KOJI_YMD][] = $data;
+                            $resultSet2[$TANT_CD1][$KOJI_YMD][] = $data;
                         }
 
                         if (!empty($TANT_CD2)) {
                             $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2'];
+                            $resultSet2[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1689,12 +1654,12 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $resultSet[$TANT_CD2][$KOJI_YMD][] = $data;
+                            $resultSet2[$TANT_CD2][$KOJI_YMD][] = $data;
                         }
 
                         if (!empty($TANT_CD3)) {
                             $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
+                            $resultSet2[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1704,19 +1669,34 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $resultSet[$TANT_CD3][$KOJI_YMD][] = $data;
-                        }                        
-                        // $resultSet[] = $row;
+                            $resultSet2[$TANT_CD3][$KOJI_YMD][] = $data;
+                        }
                     }
-                    echo '<pre>', print_r($resultSet, 1), '</pre>';
-                    die;
                 }
+                $data['user_Id']['date']['type1'];
+                $data['user_Id']['date']['type2'];
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
     }
+
+    // function getNetConstruction()
+    // {
+    //     $this->dbReference = new systemConfig();
+    //     $this->dbConnect = $this->dbReference->connectDB();
+    //     if ($this->dbConnect == NULL) {
+    //         $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+    //     } else {
+    //         if ( isset($_GET['SYOZOKU_CD'])) {
+
+    //             $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    //         } else {
+    //             $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+    //         }
+    //     }
+    // }
     //【協力店舗/営業所名プルダウン】
     function getCollaboratingStore()
     {

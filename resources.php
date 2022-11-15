@@ -80,8 +80,8 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['JYUCYU_ID'])) {
-                $JYUCYU_ID = $_GET['JYUCYU_ID'];
+            if (isset($_GET['ID'])) {
+                $ID = $_GET['ID'];
                 $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                 T_KOJI_FILEPATH.FILEPATH 
                 FROM T_KOJI 
@@ -98,7 +98,7 @@ class resources
                     }
                 }
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+            } else if (isset($_GET['ID'])) {
                 $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
                 FILEPATH 
                 FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
@@ -138,6 +138,7 @@ class resources
         }
     }
 
+    // 写真提出
     function getPhotoSubmission()
     {
         $this->dbReference = new systemConfig();
@@ -163,6 +164,7 @@ class resources
         }
     }
 
+    //写真提出-登録
     function getPhotoSubmissionRegistration()
     {
         $this->dbReference = new systemConfig();
@@ -1125,11 +1127,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['JYUCYU_ID'])
-            ) {
+            if (isset($_GET['JYUCYU_ID'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql = ' SELECT TAG_KBN,
+                $sql = 'SELECT TAG_KBN,
                 SITAMIHOMONJIKAN,
                 SITAMIHOMONJIKAN_END,
                 KOJI_JININ,
@@ -1139,14 +1139,12 @@ class resources
                 UPD_YMD,
                 MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
-                $data = array();
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['SITAMI'][] = $row;
                     }
-                    array_push($data, $resultSet);
                 }
 
                 $sql2 = ' SELECT TAG_KBN,
@@ -1159,16 +1157,23 @@ class resources
                 UPD_YMD,
                 MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
                 $this->result2 = $this->dbConnect->query($sql2);
-                $resultSet2 = array();
                 if ($this->result2->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result2->fetch_assoc()) {
-                        $resultSet2[] = $row;
+                        $resultSet['KOJI'][] = $row;
                     }
-                    array_push($data, $resultSet2);
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $sql3 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 05 AND DEL_FLG= 0';
+                $this->result = $this->dbConnect->query($sql3);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['PULLDOWN'][] = $row;
+                    }
+                }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1182,9 +1187,7 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_POST['JYUCYU_ID'])
-            ) {
+            if (isset($_POST['JYUCYU_ID'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $sql = ' SELECT TAG_KBN,
                 SITAMIAPO_KBN,
@@ -1199,14 +1202,12 @@ class resources
                 UPD_YMD,
                 MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
                 $this->result = $this->dbConnect->query($sql);
-                $data = array();
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['SITAMI'][] = $row;
                     }
-                    array_push($data, $resultSet);
                 }
 
                 $sql2 = ' SELECT TAG_KBN,
@@ -1221,17 +1222,15 @@ class resources
                 UPD_TANTCD,               
                 UPD_YMD,
                 MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
-                $this->result2 = $this->dbConnect->query($sql2);
-                $resultSet2 = array();
-                if ($this->result2->num_rows > 0) {
+                $this->result = $this->dbConnect->query($sql2);
+                if ($this->result->num_rows > 0) {
                     // output data of each row
-                    while ($row = $this->result2->fetch_assoc()) {
-                        $resultSet2[] = $row;
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['KOJI'][] = $row;
                     }
-                    array_push($data, $resultSet2);
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1245,9 +1244,7 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['TAN_EIG_ID'])
-            ) {
+            if (isset($_GET['TAN_EIG_ID'])) {
                 $TAN_EIG_ID = $_GET['TAN_EIG_ID'];
                 $sql = ' SELECT TAG_KBN,
                 YMD, 
@@ -1260,20 +1257,30 @@ class resources
                 ATTEND_NAME2,
                 ATTEND_NAME3 FROM T_EIGYO_ANKEN WHERE TAN_EIG_ID= ' . $TAN_EIG_ID . ' AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
-
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['EIGYO_ANKEN'][] = $row;
                     }
                 }
+
+                $sql2 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 10 AND DEL_FLG= 0';
+                $this->result = $this->dbConnect->query($sql2);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['PULLDOWN'][] = $row;
+                    }
+                }
+
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
     }
+    
     // 営業工事営業下見内容更新
     function postSalesConstructionSalesPreviewUpdate()
     {

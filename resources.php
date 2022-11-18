@@ -1187,24 +1187,24 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_POST['JYUCYU_ID'])) {
+            if (isset($_POST['JYUCYU_ID']) && isset($_POST['TAG_KBN'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $TAG_KBN = $_POST['TAG_KBN'];
-                $KBN = $_POST['KBN'];
-                $JIKAN = $_POST['JIKAN'];
-                $JIKAN_END = $_POST['JIKAN_END'];
-                $JININ = $_POST['JININ'];
-                $KANSAN_POINT = $_POST['KANSAN_POINT'];
-                $ALL_DAY_FLG = $_POST['ALL_DAY_FLG'];
+                $KBN = isset($_POST['KBN']) ? $_POST['UPD_TANTCD'] : NULL;
+                $JIKAN = isset($_POST['JIKAN']) ? $_POST['UPD_TANTCD'] : NULL;
+                $JIKAN_END = isset($_POST['JIKAN_END']) ? $_POST['UPD_TANTCD'] : NULL;
+                $JININ = isset($_POST['JININ']) ? $_POST['UPD_TANTCD'] : NULL;
+                $KANSAN_POINT = isset($_POST['KANSAN_POINT']) ? $_POST['UPD_TANTCD'] : NULL;
+                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? $_POST['UPD_TANTCD'] : NULL;
                 $SKJ_RENKEI_YMD = date("Y-m-d");
                 $UPD_PGID = 'KOJ1110F';
                 $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
                 $UPD_YMD = date("Y-m-d H:i:s");
-                $MEMO = $_POST['MEMO'];
+                $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
                 if (in_array($TAG_KBN, ["02", "04", "06"])) {
                     $sql = ' UPDATE T_KOJI
                     SET TAG_KBN="' . $TAG_KBN . '",
-                    SITAMIAPO_KBN=' . $KBN . ',
+                    SITAMIAPO_KBN="' . $KBN . '",
                     SITAMIHOMONJIKAN="' . $JIKAN . '",
                     SITAMIHOMONJIKAN_END="' . $JIKAN_END . '",
                     SITAMI_JININ=' . $JININ . ',
@@ -1212,10 +1212,11 @@ class resources
                     ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
                     SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
                     UPD_PGID= "' . $UPD_PGID . '",
-                    UPD_TANTCD=' . $UPD_TANTCD . ',
+                    UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '",
                     MEMO="' . $MEMO . '"
                     WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    echo $sql; die;
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }

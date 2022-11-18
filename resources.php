@@ -1120,65 +1120,65 @@ class resources
         }
     }
     //ネット工事ネット下見内容詳細
-    function getNetConstructionNetPreviewContentsDetails()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_GET['JYUCYU_ID'])) {
-                $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql = 'SELECT TAG_KBN,
-                SITAMIHOMONJIKAN,
-                SITAMIHOMONJIKAN_END,
-                KOJI_JININ,
-                SITAMI_JIKAN,
-                SITAMIAPO_KBN,
-                UPD_TANTNM,
-                UPD_YMD,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['SITAMI'][] = $row;
-                    }
-                }
+    // function getNetConstructionNetPreviewContentsDetails()
+    // {
+    //     $this->dbReference = new systemConfig();
+    //     $this->dbConnect = $this->dbReference->connectDB();
+    //     if ($this->dbConnect == NULL) {
+    //         $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+    //     } else {
+    //         if (isset($_GET['JYUCYU_ID'])) {
+    //             $JYUCYU_ID = $_GET['JYUCYU_ID'];
+    //             $sql = 'SELECT TAG_KBN,
+    //             SITAMIHOMONJIKAN,
+    //             SITAMIHOMONJIKAN_END,
+    //             KOJI_JININ,
+    //             SITAMI_JIKAN,
+    //             SITAMIAPO_KBN,
+    //             UPD_TANTNM,
+    //             UPD_YMD,
+    //             MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
+    //             $this->result = $this->dbConnect->query($sql);
+    //             $resultSet = array();
+    //             if ($this->result->num_rows > 0) {
+    //                 // output data of each row
+    //                 while ($row = $this->result->fetch_assoc()) {
+    //                     $resultSet['SITAMI'][] = $row;
+    //                 }
+    //             }
 
-                $sql2 = ' SELECT TAG_KBN,
-                KOJIHOMONJIKAN,
-                KOJIHOMONJIKAN_END,
-                KOJI_JININ,
-                KOJI_JIKAN,
-                KOJIAPO_KBN,
-                UPD_TANTNM,
-                UPD_YMD,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
-                $this->result2 = $this->dbConnect->query($sql2);
-                if ($this->result2->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result2->fetch_assoc()) {
-                        $resultSet['KOJI'][] = $row;
-                    }
-                }
+    //             $sql2 = ' SELECT TAG_KBN,
+    //             KOJIHOMONJIKAN,
+    //             KOJIHOMONJIKAN_END,
+    //             KOJI_JININ,
+    //             KOJI_JIKAN,
+    //             KOJIAPO_KBN,
+    //             UPD_TANTNM,
+    //             UPD_YMD,
+    //             MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
+    //             $this->result2 = $this->dbConnect->query($sql2);
+    //             if ($this->result2->num_rows > 0) {
+    //                 // output data of each row
+    //                 while ($row = $this->result2->fetch_assoc()) {
+    //                     $resultSet['KOJI'][] = $row;
+    //                 }
+    //             }
 
-                $sql3 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 05 AND DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql3);
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['PULLDOWN'][] = $row;
-                    }
-                }
+    //             $sql3 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 05 AND DEL_FLG= 0';
+    //             $this->result = $this->dbConnect->query($sql3);
+    //             if ($this->result->num_rows > 0) {
+    //                 // output data of each row
+    //                 while ($row = $this->result->fetch_assoc()) {
+    //                     $resultSet['PULLDOWN'][] = $row;
+    //                 }
+    //             }
 
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
+    //             $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    //         } else {
+    //             $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+    //         }
+    //     }
+    // }
     //ネット工事ネット下見内容更新
     function postNetConstructionNetPreviewContentsUpdate()
     {
@@ -1189,48 +1189,55 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $sql = ' SELECT TAG_KBN,
-                SITAMIAPO_KBN,
-                SITAMIHOMONJIKAN,
-                SITAMIHOMONJIKAN_END,
-                SITAMI_JININ,
-                SITAMI_KANSAN_POINT,
-                ALL_DAY_FLG,
-                SKJ_RENKEI_YMD,
-                UPD_PGID,
-                UPD_TANTCD,                
-                UPD_YMD,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['SITAMI'][] = $row;
-                    }
+                $TAG_KBN = $_POST['TAG_KBN'];
+                $KBN = $_POST['KBN'];
+                $JIKAN = $_POST['JIKAN'];
+                $JIKAN_END = $_POST['JIKAN_END'];
+                $JININ = $_POST['JININ'];
+                $KANSAN_POINT = $_POST['KANSAN_POINT'];
+                $ALL_DAY_FLG = $_POST['ALL_DAY_FLG'];
+                $SKJ_RENKEI_YMD = date("Y-m-d");
+                $UPD_PGID = 'KOJ1110F';
+                $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
+                $UPD_YMD = date("Y-m-d H:i:s");
+                $MEMO = $_POST['MEMO'];
+                if (in_array($TAG_KBN, ["02", "04", "06"])) {
+                    $sql = ' UPDATE T_KOJI
+                    SET TAG_KBN="' . $TAG_KBN . '",
+                    SITAMIAPO_KBN=' . $KBN . ',
+                    SITAMIHOMONJIKAN="' . $JIKAN . '",
+                    SITAMIHOMONJIKAN_END="' . $JIKAN_END . '",
+                    SITAMI_JININ=' . $JININ . ',
+                    SITAMI_KANSAN_POINT=' . $KANSAN_POINT . ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
+                    SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
+                    UPD_PGID= "' . $UPD_PGID . '",
+                    UPD_TANTCD=' . $UPD_TANTCD . ',
+                    UPD_YMD="' . $UPD_YMD . '",
+                    MEMO="' . $MEMO . '"
+                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    $this->result = $this->dbConnect->query($sql);
+                    $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
 
-                $sql2 = ' SELECT TAG_KBN,
-                KOJIAPO_KBN,
-                KOJIHOMONJIKAN,
-                KOJIHOMONJIKAN_END,
-                KOJI_JININ,
-                KOJI_KANSAN_POINT,
-                ALL_DAY_FLG,
-                SKJ_RENKEI_YMD,
-                UPD_PGID,
-                UPD_TANTCD,               
-                UPD_YMD,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
-                $this->result = $this->dbConnect->query($sql2);
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['KOJI'][] = $row;
-                    }
+                if (in_array($TAG_KBN, ["01", "03", "05"])) {
+                    $sql = 'UPDATE T_KOJI 
+                    SET TAG_KBN="' . $TAG_KBN . '",
+                    KOJIAPO_KBN=' . $KBN . ',
+                    KOJIHOMONJIKAN="' . $JIKAN . '",
+                    KOJIHOMONJIKAN_END="' . $JIKAN_END . '",
+                    KOJI_JININ=' . $JININ . ',
+                    KOJI_KANSAN_POINT=' . $KANSAN_POINT . ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
+                    SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
+                    UPD_PGID= "' . $UPD_PGID . '",
+                    UPD_TANTCD=' . $UPD_TANTCD . ',            
+                    UPD_YMD="' . $UPD_YMD . '",
+                    MEMO="' . $MEMO . '"  
+                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    $this->result = $this->dbConnect->query($sql);
+                    $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
-
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1280,7 +1287,7 @@ class resources
             }
         }
     }
-    
+
     // 営業工事営業下見内容更新
     function postSalesConstructionSalesPreviewUpdate()
     {

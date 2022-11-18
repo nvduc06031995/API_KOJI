@@ -1223,7 +1223,7 @@ class resources
                 if (in_array($TAG_KBN, ["01", "03", "05"])) {
                     $sql = 'UPDATE T_KOJI 
                     SET TAG_KBN="' . $TAG_KBN . '",
-                    KOJIAPO_KBN=' . $KBN . ',
+                    KOJIAPO_KBN="' . $KBN . '",
                     KOJIHOMONJIKAN="' . $JIKAN . '",
                     KOJIHOMONJIKAN_END="' . $JIKAN_END . '",
                     KOJI_JININ=' . $JININ . ',
@@ -1231,7 +1231,7 @@ class resources
                     ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
                     SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
                     UPD_PGID= "' . $UPD_PGID . '",
-                    UPD_TANTCD=' . $UPD_TANTCD . ',            
+                    UPD_TANTCD="' . $UPD_TANTCD . '",            
                     UPD_YMD="' . $UPD_YMD . '",
                     MEMO="' . $MEMO . '"  
                     WHERE JYUCYU_ID=' . $JYUCYU_ID . '';

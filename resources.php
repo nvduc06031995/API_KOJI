@@ -1120,65 +1120,68 @@ class resources
         }
     }
     //ネット工事ネット下見内容詳細
-    // function getNetConstructionNetPreviewContentsDetails()
-    // {
-    //     $this->dbReference = new systemConfig();
-    //     $this->dbConnect = $this->dbReference->connectDB();
-    //     if ($this->dbConnect == NULL) {
-    //         $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-    //     } else {
-    //         if (isset($_GET['JYUCYU_ID'])) {
-    //             $JYUCYU_ID = $_GET['JYUCYU_ID'];
-    //             $sql = 'SELECT TAG_KBN,
-    //             SITAMIHOMONJIKAN,
-    //             SITAMIHOMONJIKAN_END,
-    //             KOJI_JININ,
-    //             SITAMI_JIKAN,
-    //             SITAMIAPO_KBN,
-    //             UPD_TANTNM,
-    //             UPD_YMD,
-    //             MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
-    //             $this->result = $this->dbConnect->query($sql);
-    //             $resultSet = array();
-    //             if ($this->result->num_rows > 0) {
-    //                 // output data of each row
-    //                 while ($row = $this->result->fetch_assoc()) {
-    //                     $resultSet['SITAMI'][] = $row;
-    //                 }
-    //             }
+    function getNetConstructionNetPreviewContentsDetails()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (isset($_GET['JYUCYU_ID'])) {
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
+                $sql_get_tagkbn = 'SELECT TAG_KBN FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                echo $sql_get_tagkbn;
+                die;
+                $sql = 'SELECT TAG_KBN,
+                SITAMIHOMONJIKAN,
+                SITAMIHOMONJIKAN_END,
+                KOJI_JININ,
+                SITAMI_JIKAN,
+                SITAMIAPO_KBN,
+                UPD_TANTNM,
+                UPD_YMD,
+                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['SITAMI'][] = $row;
+                    }
+                }
 
-    //             $sql2 = ' SELECT TAG_KBN,
-    //             KOJIHOMONJIKAN,
-    //             KOJIHOMONJIKAN_END,
-    //             KOJI_JININ,
-    //             KOJI_JIKAN,
-    //             KOJIAPO_KBN,
-    //             UPD_TANTNM,
-    //             UPD_YMD,
-    //             MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
-    //             $this->result2 = $this->dbConnect->query($sql2);
-    //             if ($this->result2->num_rows > 0) {
-    //                 // output data of each row
-    //                 while ($row = $this->result2->fetch_assoc()) {
-    //                     $resultSet['KOJI'][] = $row;
-    //                 }
-    //             }
+                $sql2 = ' SELECT TAG_KBN,
+                KOJIHOMONJIKAN,
+                KOJIHOMONJIKAN_END,
+                KOJI_JININ,
+                KOJI_JIKAN,
+                KOJIAPO_KBN,
+                UPD_TANTNM,
+                UPD_YMD,
+                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
+                $this->result2 = $this->dbConnect->query($sql2);
+                if ($this->result2->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result2->fetch_assoc()) {
+                        $resultSet['KOJI'][] = $row;
+                    }
+                }
 
-    //             $sql3 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 05 AND DEL_FLG= 0';
-    //             $this->result = $this->dbConnect->query($sql3);
-    //             if ($this->result->num_rows > 0) {
-    //                 // output data of each row
-    //                 while ($row = $this->result->fetch_assoc()) {
-    //                     $resultSet['PULLDOWN'][] = $row;
-    //                 }
-    //             }
+                $sql3 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 05 AND DEL_FLG= 0';
+                $this->result = $this->dbConnect->query($sql3);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['PULLDOWN'][] = $row;
+                    }
+                }
 
-    //             $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-    //         } else {
-    //             $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-    //         }
-    //     }
-    // }
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
     //ネット工事ネット下見内容更新
     function postNetConstructionNetPreviewContentsUpdate()
     {
@@ -1297,67 +1300,117 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])
+                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG'])
             ) {
                 $YMD = $_POST['YMD'];
                 $JYOKEN_CD = $_POST['JYOKEN_CD'];
-                $sql = ' SELECT TAN_EIG_ID,
-                JYOKEN_CD,
-                JYOKEN_SYBET_FLG,
-                YMD,
-                TAG_KBN,
-                START_TIME,
-                END_TIME,
-                JININ,
-                JIKAN,
-                GUEST_NAME,                
-                ATTEND_NAME1,
-                ATTEND_NAME2,
-                ATTEND_NAME3,
-                ALL_DAY_FLG,
-                RENKEI_YMD,
-                ADD_PGID,
-                ADD_TANTCD,
-                ADD_YMD,
-                UPD_PGID,
-                UPD_TANTCD,
-                UPD_YMD FROM T_EIGYO_ANKEN WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= 0';
-                $this->result = $this->dbConnect->query($sql);
-                $data = array();
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                    array_push($data, $resultSet);
-                }
+                $JYOKEN_SYBET_FLG = $_POST['JYOKEN_SYBET_FLG'];
 
-                $sql2 = ' SELECT TAG_KBN,
-                START_TIME,
-                END_TIME,
-                JININ,
-                JIKAN,
-                GUEST_NAME,
-                ATTEND_NAME1,
-                ATTEND_NAME2,
-                ATTEND_NAME3,
-                ALL_DAY_FLG,
-                RENKEI_YMD,
-                UPD_PGID,               
-                UPD_TANTCD,
-                UPD_YMD  FROM T_EIGYO_ANKEN WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= 0';
-                $this->result2 = $this->dbConnect->query($sql2);
-                $resultSet2 = array();
-                if ($this->result2->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result2->fetch_assoc()) {
-                        $resultSet2[] = $row;
-                    }
-                    array_push($data, $resultSet2);
-                }
+                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
+                $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
+                $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
+                $JININ = isset($_POST['JININ']) ? '"' . $_POST['JININ'] . '"' : 'NULL';
+                $JIKAN = isset($_POST['JIKAN']) ? '"' . $_POST['JIKAN'] . '"' : 'NULL';
+                $GUEST_NAME = isset($_POST['GUEST_NAME']) ? '"' . $_POST['GUEST_NAME'] . '"' : 'NULL';
+                $ATTEND_NAME1 = isset($_POST['ATTEND_NAME1']) ? '"' . $_POST['ATTEND_NAME1'] . '"' : 'NULL';
+                $ATTEND_NAME2 = isset($_POST['ATTEND_NAME2']) ? '"' . $_POST['ATTEND_NAME2'] . '"' : 'NULL';
+                $ATTEND_NAME3 = isset($_POST['ATTEND_NAME3']) ? '"' . $_POST['ATTEND_NAME3'] . '"' : 'NULL';
+                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
+                $RENKEI_YMD = isset($_POST['RENKEI_YMD']) ? '"' . $_POST['RENKEI_YMD'] . '"' : 'NULL';
+                $ADD_PGID = "KOJ1110F";
+                $ADD_TANTCD = isset($_POST['ADD_TANTCD']) ? '"' . $_POST['ADD_TANTCD'] . '"' : '00001';
+                $ADD_YMD = date('Y-m-d H:i:s');
+                $UPD_PGID = "KOJ1110F";
+                $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? '"' . $_POST['UPD_TANTCD'] . '"' : '00001';
+                $UPD_YMD  = date('Y-m-d H:i:s');
+                $query_eigyo_anken = 'SELECT TAN_EIG_ID 
+                FROM T_EIGYO_ANKEN 
+                WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . '';
+                $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
 
-                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if ($count_eigyo_anken->num_rows > 0) {
+                    $sql = ' UPDATE T_EIGYO_ANKEN
+                    SET                     
+                    TAG_KBN=' . $TAG_KBN . ',
+                    START_TIME=' . $START_TIME . ',
+                    END_TIME=' . $END_TIME . ',
+                    JININ=' . $JININ . ',
+                    JIKAN=' . $JIKAN . ',
+                    GUEST_NAME=' . $GUEST_NAME . ',
+                    ATTEND_NAME1=' . $ATTEND_NAME1 . ',
+                    ATTEND_NAME2=' . $ATTEND_NAME2 . ',
+                    ATTEND_NAME3=' . $ATTEND_NAME3 . ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
+                    RENKEI_YMD=' . $RENKEI_YMD . ',
+                    UPD_PGID="' . $UPD_PGID . '",
+                    UPD_TANTCD=' . $UPD_TANTCD . ',
+                    UPD_YMD="' . $UPD_YMD . '" 
+                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
+                    echo $sql;
+                    die;
+                    $this->result = $this->dbConnect->query($sql);
+                    $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    //Caculate TAN_EIG_ID                    
+                    $query_max_tan_eig_id = 'SELECT max(TAN_EIG_ID) as TANCALID_MAX
+                    FROM T_EIGYO_ANKEN';
+                    $rs_max = $this->dbConnect->query($query_max_tan_eig_id);
+                    $num = 0;
+                    if ($rs_max->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $rs_max->fetch_assoc()) {
+                            $num = (int)$row['TANCALID_MAX'] + 1;
+                        }
+                    }
+
+                    $TAN_EIG_ID = sprintf('%010d', $num);                   
+                    $sql = 'INSERT INTO T_EIGYO_ANKEN 
+                    (
+                    TAN_EIG_ID,
+                    JYOKEN_CD,
+                    JYOKEN_SYBET_FLG,
+                    YMD,
+                    TAG_KBN,
+                    START_TIME,
+                    END_TIME,
+                    JININ,
+                    JIKAN,
+                    GUEST_NAME,
+                    ATTEND_NAME1,
+                    ATTEND_NAME2,
+                    ATTEND_NAME3,
+                    ALL_DAY_FLG,                    
+                    ADD_PGID,
+                    ADD_TANTCD,
+                    ADD_YMD,
+                    UPD_PGID,
+                    UPD_TANTCD,
+                    UPD_YMD                      
+                    )
+                    VALUES (
+                    ' . $TAN_EIG_ID . ',
+                    ' . $JYOKEN_CD . ',
+                    ' . $JYOKEN_SYBET_FLG . ',
+                    "' . $YMD . '",
+                    ' . $TAG_KBN . ',
+                    ' . $START_TIME . ',
+                    ' . $END_TIME . ',
+                    ' . $JININ . ',
+                    ' . $JIKAN . ',
+                    ' . $GUEST_NAME . ',
+                    ' . $ATTEND_NAME1 . ',
+                    ' . $ATTEND_NAME2 . ',
+                    ' . $ATTEND_NAME3 . ',
+                    ' . $ALL_DAY_FLG . ',                    
+                    "' . $ADD_PGID . '",
+                    ' . $ADD_TANTCD . ',
+                    "' . $ADD_YMD . '",
+                    "' . $UPD_PGID . '",
+                    ' . $UPD_TANTCD . ',
+                    "' . $UPD_YMD . '" )';                 
+                    $this->result = $this->dbConnect->query($sql);
+                    $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1584,6 +1637,7 @@ class resources
                 T_KOJI.KOJI_ITEM,
                 T_KOJI.SETSAKI_NAME,
                 T_KOJI.SITAMIAPO_KBN,
+                T_KOJI.ALL_DAY_FLG
                 M_KBN.KBNMSAI_NAME,
                 M_TANT.TANT_CD,
                 M_TANT.TANT_NAME,
@@ -1625,7 +1679,8 @@ class resources
                 T_KOJI.SETSAKI_ADDRESS,
                 T_KOJI.KOJI_ITEM,
                 T_KOJI.SETSAKI_NAME,
-                T_KOJI.KOJIAPO_KBN,            
+                T_KOJI.KOJIAPO_KBN,   
+                T_KOJI.ALL_DAY_FLG         
                 M_KBN.KBNMSAI_NAME,
                 M_TANT1.TANT_CD AS TANT_CD1,
                 M_TANT1.TANT_NAME AS TANT_NAME1,

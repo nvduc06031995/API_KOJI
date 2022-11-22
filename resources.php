@@ -1710,13 +1710,12 @@ class resources
                         M_KBN.YOBIKOMOKU1, 
                         M_KBN.KBNMSAI_NAME
                         FROM T_EIGYO_ANKEN 
-                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD                        
+                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"                   
                         WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
                             AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '" 
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
-                            AND M_KBN.KBN_CD="10"
-                            AND M_KBN.KBNMSAI_CD="01" ';
+                            AND M_KBN.KBN_CD="10"';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
@@ -1739,13 +1738,11 @@ class resources
                  M_KBN.KBNMSAI_NAME, 
                  M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
-                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD
+                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="1" AND M_KBN.KBNMSAI_CD="01"
                  WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
                      AND T_TBETUCALENDAR.YMD <= "' . $end_date . '" 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
-                     AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="1" 
-                     AND M_KBN.KBN_CD="06"
-                     AND M_KBN.KBNMSAI_CD="01" ';
+                     AND M_KBN.KBN_CD="06"';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
@@ -1788,13 +1785,12 @@ class resources
                     T_KOJI.SITAMI_YMD,
                     M_TANT.SYOZOKU_CD
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="02"
                     LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
                     AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
                     AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '
                     AND M_KBN.KBN_CD="05"
-                    AND M_KBN.KBNMSAI_CD="02"
                     ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
@@ -1835,15 +1831,14 @@ class resources
                     M_TANT3.TANT_NAME AS TANT_NAME3,
                     T_KOJI.KOJI_YMD
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
                         AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                         AND (M_TANT1.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT2.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT3.TANT_CD=' . $v['TANT_CD'] . ' )
-                        AND M_KBN.KBN_CD="05"
-                        AND M_KBN.KBNMSAI_CD="01"';
+                        AND M_KBN.KBN_CD="05"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row
@@ -1921,14 +1916,11 @@ class resources
                     M_TANT.TANT_NAME, 
                     M_TANT.TANT_CD
                     FROM T_EIGYO_ANKEN 
-                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD
-                    CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.SYOZOKUBUSYO_CD
+                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
+                    CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
                     AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '"
-                    AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG=0
-                    AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '
-                    AND M_KBN.KBN_CD="10"
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                    AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row
@@ -1956,18 +1948,17 @@ class resources
                     M_KBN.YOBIKOMOKU1,
                     M_TANT.TANT_CD          
                     FROM T_TBETUCALENDAR 
-                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD
-                    CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.SYOZOKUBUSYO_CD
+                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
+                    CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
-                    AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"                     
-                    AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
+                    AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"                                         
                     AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '
-                    AND M_KBN.KBN_CD="06"
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                    AND M_KBN.KBN_CD="06"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
+                            $TANT_CD = $row['TANT_CD'];
                             $TBETUCALENDAR_YMD = $row['YMD'];
                             $data = array();
                             $data['START_TIME'] = $row['START_TIME'];
@@ -1998,7 +1989,7 @@ class resources
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -2006,8 +1997,7 @@ class resources
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT2.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT3.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT4.TANT_CD=' . $v['TANT_CD'] . ' )
-                    AND M_KBN.KBN_CD="16" 
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                    AND M_KBN.KBN_CD="16"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row
@@ -2044,7 +2034,7 @@ class resources
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -2052,8 +2042,7 @@ class resources
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT2.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT3.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT4.TANT_CD=' . $v['TANT_CD'] . ' )
-                    AND M_KBN.KBN_CD="16" 
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                    AND M_KBN.KBN_CD="16" ';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row
@@ -2082,13 +2071,285 @@ class resources
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['GROUP']['PULLDOWN_OFFICE'] = $row;
                     }
-                }         
+                }
 
                 $data_final = array();
                 foreach ($resultSet as $key => $value) {
                     $data_final[] = $value;
                 }
                 $this->dbReference->sendResponse(200, json_encode($data_final, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+    // Default Page For One Person
+    function getDefaultPerson()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (isset($_GET['YMD']) && isset($_GET['ID'])) {
+                $YMD = $_GET['YMD'];
+                $ID = $_GET['ID'];
+                $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
+                $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($YMD)));
+
+                $sql = 'SELECT TANT_CD, TANT_NAME FROM M_TANT WHERE TANT_CD=' . $ID . '';
+
+                $this->result = $this->dbConnect->query($sql);
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $data = array();
+                        $data['TANT_CD'] = $row['TANT_CD'];
+                        $data['TANT_NAME'] = $row['TANT_NAME'];
+                        $resultSet[] = $data;
+                    }
+                }
+
+                //【ネット下見】
+                $sql = ' SELECT T_KOJI.JYUCYU_ID,
+                    T_KOJI.SITAMIHOMONJIKAN,
+                    T_KOJI.SITAMIHOMONJIKAN_END,
+                    T_KOJI.SETSAKI_ADDRESS,
+                    T_KOJI.KOJI_ITEM,
+                    T_KOJI.SETSAKI_NAME,
+                    T_KOJI.SITAMIAPO_KBN,
+                    T_KOJI.ALL_DAY_FLG,
+                    M_KBN.KBNMSAI_NAME,
+                    M_TANT.TANT_CD,
+                    M_TANT.TANT_NAME,
+                    T_KOJI.SITAMI_YMD,
+                    M_TANT.SYOZOKU_CD
+                    FROM T_KOJI 
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="02"
+                    LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
+                    AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
+                    AND M_TANT.TANT_CD=' . $ID . '
+                    AND M_KBN.KBN_CD="05"  
+                    ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $SITAMI_YMD = $row['SITAMI_YMD'];
+                        $data = array();
+                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['TYPE'] = 1;
+                        $resultSet[$SITAMI_YMD][] = $data;
+                    }
+                }
+
+                //【ネット工事】
+                $sql = ' SELECT T_KOJI.JYUCYU_ID,
+                    T_KOJI.KOJIHOMONJIKAN,
+                    T_KOJI.KOJIHOMONJIKAN_END,
+                    T_KOJI.SETSAKI_ADDRESS,
+                    T_KOJI.KOJI_ITEM,
+                    T_KOJI.SETSAKI_NAME,
+                    T_KOJI.KOJIAPO_KBN,   
+                    T_KOJI.ALL_DAY_FLG,
+                    M_KBN.KBNMSAI_NAME,
+                    M_TANT1.TANT_CD AS TANT_CD1,
+                    M_TANT1.TANT_NAME AS TANT_NAME1,
+                    M_TANT2.TANT_CD AS TANT_CD2,
+                    M_TANT2.TANT_NAME AS TANT_NAME2,
+                    M_TANT3.TANT_CD AS TANT_CD3,
+                    M_TANT3.TANT_NAME AS TANT_NAME3,
+                    T_KOJI.KOJI_YMD
+                    FROM T_KOJI 
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
+                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                        AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
+                        AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' )
+                        AND M_KBN.KBN_CD="05"';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $KOJI_YMD = $row['KOJI_YMD'];
+                        $data = array();
+                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                        $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['TYPE'] = 2;
+                        $resultSet[$KOJI_YMD][] = $data;
+                    }
+                }
+
+                //【営業工事・営業下見（担当者欄）】
+                $sql = 'SELECT T_EIGYO_ANKEN.START_TIME, 
+                    T_EIGYO_ANKEN.END_TIME, 
+                    T_EIGYO_ANKEN.GUEST_NAME, 
+                    T_EIGYO_ANKEN.YMD,
+                    T_EIGYO_ANKEN.JYOKEN_SYBET_FLG,
+                    M_KBN.KBNMSAI_NAME, 
+                    M_KBN.YOBIKOMOKU1, 
+                    M_TANT.TANT_NAME, 
+                    M_TANT.TANT_CD
+                    FROM T_EIGYO_ANKEN 
+                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
+                    CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD
+                    WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
+                    AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '"
+                    AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG=0
+                    AND M_TANT.TANT_CD=' . $ID . '
+                    AND M_KBN.KBN_CD="10"';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $EIGYO_ANKEN_YMD = $row['YMD'];
+                        $data = array();
+                        $data['START_TIME'] = $row['START_TIME'];
+                        $data['END_TIME'] = $row['END_TIME'];
+                        $data['GUEST_NAME'] = $row['GUEST_NAME'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['TYPE'] = 3;
+                        $resultSet[$EIGYO_ANKEN_YMD][] = $data;
+                    }
+                }
+
+                //【メモ（営業所欄）】
+                $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
+                    T_TBETUCALENDAR.END_TIME, NAIYO, 
+                    T_TBETUCALENDAR.YMD,
+                    M_KBN.KBNMSAI_NAME, 
+                    M_KBN.YOBIKOMOKU1,
+                    M_TANT.TANT_CD          
+                    FROM T_TBETUCALENDAR 
+                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD
+                    CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD
+                    WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
+                    AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"                     
+                    AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
+                    AND M_TANT.TANT_CD=' . $ID . '
+                    AND M_KBN.KBN_CD="06"
+                    AND M_KBN.KBNMSAI_CD="01" ';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $TBETUCALENDAR_YMD = $row['YMD'];
+                        $data = array();
+                        $data['START_TIME'] = $row['START_TIME'];
+                        $data['END_TIME'] = $row['END_TIME'];
+                        $data['NAIYO'] = $row['NAIYO'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['TYPE'] = 4;
+                        $resultSet[$TBETUCALENDAR_YMD][] = $data;
+                    }
+                }
+
+                //【日予実】
+                $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, 
+                    T_KOJI.KOJI_YMD,
+                    M_TANT1.DAYLY_SALES AS DAYLY_SALES1, 
+                    M_TANT2.DAYLY_SALES AS DAYLY_SALES2,  
+                    M_TANT3.DAYLY_SALES AS DAYLY_SALES3,  
+                    M_TANT4.DAYLY_SALES AS DAYLY_SALES4,  
+                    M_KBN.KBN_CD, 
+                    M_KBN.KBNMSAI_CD,
+                    M_TANT1.TANT_CD AS TANT_CD1,
+                    M_TANT1.TANT_NAME AS TANT_NAME1,
+                    M_TANT2.TANT_CD AS TANT_CD2,
+                    M_TANT2.TANT_NAME AS TANT_NAME2,
+                    M_TANT3.TANT_CD AS TANT_CD3,
+                    M_TANT3.TANT_NAME AS TANT_NAME3, 
+                    M_TANT4.TANT_CD AS TANT_CD4,
+                    M_TANT4.TANT_NAME AS TANT_NAME4
+                    FROM T_KOJI 
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
+                    AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' OR M_TANT4.TANT_CD=' . $ID . ' )
+                    AND M_KBN.KBN_CD="16" 
+                    AND M_KBN.KBNMSAI_CD="01" ';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $KOJI_YMD = $row['KOJI_YMD'];
+                        $data = array();
+                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                        $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                        $data['TYPE'] = 5;
+                        $resultSet[$KOJI_YMD][] = $data;
+                    }
+                }
+
+                //【計予実】
+                $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, 
+                    T_KOJI.KOJI_YMD,
+                    M_TANT1.MONTHLY_SALES AS MONTHLY_SALES1, 
+                    M_TANT2.MONTHLY_SALES AS MONTHLY_SALES2,  
+                    M_TANT3.MONTHLY_SALES AS MONTHLY_SALES3,  
+                    M_TANT4.MONTHLY_SALES AS MONTHLY_SALES4,  
+                    M_KBN.KBN_CD, 
+                    M_KBN.KBNMSAI_CD,
+                    M_TANT1.TANT_CD AS TANT_CD1,
+                    M_TANT1.TANT_NAME AS TANT_NAME1,
+                    M_TANT2.TANT_CD AS TANT_CD2,
+                    M_TANT2.TANT_NAME AS TANT_NAME2,
+                    M_TANT3.TANT_CD AS TANT_CD3,
+                    M_TANT3.TANT_NAME AS TANT_NAME3, 
+                    M_TANT4.TANT_CD AS TANT_CD4,
+                    M_TANT4.TANT_NAME AS TANT_NAME4
+                    FROM T_KOJI 
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
+                    AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' OR M_TANT4.TANT_CD=' . $ID . ' )
+                    AND M_KBN.KBN_CD="16" 
+                    AND M_KBN.KBNMSAI_CD="01" ';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $KOJI_YMD = $row['KOJI_YMD'];
+                        $data = array();
+                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                        $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                        $data['TYPE'] = 6;
+                        $resultSet[$KOJI_YMD][] = $data;
+                    }
+                }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -2109,7 +2370,7 @@ class resources
                 $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
                 $sql = 'SELECT TANT_CD,TANT_NAME 
                 FROM M_TANT WHERE SYOZOKUBUSYO_CD=' . $KOJIGYOSYA_CD . '
-                AND DEL_FLG=0';              
+                AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -2133,7 +2394,7 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $sql = ' SELECT KOJIGYOSYA_NAME  FROM M_GYOSYA';
+            $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME  FROM M_GYOSYA';
             $this->result = $this->dbConnect->query($sql);
 
             $resultSet = array();
@@ -2146,6 +2407,34 @@ class resources
             $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
         }
     }
+
+    function postMemoDelete()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_POST['JYOKEN_CD']) &&
+                isset($_POST['JYOKEN_SYBET_FLG']) &&
+                isset($_POST['YMD'])
+            ) {
+                $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
+                        SET DEL_FLG=1
+                        WHERE JYOKEN_CD="' . $_POST['JYOKEN_CD'] . '" 
+                            AND JYOKEN_SYBET_FLG="' . $_POST['JYOKEN_SYBET_FLG'] . '" 
+                            AND YMD="' . $_POST['YMD'] . '"';
+                $this->result = $this->dbConnect->query($sqlUpdate);
+
+
+                $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": "ERROR"}');
+            }
+        }
+    }
+
     //【協力店舗/営業所名】
     function getCooperatingStore()
     {

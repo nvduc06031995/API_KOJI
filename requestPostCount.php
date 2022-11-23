@@ -1,8 +1,6 @@
 <?php
 
 include('resources.php');
-$postPostCountTirasi = new resources();
-$postPostCountTirasi->postPostCountTirasi();
+$postPostCount = new resources();
+$postPostCount->postPostCount();
 
-$postPostCountKoji = new resources();
-$postPostCountKoji->postPostCountKoji();

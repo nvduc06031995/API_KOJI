@@ -1814,7 +1814,7 @@ class resources
                     }
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($data_final, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -2315,16 +2315,16 @@ class resources
                 $jyokenSybetFlg = $_POST['JYOKEN_SYBET_FLG'];
                 $ymd = $_POST['YMD'];
 
-                $MEMO_CD = isset($_POST['MEMO_CD']) ? '"' . $_POST['MEMO_CD'] . '"' : 'NULL';
-                $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
-                $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
-                $NAIYO = isset($_POST['NAIYO']) ? '"' . $_POST['NAIYO'] . '"' : 'NULL';
-                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
+                $MEMO_CD = isset($_POST['MEMO_CD']) ? '"'. $_POST['MEMO_CD'] .'"' : 'NULL';
+                $START_TIME = isset($_POST['START_TIME']) ? '"'. $_POST['START_TIME'] .'"' : 'NULL';
+                $END_TIME = isset($_POST['END_TIME']) ? '"'. $_POST['END_TIME'] .'"' : 'NULL';
+                $NAIYO = isset($_POST['NAIYO']) ? '"'. $_POST['NAIYO'] .'"' : 'NULL';
+                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"'. $_POST['ALL_DAY_FLG'] .'"' : 'NULL';
 
-                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
-                $COMMENT = isset($_POST['COMMENT']) ? '"' . $_POST['COMMENT'] . '"' : 'NULL';
+                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"'. $_POST['TAG_KBN'] .'"' : 'NULL';
+                $COMMENT = isset($_POST['COMMENT']) ? '"'. $_POST['COMMENT'] .'"' : 'NULL';
 
-                $LOGIN_ID = isset($_POST['LOGIN_ID']) ? '"' . $_POST['LOGIN_ID'] . '"' : '000';
+                $LOGIN_ID = isset($_POST['LOGIN_ID']) ? '"'. $_POST['LOGIN_ID'] .'"' : '000';
 
                 $sqlDataTBetucalendar = 'SELECT *
                         FROM T_TBETUCALENDAR 
@@ -2332,18 +2332,19 @@ class resources
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"';
                 $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-                if ($getDataTBetucalendar->num_rows > 0) {
+                
+                if($getDataTBetucalendar->num_rows > 0) {
                     $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
-                        SET MEMO_CD=' . $MEMO_CD . ', 
-                            YMD="' . $_POST['YMD'] . '", 
-                            START_TIME=' . $START_TIME . ', 
-                            END_TIME=' . $END_TIME . ', 
-                            NAIYO=' . $NAIYO . ', 
-                            ALL_DAY_FLG=' . $ALL_DAY_FLG . ', 
-                            RENKEI_YMD=NULL, 
-                            UPD_PGID=KOJ1110F, 
-                            UPD_TANTCD=' . $LOGIN_ID . ', 
-                            UPD_YMD="' . date("Y-m-d H:i:s") . '" 
+                        SET MEMO_CD='. $MEMO_CD .', 
+                            YMD="'. $ymd .'", 
+                            START_TIME='. $START_TIME .', 
+                            END_TIME='. $END_TIME .', 
+                            NAIYO='. $NAIYO .', 
+                            ALL_DAY_FLG='. $ALL_DAY_FLG .', 
+                            RENKEI_YMD="'. date('Y-m-d') .'", 
+                            UPD_PGID="KOJ1110F", 
+                            UPD_TANTCD='. $LOGIN_ID .', 
+                            UPD_YMD="'. date("Y-m-d H:i:s") .'" 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"';
@@ -2352,27 +2353,27 @@ class resources
                     $sqlDataTBetucalendar = 'SELECT max(TAN_CAL_ID) as TANCALID_MAX
                         FROM T_TBETUCALENDAR';
                     $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-                    $num = 0;
+                    $num = 0;    
                     if ($getDataTBetucalendar->num_rows > 0) {
                         // output data of each row
                         while ($row = $getDataTBetucalendar->fetch_assoc()) {
                             $num = (int)$row['TANCALID_MAX'] + 1;
                         }
                     }
-
+                    
                     $TAN_CAL_ID = sprintf('%010d', $num);
                     $sqlInsert = 'INSERT INTO T_TBETUCALENDAR 
                                     (
                                         TAN_CAL_ID, JYOKEN_CD, JYOKEN_SYBET_FLG, YMD, TAG_KBN, START_TIME, END_TIME, 
-                                        MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, ADD_PGID, ADD_TANTCD, ADD_YMD, 
+                                        MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, DEL_FLG, ADD_PGID, ADD_TANTCD, ADD_YMD, 
                                         UPD_PGID, UPD_TANTCD, UPD_YMD
                                     )
                                 VALUES 
                                     (
-                                        "' . $TAN_CAL_ID . '", "' . $_POST['JYOKEN_CD'] . '", "' . $_POST['JYOKEN_SYBET_FLG'] . '", 
-                                        "' . $_POST['YMD'] . '", ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
-                                        ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', ' . $ALL_DAY_FLG . ', NULL, 
-                                        "KOJ1110F", ' . $LOGIN_ID . ', "' . date("Y-m-d H:i:s") . '", "KOJ1110F", ' . $LOGIN_ID . ', "' . date("Y-m-d H:i:s") . '"
+                                        "'.$TAN_CAL_ID.'", "'.$_POST['JYOKEN_CD'].'", "'.$_POST['JYOKEN_SYBET_FLG'].'", 
+                                        "'.$_POST['YMD'].'", '.$TAG_KBN.', '.$START_TIME.', '.$END_TIME.', 
+                                        '.$MEMO_CD.', '.$NAIYO.', '.$COMMENT.', '.$ALL_DAY_FLG.', "'. date('Y-m-d') .'", 0, 
+                                        "KOJ1110F", '.$LOGIN_ID.', "'.date("Y-m-d H:i:s").'", "KOJ1110F", '.$LOGIN_ID.', "'.date("Y-m-d H:i:s").'"
                                     );';
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
@@ -2383,7 +2384,6 @@ class resources
             }
         }
     }
-
     function postMemoDelete()
     {
         $this->dbReference = new systemConfig();
@@ -2397,12 +2397,12 @@ class resources
                 isset($_POST['YMD'])
             ) {
                 $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
-                        SET DEL_FLG=1
+                        SET DEL_FLG=1, 
+                            RENKEI_YMD="'. date('Y-m-d') .'" 
                         WHERE JYOKEN_CD="' . $_POST['JYOKEN_CD'] . '" 
                             AND JYOKEN_SYBET_FLG="' . $_POST['JYOKEN_SYBET_FLG'] . '" 
                             AND YMD="' . $_POST['YMD'] . '"';
                 $this->result = $this->dbConnect->query($sqlUpdate);
-
 
                 $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {

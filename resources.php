@@ -1155,6 +1155,7 @@ class resources
                 }
 
                 $sql = 'SELECT T_EIGYO_ANKEN.START_TIME, 
+                        T_EIGYO_ANKEN.TAN_EIG_ID, 
                         T_EIGYO_ANKEN.END_TIME, 
                         T_EIGYO_ANKEN.GUEST_NAME, 
                         T_EIGYO_ANKEN.YMD,
@@ -1166,7 +1167,7 @@ class resources
                             AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '" 
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
-                            AND M_KBN.KBN_CD="10"';
+                            AND M_KBN.KBN_CD="10"';                           
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
@@ -1185,10 +1186,11 @@ class resources
 
                 //【メモ（営業所欄）】
                 $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
-                 T_TBETUCALENDAR.END_TIME, NAIYO, 
-                 T_TBETUCALENDAR.YMD,
-                 M_KBN.KBNMSAI_NAME, 
-                 M_KBN.YOBIKOMOKU1          
+                T_TBETUCALENDAR.TAN_CAL_ID,
+                T_TBETUCALENDAR.END_TIME, NAIYO, 
+                T_TBETUCALENDAR.YMD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
                  CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="1" AND M_KBN.KBNMSAI_CD="01"
                  WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
@@ -1301,7 +1303,7 @@ class resources
                             $TANT_CD2 = $row['TANT_CD2'];
                             $TANT_CD3 = $row['TANT_CD3'];
                             if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
-                                $KOJI_YMD = $row['KOJI_YMD'];                               
+                                $KOJI_YMD = $row['KOJI_YMD'];
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1322,7 +1324,7 @@ class resources
                             }
 
                             if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
-                                $KOJI_YMD = $row['KOJI_YMD'];                            
+                                $KOJI_YMD = $row['KOJI_YMD'];
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1343,7 +1345,7 @@ class resources
                             }
 
                             if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
-                                $KOJI_YMD = $row['KOJI_YMD'];                               
+                                $KOJI_YMD = $row['KOJI_YMD'];
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1531,14 +1533,14 @@ class resources
                             $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                         }
                     }
-                }             
+                }
 
                 $data_person = array();
                 foreach ($resultSet2 as $key => $value) {
                     $data_person[] = $value;
                 }
 
-                $resultSet['PERSON'][] = $data_person;              
+                $resultSet['PERSON'][] = $data_person;
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -2154,7 +2156,7 @@ class resources
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD=' . $UPD_TANTCD . ',
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';                   
+                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {

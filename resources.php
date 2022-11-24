@@ -1207,7 +1207,7 @@ class resources
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
                         $data['TYPE'] = 2;
-                        $resultSet['OFFICE']['TBETUCALENDAR'][$TBETUCALENDAR_YMD][] = $data;
+                        $resultSet['OFFICE'][$TBETUCALENDAR_YMD][] = $data;
                     }
                 }
 
@@ -1251,7 +1251,7 @@ class resources
                             $TANT_CD = $row['TANT_CD'];
                             $SITAMI_YMD = $row['SITAMI_YMD'];
                             $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
-                            $resultSet2[$TANT_CD]['TANT_CD'] = $TANT_CD;
+                            $resultSet2[$TANT_CD]['TANT_CD'] = $row['TANT_CD'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
@@ -1260,6 +1260,8 @@ class resources
                             $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['TANT_CD'] = $v['TANT_CD'];
                             $data['TYPE'] = 1;
                             $resultSet2[$TANT_CD][$SITAMI_YMD][] = $data;
                         }
@@ -1299,7 +1301,7 @@ class resources
                             $TANT_CD2 = $row['TANT_CD2'];
                             $TANT_CD3 = $row['TANT_CD3'];
                             if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
-                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $KOJI_YMD = $row['KOJI_YMD'];                               
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1309,6 +1311,8 @@ class resources
                                 $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                                $data['TANT_NAME'] = $row['TANT_NAME1'];
+                                $data['TANT_CD'] = $TANT_CD1;
                                 $data['TYPE'] = 2;
                                 if (empty($resultSet2[$TANT_CD1])) {
                                     $resultSet2[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
@@ -1318,7 +1322,7 @@ class resources
                             }
 
                             if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
-                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $KOJI_YMD = $row['KOJI_YMD'];                            
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1328,6 +1332,8 @@ class resources
                                 $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                                $data['TANT_CD'] =  $TANT_CD2;
+                                $data['TANT_NAME'] = $row['TANT_NAME2'];
                                 $data['TYPE'] = 2;
                                 if (empty($resultSet2[$TANT_CD2])) {
                                     $resultSet2[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2'];
@@ -1337,7 +1343,7 @@ class resources
                             }
 
                             if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
-                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $KOJI_YMD = $row['KOJI_YMD'];                               
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -1347,6 +1353,8 @@ class resources
                                 $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                                $data['TANT_CD'] =  $TANT_CD3;
+                                $data['TANT_NAME'] = $row['TANT_NAME3'];
                                 $data['TYPE'] = 2;
                                 if (empty($resultSet2[$TANT_CD3])) {
                                     $resultSet2[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
@@ -1387,6 +1395,8 @@ class resources
                             $data['GUEST_NAME'] = $row['GUEST_NAME'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 3;
                             $resultSet2[$TANT_CD][$EIGYO_ANKEN_YMD][] = $data;
                         }
@@ -1398,7 +1408,8 @@ class resources
                     T_TBETUCALENDAR.YMD,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1,
-                    M_TANT.TANT_CD          
+                    M_TANT.TANT_CD,
+                    M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
                     CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
                     CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
@@ -1412,12 +1423,16 @@ class resources
                         while ($row = $this->result->fetch_assoc()) {
                             $TANT_CD = $row['TANT_CD'];
                             $TBETUCALENDAR_YMD = $row['YMD'];
+                            $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
+                            $resultSet2[$TANT_CD]['TANT_CD'] = $row['TANT_CD'];
                             $data = array();
                             $data['START_TIME'] = $row['START_TIME'];
                             $data['END_TIME'] = $row['END_TIME'];
                             $data['NAIYO'] = $row['NAIYO'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 4;
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
                         }
@@ -1463,6 +1478,8 @@ class resources
                             $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
                             $data['KBN_CD'] = $row['KBN_CD'];
                             $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 5;
                             $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                         }
@@ -1508,17 +1525,20 @@ class resources
                             $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
                             $data['KBN_CD'] = $row['KBN_CD'];
                             $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 6;
                             $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                         }
                     }
-                }
+                }             
 
                 $data_person = array();
                 foreach ($resultSet2 as $key => $value) {
                     $data_person[] = $value;
                 }
-                $resultSet['PERSON'][] = $data_person;
+
+                $resultSet['PERSON'][] = $data_person;              
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -1791,7 +1811,7 @@ class resources
                     }
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode($data_final, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -2105,7 +2125,7 @@ class resources
                 $ATTEND_NAME2 = isset($_POST['ATTEND_NAME2']) ? '"' . $_POST['ATTEND_NAME2'] . '"' : 'NULL';
                 $ATTEND_NAME3 = isset($_POST['ATTEND_NAME3']) ? '"' . $_POST['ATTEND_NAME3'] . '"' : 'NULL';
                 $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
-                $RENKEI_YMD = isset($_POST['RENKEI_YMD']) ? '"' . $_POST['RENKEI_YMD'] . '"' : 'NULL';
+                $RENKEI_YMD = date('Y-m-d');
                 $ADD_PGID = "KOJ1110F";
                 $ADD_TANTCD = isset($_POST['ADD_TANTCD']) ? '"' . $_POST['ADD_TANTCD'] . '"' : '00001';
                 $ADD_YMD = date('Y-m-d H:i:s');
@@ -2130,13 +2150,11 @@ class resources
                     ATTEND_NAME2=' . $ATTEND_NAME2 . ',
                     ATTEND_NAME3=' . $ATTEND_NAME3 . ',
                     ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
-                    RENKEI_YMD=' . $RENKEI_YMD . ',
+                    RENKEI_YMD="' . $RENKEI_YMD . '",
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD=' . $UPD_TANTCD . ',
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
-                    echo $sql;
-                    die;
+                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';                   
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
@@ -2451,9 +2469,9 @@ class resources
                 FROM M_TANT 
                 LEFT JOIN M_GYOSYA ON M_TANT.SYOZOKUBUSYO_CD = M_GYOSYA.KOJIGYOSYA_CD
                 WHERE M_TANT.TANT_CD="' . $LOGIN_ID . '" 
-                AND M_TANT.DEL_FLG= 0';       
-                $temp_data = '';                      
-                $this->result = $this->dbConnect->query($sql);               
+                AND M_TANT.DEL_FLG= 0';
+                $temp_data = '';
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -2465,9 +2483,9 @@ class resources
                 FROM T_NYUKOYOTEI 
                 LEFT JOIN M_GYOSYA ON T_NYUKOYOTEI.SOKO_CD = M_GYOSYA.KOJIGYOSYA_CD
                 WHERE T_NYUKOYOTEI.SOKO_CD="' . $temp_data . '" 
-                AND T_NYUKOYOTEI.DEL_FLG= 0';       
-                             
-                $this->result = $this->dbConnect->query($sql);               
+                AND T_NYUKOYOTEI.DEL_FLG= 0';
+
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -2476,15 +2494,15 @@ class resources
                         $data[] = 'NYUKOYOTEI_TOTAL';
                         $resultSet[] = $data;
                     }
-                }  
-                
+                }
+
                 // お知らせ(完了報告) 
                 $sql = 'SELECT COUNT(*)
                 FROM T_KOJI 
                 WHERE ADD_TANTCD="' . $LOGIN_ID . '" 
-                AND KOJI_YMD="'.date('d.m.Y',strtotime("-1 days")).'" 
-                AND REPORT_FLG="02"';                
-                $this->result = $this->dbConnect->query($sql);               
+                AND KOJI_YMD="' . date('d.m.Y', strtotime("-1 days")) . '" 
+                AND REPORT_FLG="02"';
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -2493,15 +2511,15 @@ class resources
                         $data[] = 'KOJI_TOTAL';
                         $resultSet[] = $data;
                     }
-                }  
-                
+                }
+
                 // お知らせ(下見)
                 $sql = 'SELECT COUNT(*)
                 FROM T_KOJI 
                 WHERE ADD_TANTCD="' . $LOGIN_ID . '" 
-                AND SITAMI_YMD="'.date('d.m.Y',strtotime("-1 days")).'" 
-                AND REPORT_FLG="01"';                
-                $this->result = $this->dbConnect->query($sql);               
+                AND SITAMI_YMD="' . date('d.m.Y', strtotime("-1 days")) . '" 
+                AND REPORT_FLG="01"';
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -2510,7 +2528,7 @@ class resources
                         $data[] = 'SITAMI_TOTAL';
                         $resultSet[] = $data;
                     }
-                }  
+                }
 
                 // お知らせ(部材発注申請)    
                 $sql = 'SELECT COUNT(*)
@@ -2518,8 +2536,8 @@ class resources
                 LEFT JOIN M_GYOSYA ON T_BUZAIHACYU.SYOZOKU_CD = M_GYOSYA.KOJIGYOSYA_CD
                 WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $temp_data . '" 
                 AND T_BUZAIHACYU.HACYU_OKFLG= "01"
-                AND T_BUZAIHACYU.SYONIN_FLG= 1';                      
-                $this->result = $this->dbConnect->query($sql);               
+                AND T_BUZAIHACYU.SYONIN_FLG= 1';
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -2528,14 +2546,14 @@ class resources
                         $data[] = 'BUZAIHACYU_TOTAL';
                         $resultSet[] = $data;
                     }
-                }           
+                }
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
-    }   
+    }
 
     function postUpdateKojiReadFlg()
     {
@@ -2548,9 +2566,9 @@ class resources
                 isset($_POST['JYUCYU_ID'])
             ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql = 'UPDATE KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="'.$JYUCYU_ID.'" ';
+                $sql = 'UPDATE KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $JYUCYU_ID . '" ';
                 $this->result = $this->dbConnect->query($sql);
-               
+
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');

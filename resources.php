@@ -40,7 +40,8 @@ class resources
                 SITAMI_JIKAN,
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
-                SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
+                SITAMI_YMD,
+                SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -58,9 +59,9 @@ class resources
                 KOJI_JIKAN,
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
-                SETSAKI_NAME FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '" AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
+                KOJI_YMD,
+                SETSAKI_NAME FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '" AND SYUYAKU_JYUCYU_ID IS NOT NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql2);
-                // $resultSet2 = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
@@ -1938,10 +1939,7 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (isset($_GET['JYUCYU_ID'])) {
-                $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql_get_tagkbn = 'SELECT TAG_KBN FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
-                echo $sql_get_tagkbn;
-                die;
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];         
                 $sql = 'SELECT TAG_KBN,
                 SITAMIHOMONJIKAN,
                 SITAMIHOMONJIKAN_END,
@@ -1950,13 +1948,27 @@ class resources
                 SITAMIAPO_KBN,
                 UPD_TANTNM,
                 UPD_YMD,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
+                SITAMI_KANSAN_POINT,
+                JYUCYU_ID,
+                MEMO  FROM T_KOJI WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG= 0';                
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['SITAMI'][] = $row;
+                        $data = array();
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                        $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                        $data['UPD_TANTNM'] = $row['UPD_TANTNM'];
+                        $data['UPD_YMD'] = $row['UPD_YMD'];  
+                        $data['SITAMI_KANSAN_POINT'] = ceil($row['SITAMI_KANSAN_POINT']);  
+                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];   
+                        $data['MEMO'] = $row['MEMO'];                        
+                        $resultSet['SITAMI'][] = $data;
                     }
                 }
 
@@ -1968,12 +1980,26 @@ class resources
                 KOJIAPO_KBN,
                 UPD_TANTNM,
                 UPD_YMD,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID=' . $JYUCYU_ID . ' AND DEL_FLG= 0';
+                KOJI_KANSAN_POINT,
+                JYUCYU_ID,
+                MEMO  FROM T_KOJI WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG= 0';
                 $this->result2 = $this->dbConnect->query($sql2);
                 if ($this->result2->num_rows > 0) {
                     // output data of each row
-                    while ($row = $this->result2->fetch_assoc()) {
-                        $resultSet['KOJI'][] = $row;
+                    while ($row = $this->result2->fetch_assoc()) {                        
+                        $data = array();
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                        $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                        $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                        $data['UPD_TANTNM'] = $row['UPD_TANTNM'];
+                        $data['UPD_YMD'] = $row['UPD_YMD'];  
+                        $data['KOJI_KANSAN_POINT'] = ceil($row['KOJI_KANSAN_POINT']); 
+                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];   
+                        $data['MEMO'] = $row['MEMO'];   
+                        $resultSet['KOJI'][] = $data;
                     }
                 }
 

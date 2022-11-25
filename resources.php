@@ -501,48 +501,9 @@ class resources
         }
     }
 
-    // Construction Report
+    // 工事報告
     //----未報告の場合
-    function getConstructionReportNotReport()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            // $_GET['kojimsai_jyucyu_id']: required
-            // $_GET['kojimsai_kojijituika_flg']: required
-            if (
-                isset($_GET['kojimsai_jyucyu_id']) &&
-                isset($_GET['kojimsai_kojijituika_flg']) &&
-                $_GET['kojimsai_kojijituika_flg'] == '0'
-            ) {
-
-                $jyucyuId = $_GET['kojimsai_jyucyu_id'];
-                $kojijituikaFlg = $_GET['kojimsai_kojijituika_flg'];
-
-                $sql = 'SELECT MAKER_CD, HINBAN 
-                        FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $jyucyuId . '" AND KOJIJITUIKA_FLG="' . $kojijituikaFlg . '" AND DEL_FLG="0"';
-                $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
-
-    //----未報告の場合で、完了書を1枚にまとめる
-    function getConstructionReportNotReportSummarize()
+    function getConstructionReport()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -550,132 +511,53 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['koji_jyucyu_id']) &&
-                isset($_GET['kojimsai_jyucyu_id']) &&
-                isset($_GET['kojimsai_kojijituika_flg']) &&
-                $_GET['kojimsai_kojijituika_flg'] == '0'
+                isset($_GET['JYUCYU_ID'])
             ) {
-
-                $kojiJyucyuId = $_GET['koji_jyucyu_id'];
-                $jyucyuId = $_GET['kojimsai_jyucyu_id'];
-                $kojijituikaFlg = $_GET['kojimsai_kojijituika_flg'];
-
-                $sql = 'SELECT MAKER_CD, HINBAN 
+                $jyucyuId = $_GET['JYUCYU_ID'];
+                $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
                         FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $jyucyuId . '" AND KOJIJITUIKA_FLG="' . $kojijituikaFlg . '" AND DEL_FLG="0"';
-                $this->result = $this->dbConnect->query($sql);
+                        WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                        AND KOJIJITUIKA_FLG<>"0" 
+                        AND DEL_FLG="0"';
+                $this->result = $this->dbConnect->query($sqlNotReported);
 
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['constructionNotReport'] = $row;
                     }
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
+                $resultSet['constructionNotReportSummarize'] = "NaN";
 
-    //----報告済みの場合
-    function getConstructionReportReported()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (
-                isset($_GET['kojimsai_jyucyu_id']) &&
-                isset($_GET['kojimsai_kojijituika_flg']) &&
-                $_GET['kojimsai_kojijituika_flg'] == '0'
-            ) {
 
-                $jyucyuId = $_GET['kojimsai_jyucyu_id'];
-                $kojijituikaFlg = $_GET['kojimsai_kojijituika_flg'];
+                $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
+                FROM T_KOJIMSAI 
+                WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                AND KOJIJITUIKA_FLG<>"0" 
+                AND DEL_FLG="0"';
+                $this->result = $this->dbConnect->query($sqlReported);
 
-                $sql = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                        FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $jyucyuId . '" AND KOJIJITUIKA_FLG="' . $kojijituikaFlg . '" AND DEL_FLG="0"';
-                $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['constructionReport'] = $row;
                     }
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
+                $resultSet['constructionReportSummarize'] = "NaN";
 
-    //----報告済みの場合で、完了書を1枚にまとめた
-    function getConstructionReportReportedSummarized()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (
-                isset($_GET['koji_jyucyu_id']) &&
-                isset($_GET['kojimsai_jyucyu_id']) &&
-                isset($_GET['kojimsai_kojijituika_flg']) &&
-                $_GET['kojimsai_kojijituika_flg'] == '0'
-            ) {
 
-                $jyucyuId = $_GET['kojimsai_jyucyu_id'];
-                $kojijituikaFlg = $_GET['kojimsai_kojijituika_flg'];
-
-                $sql = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                        FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $jyucyuId . '" AND KOJIJITUIKA_FLG="' . $kojijituikaFlg . '" AND DEL_FLG="0"';
-                $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
-
-    //----建築形態プルダウン
-    function getConstructionReportArchitectural()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_GET['kbn_kbn_cd'])) {
-                $kbnCd = $_GET['kbn_kbn_cd'];
-
-                $sql = 'SELECT KBNMSAI_NAME 
+                $sqlPulldown = 'SELECT KBNMSAI_NAME 
                         FROM M_KBN 
-                        WHERE KBN_CD="' . $kbnCd . '"';
-                $this->result = $this->dbConnect->query($sql);
+                        WHERE KBN_CD="07"';
+                $this->result = $this->dbConnect->query($sqlPulldown);
 
-                $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['Pulldown_KBNMSAI'] = $row;
                     }
                 }
 
@@ -686,7 +568,7 @@ class resources
         }
     }
 
-    // Letter of Consent - Sign Registration
+    // 承諾書-サイン登録
     function postLetterConsent()
     {
         $this->dbReference = new systemConfig();
@@ -694,23 +576,56 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $sql = 'SELECT FILEPATH_ID, ID, FILEPATH, FILE_KBN_CD, ADD_PGID, ADD_TANTCD, ADD_YMD, UPD_PGID, UPD_TANTCD, UPD_YMD
+            if (
+                isset($_GET['JYUCYU_ID'])
+            ) {
+                $query_max_tan_eig_id = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                     FROM T_KOJI_FILEPATH';
-            $this->result = $this->dbConnect->query($sql);
-
-            $resultSet = array();
-            if ($this->result->num_rows > 0) {
-                // output data of each row
-                while ($row = $this->result->fetch_assoc()) {
-                    $resultSet[] = $row;
+                $rs_max = $this->dbConnect->query($query_max_tan_eig_id);
+                $num = 0;
+                if ($rs_max->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $rs_max->fetch_assoc()) {
+                        $num = (int)$row['FILEPATH_ID_MAX'] + 1;
+                    }
                 }
-            }
 
-            $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $FILEPATH_ID = sprintf('%010d', $num);
+                $sql = 'INSERT INTO T_KOJI_FILEPATH 
+                    (
+                    FILEPATH_ID,
+                    ID,
+                    FILEPATH,
+                    FILE_KBN_CD,
+                    ADD_PGID,
+                    ADD_TANTCD,
+                    ADD_YMD,
+                    UPD_PGID,
+                    UPD_TANTCD,
+                    UPD_YMD                  
+                    )
+                    VALUES (
+                    "' . $FILEPATH_ID . '",
+                    "'. $_GET['JYUCYU_ID'] .'",
+                    NULL,
+                    "08",
+                    "KOJ1120F",
+                    NULL,
+                    "' . date('Y-m-d H:i:s') . '",
+                    "KOJ1120F",
+                    NULL,
+                    "' . date('Y-m-d H:i:s') . '"
+                    )';
+                $this->result = $this->dbConnect->query($sql);
+                $this->dbReference->sendResponse(200, "Success");
+
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
         }
     }
 
-    // Consent - Registration
+    // 承諾書-登録
     // ----Consent Default
     function postConsent()
     {
@@ -720,47 +635,76 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_POST['koji_jyucyu_id']) &&
-                isset($_POST['kojimsai_jyucyu_id'])
+                isset($_POST['JYUCYU_ID']) &&
+                isset($_POST['SYUYAKU_JYUCYU_ID'])
             ) {
-                $kojiJyucyuId = $_POST['koji_jyucyu_id'];
-                $kojimsaiJyucyuId = $_POST['kojimsai_jyucyu_id'];
-                $dataArr = array();
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];
+                $SYUYAKU_JYUCYU_ID = $_POST['SYUYAKU_JYUCYU_ID'];
+                $BIKO = isset($_POST['BIKO']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['BEF_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['AFT_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"'.$_POST['OTHER_PHOTO_FOLDERPATH'].'"' : 'NULL';
 
-                //Get data T_KOJI
-                $sql = 'SELECT  KOJI_RENKEI_YMD AS renkei_ymd, KOJI_KEKKA AS kekka, BIKO AS biko, 
-                        UPD_PGID AS t_koji_update_pgid, UPD_TANTCD AS t_koji_update_id, UPD_YMD AS t_koji_update_dt
-                        FROM T_KOJI 
-                        WHERE JYUCYU_ID="' . $kojiJyucyuId . '"';
-                $this->result = $this->dbConnect->query($sql);
+                $sqlUpdateKOJI = 'UPDATE T_KOJI 
+                    SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
+                        KOJI_KEKKA = "01",
+                        BIKO = '.$BIKO.',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "'. $SYUYAKU_JYUCYU_ID .'",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE SYUYAKU_JYUCYU_ID = "'. $SYUYAKU_JYUCYU_ID .'"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-                array_push($dataArr, $resultSet);
+                $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
+                    SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
+                        BEF_SEKO_PHOTO_FILEPATH = ' . $BEF_SEKO_PHOTO_FILEPATH . ',
+                        AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
+                        OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
 
-                //Get data T_KOJIMSAI
-                $sql2 = 'SELECT  KENSETU_KEITAI AS kensetu_keitai, BEF_SEKO_PHOTO_FILEPATH AS bef_photo, 
-                        AFT_SEKO_PHOTO_FILEPATH AS aft_photo, OTHER_PHOTO_FOLDERPATH AS other_photo, 
-                        UPD_PGID AS t_kojimsai_update_pgid, UPD_TANTCD AS t_kojimsai_update_id, UPD_YMD AS t_kojimsai_update_dt
-                        FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $kojimsaiJyucyuId . '"';
-                $this->result = $this->dbConnect->query($sql2);
+                $this->dbReference->sendResponse(200, "Success");
+            }
+            elseif (
+                isset($_POST['JYUCYU_ID'])
+            ) {
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];
 
-                $resultSet2 = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet2[] = $row;
-                    }
-                }
-                array_push($dataArr, $resultSet2);
+                $BIKO = isset($_POST['BIKO']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['BEF_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['AFT_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"'.$_POST['OTHER_PHOTO_FOLDERPATH'].'"' : 'NULL';
+                $sqlUpdateKOJI = 'UPDATE T_KOJI 
+                    SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
+                        KOJI_KEKKA = "01",
+                        BIKO = '.$BIKO.',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
-                $this->dbReference->sendResponse(200, json_encode($dataArr, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
+                    SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
+                        BEF_SEKO_PHOTO_FILEPATH = ' . $BEF_SEKO_PHOTO_FILEPATH . ',
+                        AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
+                        OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
+
+                $this->dbReference->sendResponse(200, "Success");
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -823,7 +767,7 @@ class resources
         }
     }
 
-    // Corporate Completion Form - Registration
+    // 法人完了書-登録
     function postCorporateCompletion()
     {
         $this->dbReference = new systemConfig();
@@ -832,54 +776,46 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_POST['koji_jyucyu_id']) &&
-                isset($_POST['kojimsai_jyucyu_id'])
+                isset($_POST['JYUCYU_ID'])
             ) {
-                $kojiJyucyuId = $_POST['koji_jyucyu_id'];
-                $kojimsaiJyucyuId = $_POST['kojimsai_jyucyu_id'];
-                $dataArr = array();
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];
 
-                //Get data T_KOJI
-                $sql = 'SELECT  KOJI_RENKEI_YMD AS renkei_ymd, KOJI_KEKKA AS kekka, 
-                        UPD_PGID AS t_koji_update_pgid, UPD_TANTCD AS t_koji_update_id, UPD_YMD AS t_koji_update_dt
-                        FROM T_KOJI 
-                        WHERE JYUCYU_ID="' . $kojiJyucyuId . '"';
-                $this->result = $this->dbConnect->query($sql);
+                $BIKO = isset($_POST['BIKO']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['BEF_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['AFT_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"'.$_POST['OTHER_PHOTO_FOLDERPATH'].'"' : 'NULL';
+                $sqlUpdateKOJI = 'UPDATE T_KOJI 
+                    SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
+                        KOJI_KEKKA = "01",
+                        BIKO = '.$BIKO.',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-                array_push($dataArr, $resultSet);
+                $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
+                    SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
+                        BEF_SEKO_PHOTO_FILEPATH = ' . $BEF_SEKO_PHOTO_FILEPATH . ',
+                        AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
+                        OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
 
-                //Get data T_KOJIMSAI
-                $sql2 = 'SELECT  KENSETU_KEITAI AS kensetu_keitai, BEF_SEKO_PHOTO_FILEPATH AS bef_photo, 
-                        AFT_SEKO_PHOTO_FILEPATH AS aft_photo, OTHER_PHOTO_FOLDERPATH AS other_photo, 
-                        UPD_PGID AS t_kojimsai_update_pgid, UPD_TANTCD AS t_kojimsai_update_id, UPD_YMD AS t_kojimsai_update_dt
-                        FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $kojimsaiJyucyuId . '"';
-                $this->result = $this->dbConnect->query($sql2);
-
-                $resultSet2 = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet2[] = $row;
-                    }
-                }
-                array_push($dataArr, $resultSet2);
-
-                $this->dbReference->sendResponse(200, json_encode($dataArr, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, "Success");
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
     }
 
-    // Enter reason
+    // 理由記入
     function getEnterReason()
     {
         $this->dbReference = new systemConfig();
@@ -888,14 +824,14 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['koji_jyucyu_id'])
+                isset($_GET['JYUCYU_ID'])
             ) {
-                $kojiJyucyuId = $_GET['koji_jyucyu_id'];
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
 
                 //Get data T_KOJI
                 $sql = 'SELECT CANCEL_RIYU 
                         FROM T_KOJI 
-                        WHERE JYUCYU_ID="' . $kojiJyucyuId . '" AND DEL_FLG="0"';
+                        WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG="0"';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();
@@ -913,7 +849,7 @@ class resources
         }
     }
 
-    // Photo submission - preview
+    // 写真提出_下見
     function getPhotoSubmissionPreview()
     {
         $this->dbReference = new systemConfig();
@@ -922,9 +858,9 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['koji_filepath_file_kbn_cd'])
+                isset($_GET['FILE_KBN_CD'])
             ) {
-                $kojiFilePathFileKbnCd = $_GET['koji_filepath_file_kbn_cd'];
+                $kojiFilePathFileKbnCd = $_GET['FILE_KBN_CD'];
 
                 //Get data T_KOJI
                 $sql = 'SELECT FILEPATH 
@@ -947,8 +883,8 @@ class resources
         }
     }
 
-    // Photo Submission_Registration
-    // ----Transition from the button to send only photos to the system and press the registration button
+    // 写真提出_登録
+    // ----写真のみシステムに送信するボタンから遷移し、登録ボタンを押下
     function postPhotoSubmissionRegistrationFromSendPhoto()
     {
         $this->dbReference = new systemConfig();
@@ -988,7 +924,7 @@ class resources
         }
     }
 
-    // ----As a result of preliminary inspection, transition from the cancel report button and press the register button
+    // ----下見の結果、キャンセルの報告ボタンから遷移し、登録ボタンを押下
     function postPhotoSubmissionRegistrationFromCancel()
     {
         $this->dbReference = new systemConfig();
@@ -1028,7 +964,7 @@ class resources
         }
     }
 
-    // ----Transition from the button to report delayed estimate creation and press the register button
+    // ----見積作成遅延報告を行うボタンから遷移し、登録ボタンを押下
     function postPhotoSubmissionRegistrationFromReportDelayed()
     {
         $this->dbReference = new systemConfig();
@@ -1069,7 +1005,7 @@ class resources
         }
     }
 
-    // ----Transition from the report without quotation button and press the registration button
+    // ----見積書なし報告ボタンから遷移し、登録ボタンを押下
     function postPhotoSubmissionRegistrationFromReportNoQuoation()
     {
         $this->dbReference = new systemConfig();

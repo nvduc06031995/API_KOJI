@@ -64,6 +64,7 @@ class resources
                 $LOGIN_ID = $_GET['LOGIN_ID'];
                 $sql = 'SELECT SITAMIHOMONJIKAN,
                 HOMON_SBT,
+                KOJI_ST,
                 JYUCYU_ID,
                 SITAMI_JININ,
                 SITAMI_JIKAN,
@@ -81,6 +82,7 @@ class resources
                         $data = array();
                         $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
                         $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['KOJI_ST'] = $row['KOJI_ST'];
                         $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                         $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
                         $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
@@ -95,6 +97,7 @@ class resources
 
                 $sql2 = 'SELECT KOJIHOMONJIKAN,
                 HOMON_SBT,
+                KOJI_ST,
                 JYUCYU_ID,
                 KOJI_JININ,
                 KOJI_JIKAN,
@@ -111,6 +114,7 @@ class resources
                         $data = array();
                         $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                         $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['KOJI_ST'] = $row['KOJI_ST'];
                         $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                         $data['KOJI_JININ'] = $row['KOJI_JININ'];
                         $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];

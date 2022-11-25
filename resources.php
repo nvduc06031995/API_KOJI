@@ -1311,7 +1311,7 @@ class resources
                     LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
                     AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
-                    AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '
+                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
                     AND M_KBN.KBN_CD="05"
                     ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
                     $this->result = $this->dbConnect->query($sql);
@@ -1361,7 +1361,7 @@ class resources
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
                         AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
-                        AND (M_TANT1.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT2.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT3.TANT_CD=' . $v['TANT_CD'] . ' )
+                        AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" )
                         AND M_KBN.KBN_CD="05"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
@@ -1450,7 +1450,7 @@ class resources
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
                     AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '"
-                    AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '';
+                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row
@@ -1485,7 +1485,7 @@ class resources
                     CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
                     AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"                                         
-                    AND M_TANT.TANT_CD=' . $v['TANT_CD'] . '
+                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
                     AND M_KBN.KBN_CD="06"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
@@ -1533,7 +1533,7 @@ class resources
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
-                    AND (M_TANT1.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT2.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT3.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT4.TANT_CD=' . $v['TANT_CD'] . ' )
+                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
                     AND M_KBN.KBN_CD="16"';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
@@ -1580,7 +1580,7 @@ class resources
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
-                    AND (M_TANT1.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT2.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT3.TANT_CD=' . $v['TANT_CD'] . ' OR M_TANT4.TANT_CD=' . $v['TANT_CD'] . ' )
+                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
                     AND M_KBN.KBN_CD="16" ';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {

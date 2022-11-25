@@ -69,7 +69,7 @@ class resources
                 SITAMI_JIKAN,
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
-                SITAMI_YMD,
+                SITAMI_YMD,            
                 SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
                 AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
@@ -89,7 +89,6 @@ class resources
                         $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                         $data['ID'] = $LOGIN_ID;
-                        $data['TYPE'] = 'SITAMI';
                         $resultSet[] = $data;
                     }
                 }
@@ -120,7 +119,6 @@ class resources
                         $data['KOJI_YMD'] = $row['KOJI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                         $data['ID'] = $LOGIN_ID;
-                        $row['TYPE'] = 'KOJI';
                         $resultSet[] = $data;
                     }
                 }
@@ -133,7 +131,7 @@ class resources
     }
 
     /* ==================================================================== 投稿数更新 */
-    function postPostCount()
+    function postCount()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -264,23 +262,27 @@ class resources
                     }
                 }
                 if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
-                    $SYUYAKU_JYUCYU_ID = $_GET['SYUYAKU_JYUCYU_ID'];
-                    $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
-                        T_KOJI_FILEPATH.FILEPATH,
-                        T_KOJI.JYUCYU_ID,
-                        T_KOJI_FILEPATH.FILEPATH_ID
-                        FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE JYUCYU_ID= ' . $SYUYAKU_JYUCYU_ID . '                
-                        AND T_KOJI.DEL_FLG=0';
-                    $this->result = $this->dbConnect->query($sql);
-                    $resultSet = array();
-                    if ($this->result->num_rows > 0) {
-                        // output data of each row                    
-                        while ($row = $this->result->fetch_assoc()) {
-                            $resultSet['SUMMARIZE'][] = $row;
-                        }
-                    }
+                    //     $SYUYAKU_JYUCYU_ID = $_GET['SYUYAKU_JYUCYU_ID'];
+                    //     $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
+                    //         T_KOJI_FILEPATH.FILEPATH,
+                    //         T_KOJI.JYUCYU_ID,
+                    //         T_KOJI_FILEPATH.FILEPATH_ID
+                    //         FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                    //         WHERE JYUCYU_ID= ' . $SYUYAKU_JYUCYU_ID . '                
+                    //         AND T_KOJI.DEL_FLG=0';
+                    //     $this->result = $this->dbConnect->query($sql);
+                    //     $resultSet = array();
+                    //     if ($this->result->num_rows > 0) {
+                    //         // output data of each row                    
+                    //         while ($row = $this->result->fetch_assoc()) {
+                    //             $resultSet['SUMMARIZE'][] = $row;
+                    //         }
+                    //     }
+                    $data_temp = array();
+                    $resultSet['SUMMARIZE'][] = $data_temp;
                 }
+
+
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
@@ -312,9 +314,12 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['SINGLE'][] = $row;
                     }
                 }
+
+                $data_temp = array();
+                $resultSet['SUMMARIZE'][] = $data_temp;
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -332,12 +337,12 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['JYUCYU_ID'])) {
+            if (isset($_GET['FILEPATH_ID'])) {
                 $FILEPATH_ID = $_GET['FILEPATH_ID'];
                 $sql = 'SELECT FILEPATH,
-                FILEPATH_ID,
+                FILEPATH_ID
                 FROM T_KOJI_FILEPATH
-                WHERE FILEPATH_ID= ' . $FILEPATH_ID . ' AND FILE_KBN_CD=10 AND DEL_FLG IS NULL';
+                WHERE FILEPATH_ID= "' . $FILEPATH_ID . '" AND FILE_KBN_CD="10" AND DEL_FLG=0';              
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -354,7 +359,7 @@ class resources
     }
 
     /* ==================================================================== 写真提出-登録 */
-    function getPhotoSubmissionRegistration()
+    function postPhotoSubmissionRegistration()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -363,15 +368,16 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $FILEPATH = 'img/';
-                $FILE_KBN_CD = 10;
-                $ADD_PGID = 'KOJ1120F';
-                $ADD_TANTCD = $_POST['LOGIN_ID'];
-                $ADD_YMD = data('Y-m-d');
+                $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
+                $FILEPATH = "img/";
+                $FILE_KBN_CD = "10";
+                $ADD_PGID = "KOJ1120F";
+                $ADD_TANTCD = isset($_POST['LOGIN_ID']) ? $_POST['LOGIN_ID'] : 'NULL';
+                $ADD_YMD = date('Y-m-d');
                 $UPD_PGID = 'KOJ1120F';
-                $UPD_TANTCD = $_POST['LOGIN_ID'];
-                $UPD_YMD = data('Y-m-d');
-
+                $UPD_TANTCD = isset($_POST['LOGIN_ID']) ? $_POST['LOGIN_ID'] : 'NULL';
+                $UPD_YMD = date('Y-m-d');
+                $PRESENT_DATE = date('Y-m-d');
                 $query_max_filepath_id = 'SELECT max(FILEPATH_ID) as TANCALID_MAX
                     FROM T_KOJI_FILEPATH';
                 $rs_max = $this->dbConnect->query($query_max_filepath_id);
@@ -385,63 +391,39 @@ class resources
 
                 $FILEPATH_ID = sprintf('%010d', $num);
 
-                $sql = 'UPDATE T_KOJI_FILEPATH SET
-                FILEPATH_ID="'.$FILEPATH_ID.'"
-                ID="'.$JYUCYU_ID.'"
-                FILEPATH="img/abc.png"
-                FILE_KBN_CD="'.$FILE_KBN_CD.'",
-                ADD_PGID="'.$ADD_PGID.'",
-                ADD_TANTCD="'.$ADD_TANTCD.'",
-                ADD_YMD="'.$ADD_YMD.'",
-                UPD_PGID="'.$UPD_PGID.'",
-                UPD_TANTCD="'.$UPD_TANTCD.'",
-                UPD_YMD="'.$UPD_YMD.'"';
-                $sql = 'SELECT KOJI_KEKKA as kekka,
-                SKJ_RENKEI_YMD as renkei_ymd,
-                UPD_PGID as update_pgid,
-                UPD_TANTCD as update_tantcd,
-                UPD_YMD as update_ymd FROM T_KOJI WHERE JYUCYU_ID= ' . $JYUCYU_ID . '';
+                $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
+                ID,
+                FILEPATH,
+                FILE_KBN_CD,
+                ADD_PGID,
+                ADD_TANTCD,
+                ADD_YMD,
+                UPD_PGID,
+                UPD_TANTCD,
+                UPD_YMD
+                ) VALUES (
+                "' . $FILEPATH_ID . '",
+                "' . $JYUCYU_ID . '",
+                "' . $FILEPATH . $FILE_NAME . '",
+                "' . $FILE_KBN_CD . '",
+                "' . $ADD_PGID . '",
+                "' . $ADD_TANTCD . '",
+                "' . $ADD_YMD . '",
+                "' . $UPD_PGID . '",
+                "' . $UPD_TANTCD . '",
+                "' . $UPD_YMD . '")';
                 $this->result = $this->dbConnect->query($sql);
-                $data = array();
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
 
-                    foreach ($resultSet as $key => $value) {
-                        $resultSet[$key]['message'] = 'OKを設定';
-                    }
+                $sql = 'UPDATE T_KOJI SET KOJI_KEKKA="03",
+                SKJ_RENKEI_YMD="' . $PRESENT_DATE . '",
+                UPD_PGID="' . $UPD_PGID . '",
+                UPD_TANTCD="' . $UPD_TANTCD . '",
+                UPD_YMD="' . $UPD_YMD . '" 
+                WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';
 
-                    array_push($data, $resultSet);
-                }
+                $this->result = $this->dbConnect->query($sql);
 
-                $sql2 = 'SELECT FILEPATH_ID as filepath_id,
-                ID as id,
-                FILEPATH as filepath,
-                FILE_KBN_CD as kbn_cd,
-                ADD_PGID as add_pgid,
-                ADD_TANTCD as add_tantcd,
-                ADD_YMD as add_ymd,
-                UPD_PGID as update_pgid,
-                UPD_TANTCD as update_tantcd,
-                UPD_YMD as update_ymd FROM T_KOJI_FILEPATH WHERE ID= ' . $JYUCYU_ID . '';
-                $this->result2 = $this->dbConnect->query($sql2);
-                $resultSet2 = array();
-                if ($this->result2->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result2->fetch_assoc()) {
-                        $resultSet2[] = $row;
-                    }
-                    foreach ($resultSet2 as $key => $value) {
-                        $resultSet2[$key]['message'] = 'OKを設定';
-                    }
-
-                    array_push($data, $resultSet2);
-                }
-
-                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
             }
@@ -2642,10 +2624,10 @@ class resources
                 // お知らせ(部材発注申請)    
                 $sql = 'SELECT COUNT(*)
                 FROM T_BUZAIHACYU 
-                LEFT JOIN M_GYOSYA ON T_BUZAIHACYU.SYOZOKU_CD = M_GYOSYA.KOJIGYOSYA_CD
+                LEFT JOIN M_TANT ON T_BUZAIHACYU.SYOZOKU_CD = M_TANT.SYOZOKU_CD
                 WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $temp_data . '" 
                 AND T_BUZAIHACYU.HACYU_OKFLG= "01"
-                AND T_BUZAIHACYU.SYONIN_FLG= 1';
+                AND M_TANT.BUZAI_HACOK_FLG= 1';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row

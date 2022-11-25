@@ -1,6 +1,6 @@
 <?php
 
 include('resources.php');
-$postPostCount = new resources();
-$postPostCount->postPostCount();
+$postCount = new resources();
+$postCount->postCount();
 

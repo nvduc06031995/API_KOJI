@@ -26,7 +26,7 @@ class resources
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
+        } else {            
             if (isset($_POST['LOGIN_ID']) && isset($_POST['PASSWORD'])) {
                 $LOGIN_ID = $_POST['LOGIN_ID'];
                 $PASSWORD = $_POST['PASSWORD'];
@@ -37,12 +37,12 @@ class resources
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
                         $row['STATUS'] = 'success';
-                        $resultSet[] = $row;
+                        $resultSet= $row;
                     }
                 } else {
                     $this->dbReference->sendResponse(401, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(401) . '}');    
                 }
-
+            
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
@@ -436,6 +436,7 @@ class resources
         }
     }
 
+    /* ==================================================================== 承諾書 */
     function getWrittenConsent()
     {
         $this->dbReference = new systemConfig();
@@ -443,97 +444,75 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJIGYOSYA_CD'])) {
-                $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
-                $sql = 'SELECT JYUCYU_ID,
-                SETSAKI_NAME,
-                KOJI_YMD,
-                KOJIGYOSYA_NAME,
-                HOMON_TANT_NAME1,
-                HOMON_TANT_NAME2,
-                HOMON_TANT_NAME3,
-                HOMON_TANT_NAME4,
-                CO_NAME,
-                CO_POSTNO,
-                CO_ADDRESS FROM T_KOJI LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD WHERE JYUCYU_ID= ' . $JYUCYU_ID . ' AND T_KOJI.KOJIGYOSYA_CD= ' . $KOJIGYOSYA_CD . ' AND HOJIN_FLG= 0 AND T_KOJI.DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-            }
-        }
-    }
-
-    function getWrittenConsent2()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJIGYOSYA_CD'])) {
-                $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
+            if (isset($_GET['JYUCYU_ID'])) {
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];               
                 $sql = 'SELECT T_KOJI.JYUCYU_ID,
-                SETSAKI_NAME,
-                KOJI_YMD,
-                KOJIGYOSYA_NAME,
-                HOMON_TANT_NAME1,
-                HOMON_TANT_NAME2,
-                HOMON_TANT_NAME3,
-                HOMON_TANT_NAME4,
-                CO_NAME,
-                CO_POSTNO,
-                CO_ADDRESS,
-                TUIKA_SYOHIN_NAME,
-                TUIKA_JISYA_CD,
-                SURYO,
-                HANBAI_TANKA,
-                KINGAK FROM T_KOJI 
-                LEFT JOIN T_KOJIMSAI ON T_KOJI.JYUCYU_ID=T_KOJIMSAI.JYUCYU_ID
-                LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD WHERE T_KOJI.JYUCYU_ID= ' . $JYUCYU_ID . ' AND T_KOJI.KOJIGYOSYA_CD= ' . $KOJIGYOSYA_CD . ' AND HOJIN_FLG= 0 AND T_KOJI.DEL_FLG= 0 AND KOJIJITUIKA_FLG= 1';
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.KOJI_YMD,
+                T_KOJI.HOMON_TANT_NAME1,
+                T_KOJI.HOMON_TANT_NAME2,
+                T_KOJI.HOMON_TANT_NAME3,
+                T_KOJI.HOMON_TANT_NAME4,
+                T_KOJI.CO_NAME,
+                T_KOJI.CO_POSTNO,
+                T_KOJI.CO_ADDRESS,
+                T_KOJI.KOJIGYOSYA_CD,
+                M_GYOSYA.KOJIGYOSYA_NAME FROM T_KOJI 
+                LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
+                WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"              
+                AND HOJIN_FLG= 0 
+                AND T_KOJI.DEL_FLG= 0';                
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
+                        $row['STATUS'] = 'NOT_REPORTED';
                         $resultSet[] = $row;
                     }
                 }
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-            }
-        }
-    }
 
-    function getWrittenConsent3()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_GET['JISYA_CD'])) {
-                $JISYA_CD = $_GET['JISYA_CD'];
-                $sql = 'SELECT SYOHIN_NAME,
-                KOJI_KAKAKU FROM M_KOJI_KAKAKU WHERE JISYA_CD= "KOJ' . $JISYA_CD . '" ';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
+                $sql = 'SELECT T_KOJI.JYUCYU_ID,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.KOJI_YMD,
+                M_GYOSYA.KOJIGYOSYA_NAME,
+                T_KOJI.HOMON_TANT_NAME1,
+                T_KOJI.HOMON_TANT_NAME2,
+                T_KOJI.HOMON_TANT_NAME3,
+                T_KOJI.HOMON_TANT_NAME4,
+                T_KOJI.CO_NAME,
+                T_KOJI.CO_POSTNO,
+                T_KOJI.CO_ADDRESS,
+                T_KOJIMSAI.TUIKA_SYOHIN_NAME,
+                T_KOJIMSAI.TUIKA_JISYA_CD,
+                T_KOJIMSAI.SURYO,
+                T_KOJIMSAI.HANBAI_TANKA,
+                T_KOJIMSAI.KINGAK FROM T_KOJI 
+                LEFT JOIN T_KOJIMSAI ON T_KOJI.JYUCYU_ID=T_KOJIMSAI.JYUCYU_ID
+                LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
+                WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
+                AND T_KOJI.HOJIN_FLG= 0 
+                AND T_KOJI.DEL_FLG= 0 
+                AND KOJIJITUIKA_FLG= 1';              
+                $this->result = $this->dbConnect->query($sql);               
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
+                        $row['STATUS'] = 'REPORTED';
                         $resultSet[] = $row;
                     }
                 }
+
+                // $sql = 'SELECT SYOHIN_NAME,
+                // KOJI_KAKAKU FROM M_KOJI_KAKAKU WHERE JISYA_CD= "KOJ' . $JISYA_CD . '" ';
+                // $this->result = $this->dbConnect->query($sql);
+                // $resultSet = array();
+                // if ($this->result->num_rows > 0) {
+                //     // output data of each row                    
+                //     while ($row = $this->result->fetch_assoc()) {
+                //         $resultSet[] = $row;
+                //     }
+                // }
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
@@ -1921,7 +1900,7 @@ class resources
     }
 
     //【協力店舗/営業所名プルダウン】
-    function getListDepartmant()
+    function getListOffice()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -1953,33 +1932,41 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['koji_jyucyu_id']) &&
-                isset($_GET['kbn_kbnmsai_cd']) &&
-                isset($_GET['koji_filepath_id']) &&
-                isset($_GET['koji_filepath_file_kbn_cd'])
+                isset($_GET['JYUCYU_ID']) 
             ) {
-                $kojiJyuCyuId = $_GET['koji_jyucyu_id'];
-                $kbnKbnCd = $_GET['kbn_kbn_cd'];
-                $kbnKbnmsaiCd = $_GET['kbn_kbnmsai_cd'];
-                $kojiFilepathId = $_GET['koji_filepath_id'];
-                $kojiFilePathFileKbnCd = $_GET['koji_filepath_file_kbn_cd'];
-
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];                                             
                 //Get data T_KOJI
-                $sql = 'SELECT JYUCYU_ID, KOJI_JININ, KOJIHOMONJIKAN, KOJIHOMONJIKAN_END, KOJI_JIKAN, SETSAKI_ADDRESS, 
-                                KOJI_ITEM, SETSAKI_NAME, HOMON_TANT_NAME1, HOMON_TANT_NAME2, HOMON_TANT_NAME3, HOMON_TANT_NAME4, 
-                                ADD_TANTNM, T_KOJI.ADD_YMD, T_KOJI.UPD_TANTNM, T_KOJI.UPD_YMD, SITAMIIRAISYO_FILEPATH, MEMO, COMMENT, 
-                                M_KBN.KBNMSAI_NAME, T_KOJI_FILEPATH.FILEPATH 
-                            FROM T_KOJI 
-                            CROSS JOIN M_KBN
-                            ON T_KOJI.TAG_KBN = M_KBN.KBN_CD 
-                            CROSS JOIN T_KOJI_FILEPATH
-                            ON T_KOJI.JYUCYU_ID = T_KOJI_FILEPATH.ID 
-                            WHERE T_KOJI.JYUCYU_ID="' . $kojiJyuCyuId . '" 
-                                AND M_KBN.KBN_CD="5" 
-                                AND M_KBN.KBNMSAI_CD="' . $kbnKbnmsaiCd . '" 
-                                AND T_KOJI_FILEPATH.ID="' . $kojiFilepathId . '" 
-                                AND T_KOJI_FILEPATH.FILE_KBN_CD="' . $kojiFilePathFileKbnCd . '" 
-                                AND T_KOJI.DEL_FLG="0"';
+                $sql = 'SELECT JYUCYU_ID, 
+                T_KOJI.KOJI_JININ, 
+                T_KOJI.KOJIHOMONJIKAN, 
+                T_KOJI.KOJIHOMONJIKAN_END, 
+                T_KOJI.KOJI_JIKAN, 
+                T_KOJI.SETSAKI_ADDRESS, 
+                T_KOJI.KOJI_ITEM, 
+                T_KOJI.SETSAKI_NAME, 
+                T_KOJI.HOMON_TANT_NAME1, 
+                T_KOJI.HOMON_TANT_NAME2, 
+                T_KOJI.HOMON_TANT_NAME3, 
+                T_KOJI.HOMON_TANT_NAME4, 
+                T_KOJI.ADD_TANTNM, 
+                T_KOJI.ADD_YMD, 
+                T_KOJI.UPD_TANTNM, 
+                T_KOJI.UPD_YMD, 
+                T_KOJI.SITAMIIRAISYO_FILEPATH, 
+                T_KOJI.MEMO, 
+                T_KOJI.COMMENT, 
+                M_KBN.KBNMSAI_NAME, 
+                T_KOJI_FILEPATH.ID,
+                T_KOJI_FILEPATH.FILEPATH 
+                FROM T_KOJI 
+                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBN_CD 
+                CROSS JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID = T_KOJI_FILEPATH.ID 
+                WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '"
+                AND M_KBN.KBN_CD="05" 
+                AND M_KBN.KBNMSAI_CD="01" 
+                AND T_KOJI_FILEPATH.ID="' . $JYUCYU_ID . '" 
+                AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04" OR T_KOJI_FILEPATH.FILE_KBN_CD="05")
+                AND T_KOJI.DEL_FLG="0"';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();

@@ -1,5 +1,5 @@
 <?php
 
 include('resources.php');
-$getListDepartmant = new resources();
-$getListDepartmant->getListDepartmant();
+$getListOffice = new resources();
+$getListOffice->getListOffice();

@@ -28,9 +28,9 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (isset($_POST['LOGIN_ID']) && isset($_POST['PASSWORD'])) {
-                $LOGIN_ID = $_GET['LOGIN_ID'];
-                $PASSWORD = $_GET['PASSWORD'];
-                $sql = 'SELECT * FROM M_TANT WHERE TANT_CD="' . $LOGIN_ID . '" AND PASSWORD="' . $PASSWORD . '" AND DEL_FLG= 0';
+                $LOGIN_ID = $_POST['LOGIN_ID'];
+                $PASSWORD = $_POST['PASSWORD'];
+                $sql = 'SELECT * FROM M_TANT WHERE TANT_CD="' . $LOGIN_ID . '" AND PASSWORD="' . $PASSWORD . '" AND DEL_FLG= 0';           
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -39,6 +39,8 @@ class resources
                         $row['STATUS'] = 'success';
                         $resultSet[] = $row;
                     }
+                } else {
+                    $this->dbReference->sendResponse(401, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(401) . '}');    
                 }
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

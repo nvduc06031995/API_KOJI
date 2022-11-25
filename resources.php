@@ -186,9 +186,6 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            // $_POST['setsaki_address']: required
-            // $_POST['koji_ymd']: required
-            // $_POST['koji_st']: required
             if (
                 isset($_POST['setsaki_address']) &&
                 isset($_POST['koji_ymd']) &&
@@ -257,7 +254,7 @@ class resources
                     WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
                     AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
                     AND T_KOJI.DEL_FLG=0 
-                    AND T_KOJI_FILEPATH.DEL_FLG=0';                   
+                    AND T_KOJI_FILEPATH.DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -265,7 +262,7 @@ class resources
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['SINGLE'][] = $row;
                     }
-                }            
+                }
                 if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
                     $SYUYAKU_JYUCYU_ID = $_GET['SYUYAKU_JYUCYU_ID'];
                     $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
@@ -291,6 +288,42 @@ class resources
         }
     }
 
+    /* ==================================================================== 写真確認 */
+    function getPhotoConfirm()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (
+                isset($_GET['ID'])
+            ) {
+                $ID = $_GET['ID'];
+                $sql = ' SELECT FILEPATH,
+                ID,
+                FILEPATH_ID
+                FROM T_KOJI_FILEPATH
+                WHERE ID="' . $ID . '" 
+                AND FILE_KBN_CD="05"';
+                $this->result = $this->dbConnect->query($sql);
+
+                $resultSet = array();
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+            }
+        }
+    }
+
+
     /* ==================================================================== 写真提出 */
     function getPhotoSubmission()
     {
@@ -299,9 +332,12 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['FILEPATH_ID'])) {
+            if (isset($_GET['JYUCYU_ID'])) {
                 $FILEPATH_ID = $_GET['FILEPATH_ID'];
-                $sql = 'SELECT FILEPATH FROM T_KOJI_FILEPATH WHERE FILEPATH_ID= ' . $FILEPATH_ID . ' AND FILE_KBN_CD=10 AND DEL_FLG IS NULL';
+                $sql = 'SELECT FILEPATH,
+                FILEPATH_ID,
+                FROM T_KOJI_FILEPATH
+                WHERE FILEPATH_ID= ' . $FILEPATH_ID . ' AND FILE_KBN_CD=10 AND DEL_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -317,7 +353,7 @@ class resources
         }
     }
 
-    //写真提出-登録
+    /* ==================================================================== 写真提出-登録 */
     function getPhotoSubmissionRegistration()
     {
         $this->dbReference = new systemConfig();
@@ -327,6 +363,39 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
+                $FILEPATH = 'img/';
+                $FILE_KBN_CD = 10;
+                $ADD_PGID = 'KOJ1120F';
+                $ADD_TANTCD = $_POST['LOGIN_ID'];
+                $ADD_YMD = data('Y-m-d');
+                $UPD_PGID = 'KOJ1120F';
+                $UPD_TANTCD = $_POST['LOGIN_ID'];
+                $UPD_YMD = data('Y-m-d');
+
+                $query_max_filepath_id = 'SELECT max(FILEPATH_ID) as TANCALID_MAX
+                    FROM T_KOJI_FILEPATH';
+                $rs_max = $this->dbConnect->query($query_max_filepath_id);
+                $num = 0;
+                if ($rs_max->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $rs_max->fetch_assoc()) {
+                        $num = (int)$row['TANCALID_MAX'] + 1;
+                    }
+                }
+
+                $FILEPATH_ID = sprintf('%010d', $num);
+
+                $sql = 'UPDATE T_KOJI_FILEPATH SET
+                FILEPATH_ID="'.$FILEPATH_ID.'"
+                ID="'.$JYUCYU_ID.'"
+                FILEPATH="img/abc.png"
+                FILE_KBN_CD="'.$FILE_KBN_CD.'",
+                ADD_PGID="'.$ADD_PGID.'",
+                ADD_TANTCD="'.$ADD_TANTCD.'",
+                ADD_YMD="'.$ADD_YMD.'",
+                UPD_PGID="'.$UPD_PGID.'",
+                UPD_TANTCD="'.$UPD_TANTCD.'",
+                UPD_YMD="'.$UPD_YMD.'"';
                 $sql = 'SELECT KOJI_KEKKA as kekka,
                 SKJ_RENKEI_YMD as renkei_ymd,
                 UPD_PGID as update_pgid,
@@ -509,44 +578,6 @@ class resources
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-            }
-        }
-    }
-
-    //写真確認
-    function getPhotoConfirm()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            // $_GET['koji_filepath_id']: required
-            // $_GET['koji_filepath_file_kbn_cd']: required
-            if (
-                isset($_GET['koji_filepath_id'])
-            ) {
-
-                $kojiFilepathId = $_GET['koji_filepath_id'];
-
-                $sql = ' SELECT FILEPATH 
-                    FROM T_KOJI_FILEPATH 
-                    WHERE FILEPATH_ID="' . $kojiFilepathId . '" 
-                        AND FILE_KBN_CD="05"
-                    ';
-                $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
         }
     }
@@ -2365,16 +2396,16 @@ class resources
                 $jyokenSybetFlg = $_POST['JYOKEN_SYBET_FLG'];
                 $ymd = $_POST['YMD'];
 
-                $MEMO_CD = isset($_POST['MEMO_CD']) ? '"'. $_POST['MEMO_CD'] .'"' : 'NULL';
-                $START_TIME = isset($_POST['START_TIME']) ? '"'. $_POST['START_TIME'] .'"' : 'NULL';
-                $END_TIME = isset($_POST['END_TIME']) ? '"'. $_POST['END_TIME'] .'"' : 'NULL';
-                $NAIYO = isset($_POST['NAIYO']) ? '"'. $_POST['NAIYO'] .'"' : 'NULL';
-                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"'. $_POST['ALL_DAY_FLG'] .'"' : 'NULL';
+                $MEMO_CD = isset($_POST['MEMO_CD']) ? '"' . $_POST['MEMO_CD'] . '"' : 'NULL';
+                $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
+                $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
+                $NAIYO = isset($_POST['NAIYO']) ? '"' . $_POST['NAIYO'] . '"' : 'NULL';
+                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
 
-                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"'. $_POST['TAG_KBN'] .'"' : 'NULL';
-                $COMMENT = isset($_POST['COMMENT']) ? '"'. $_POST['COMMENT'] .'"' : 'NULL';
+                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
+                $COMMENT = isset($_POST['COMMENT']) ? '"' . $_POST['COMMENT'] . '"' : 'NULL';
 
-                $LOGIN_ID = isset($_POST['LOGIN_ID']) ? '"'. $_POST['LOGIN_ID'] .'"' : '000';
+                $LOGIN_ID = isset($_POST['LOGIN_ID']) ? '"' . $_POST['LOGIN_ID'] . '"' : '000';
 
                 $sqlDataTBetucalendar = 'SELECT *
                         FROM T_TBETUCALENDAR 
@@ -2382,19 +2413,19 @@ class resources
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"';
                 $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-                
-                if($getDataTBetucalendar->num_rows > 0) {
+
+                if ($getDataTBetucalendar->num_rows > 0) {
                     $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
-                        SET MEMO_CD='. $MEMO_CD .', 
-                            YMD="'. $ymd .'", 
-                            START_TIME='. $START_TIME .', 
-                            END_TIME='. $END_TIME .', 
-                            NAIYO='. $NAIYO .', 
-                            ALL_DAY_FLG='. $ALL_DAY_FLG .', 
-                            RENKEI_YMD="'. date('Y-m-d') .'", 
+                        SET MEMO_CD=' . $MEMO_CD . ', 
+                            YMD="' . $ymd . '", 
+                            START_TIME=' . $START_TIME . ', 
+                            END_TIME=' . $END_TIME . ', 
+                            NAIYO=' . $NAIYO . ', 
+                            ALL_DAY_FLG=' . $ALL_DAY_FLG . ', 
+                            RENKEI_YMD="' . date('Y-m-d') . '", 
                             UPD_PGID="KOJ1110F", 
-                            UPD_TANTCD='. $LOGIN_ID .', 
-                            UPD_YMD="'. date("Y-m-d H:i:s") .'" 
+                            UPD_TANTCD=' . $LOGIN_ID . ', 
+                            UPD_YMD="' . date("Y-m-d H:i:s") . '" 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"';
@@ -2403,14 +2434,14 @@ class resources
                     $sqlDataTBetucalendar = 'SELECT max(TAN_CAL_ID) as TANCALID_MAX
                         FROM T_TBETUCALENDAR';
                     $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-                    $num = 0;    
+                    $num = 0;
                     if ($getDataTBetucalendar->num_rows > 0) {
                         // output data of each row
                         while ($row = $getDataTBetucalendar->fetch_assoc()) {
                             $num = (int)$row['TANCALID_MAX'] + 1;
                         }
                     }
-                    
+
                     $TAN_CAL_ID = sprintf('%010d', $num);
                     $sqlInsert = 'INSERT INTO T_TBETUCALENDAR 
                                     (
@@ -2420,10 +2451,10 @@ class resources
                                     )
                                 VALUES 
                                     (
-                                        "'.$TAN_CAL_ID.'", "'.$_POST['JYOKEN_CD'].'", "'.$_POST['JYOKEN_SYBET_FLG'].'", 
-                                        "'.$_POST['YMD'].'", '.$TAG_KBN.', '.$START_TIME.', '.$END_TIME.', 
-                                        '.$MEMO_CD.', '.$NAIYO.', '.$COMMENT.', '.$ALL_DAY_FLG.', "'. date('Y-m-d') .'", 0, 
-                                        "KOJ1110F", '.$LOGIN_ID.', "'.date("Y-m-d H:i:s").'", "KOJ1110F", '.$LOGIN_ID.', "'.date("Y-m-d H:i:s").'"
+                                        "' . $TAN_CAL_ID . '", "' . $_POST['JYOKEN_CD'] . '", "' . $_POST['JYOKEN_SYBET_FLG'] . '", 
+                                        "' . $_POST['YMD'] . '", ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
+                                        ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', ' . $ALL_DAY_FLG . ', "' . date('Y-m-d') . '", 0, 
+                                        "KOJ1110F", ' . $LOGIN_ID . ', "' . date("Y-m-d H:i:s") . '", "KOJ1110F", ' . $LOGIN_ID . ', "' . date("Y-m-d H:i:s") . '"
                                     );';
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
@@ -2448,7 +2479,7 @@ class resources
             ) {
                 $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
                         SET DEL_FLG=1, 
-                            RENKEI_YMD="'. date('Y-m-d') .'" 
+                            RENKEI_YMD="' . date('Y-m-d') . '" 
                         WHERE JYOKEN_CD="' . $_POST['JYOKEN_CD'] . '" 
                             AND JYOKEN_SYBET_FLG="' . $_POST['JYOKEN_SYBET_FLG'] . '" 
                             AND YMD="' . $_POST['YMD'] . '"';

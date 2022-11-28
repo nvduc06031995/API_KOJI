@@ -157,7 +157,7 @@ class resources
                 AND KOJI_ST="02"
                 AND DEL_FLG= 0 ';
             $this->result = $this->dbConnect->query($sql);
-            
+
             if ($this->result->num_rows > 0) {
                 // output data of each row
                 while ($row = $this->result->fetch_assoc()) {
@@ -172,18 +172,18 @@ class resources
                 AND KOJI_YMD="' . $YMD . '"
                 AND KOJI_ST="02"
                 AND DEL_FLG= 0 ';
-                $this->result = $this->dbConnect->query($sql);     
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {                       
+                    while ($row = $this->result->fetch_assoc()) {
                         $count_syuyaku_jyucyu = $row["COUNT(*)"];
                     }
                 }
             }
-          
-            if($count_syuyaku_jyucyu > 1){
+
+            if ($count_syuyaku_jyucyu > 1) {
                 return $flg = true;
-            }           
+            }
         }
         return $flg;
     }
@@ -194,8 +194,8 @@ class resources
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {           
-            if($this->checkCount()){
+        } else {
+            if ($this->checkCount()) {
                 if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD']) && isset($_POST['JYUCYU_ID']) && isset($_POST['SETSAKI_ADDRESS'])) {
                     $LOGIN_ID = $_POST['LOGIN_ID'];
                     $YMD = $_POST['YMD'];
@@ -211,7 +211,7 @@ class resources
                     WHERE TANT_CD="' . $LOGIN_ID . '" 
                     AND YMD="' . $YMD . '"';
                     $this->result = $this->dbConnect->query($sql);
-    
+
                     $SETSAKI_ADDRESS = $_POST['SETSAKI_ADDRESS'];
                     $JYUCYU_ID = $_POST['JYUCYU_ID'];
                     $RENKEI_YMD = 'NULL';
@@ -223,18 +223,18 @@ class resources
                     WHERE SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
                     AND KOJI_YMD="' . $YMD . '"
                     AND DEL_FLG= 0 
-                    AND KOJI_ST="02" ';                   
+                    AND KOJI_ST="02" ';
                     $this->result = $this->dbConnect->query($sql);
-    
+
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
                     $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
                 }
             } else {
                 $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
-            }            
+            }
         }
-    }    
+    }
 
     /* ==================================================================== 依頼書 */
     function getRequestForm()
@@ -244,47 +244,106 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['JYUCYU_ID'])) {
+            if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT']) && isset($_GET['SINGLE_SUMMARIZE'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
-                    T_KOJI.JYUCYU_ID,
-                    T_KOJI_FILEPATH.FILEPATH_ID,
-                    T_KOJI_FILEPATH.FILEPATH 
-                    FROM T_KOJI 
-                    LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                    WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
-                    AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
-                    AND T_KOJI.DEL_FLG=0 
-                    AND T_KOJI_FILEPATH.DEL_FLG=0';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['SINGLE'][] = $row;
-                    }
-                }
-                if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
-                    //     $SYUYAKU_JYUCYU_ID = $_GET['SYUYAKU_JYUCYU_ID'];
-                    //     $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
-                    //         T_KOJI_FILEPATH.FILEPATH,
-                    //         T_KOJI.JYUCYU_ID,
-                    //         T_KOJI_FILEPATH.FILEPATH_ID
-                    //         FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                    //         WHERE JYUCYU_ID= ' . $SYUYAKU_JYUCYU_ID . '                
-                    //         AND T_KOJI.DEL_FLG=0';
-                    //     $this->result = $this->dbConnect->query($sql);
-                    //     $resultSet = array();
-                    //     if ($this->result->num_rows > 0) {
-                    //         // output data of each row                    
-                    //         while ($row = $this->result->fetch_assoc()) {
-                    //             $resultSet['SUMMARIZE'][] = $row;
-                    //         }
-                    //     }
-                    $data_temp = array();
-                    $resultSet['SUMMARIZE'][] = $data_temp;
-                }
+                $HOMON_SBT = $_GET['HOMON_SBT'];
+                $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
 
+                if ($SINGLE_SUMMARIZE == "01") {
+                    if ($HOMON_SBT == "01") {
+                        $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
+                        T_KOJI.JYUCYU_ID,
+                        T_KOJI.HOMON_SBT,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI_FILEPATH.FILEPATH_ID,
+                        T_KOJI_FILEPATH.FILEPATH 
+                        FROM T_KOJI 
+                        LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                        WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
+                        AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
+                        AND T_KOJI.DEL_FLG=0 
+                        AND T_KOJI_FILEPATH.DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sql);
+                        $resultSet = array();
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row                    
+                            while ($row = $this->result->fetch_assoc()) {
+                                $row['SINGLE_SUMMARIZE'] = "01";
+                                $resultSet[] = $row;
+                            }
+                        }
+                    } else if ($HOMON_SBT == "02") {
+                        $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
+                        T_KOJI.JYUCYU_ID,
+                        T_KOJI.HOMON_SBT,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI_FILEPATH.FILEPATH_ID,
+                        T_KOJI_FILEPATH.FILEPATH 
+                        FROM T_KOJI 
+                        LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                        WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
+                        AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
+                        AND T_KOJI.DEL_FLG=0 
+                        AND T_KOJI_FILEPATH.DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sql);
+                        $resultSet = array();
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row                    
+                            while ($row = $this->result->fetch_assoc()) {
+                                $row['SINGLE_SUMMARIZE'] = "01";
+                                $resultSet[] = $row;
+                            }
+                        }
+                    } else {
+                        $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                    }
+                } else if ($SINGLE_SUMMARIZE == "02") {
+                    if ($HOMON_SBT == "01") {
+                        $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
+                        T_KOJI_FILEPATH.FILEPATH,
+                        T_KOJI.JYUCYU_ID,
+                        T_KOJI.HOMON_SBT,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI_FILEPATH.FILEPATH_ID
+                        FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                        WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
+                        AND T_KOJI.HOMON_SBT="01"
+                        AND T_KOJI.DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sql);
+                        $resultSet = array();
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row                    
+                            while ($row = $this->result->fetch_assoc()) {
+                                $row['SINGLE_SUMMARIZE'] = "02";
+                                $resultSet[] = $row;
+                            }
+                        }
+                    } else if ($HOMON_SBT == "02") {
+                        $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
+                        T_KOJI_FILEPATH.FILEPATH,
+                        T_KOJI.JYUCYU_ID,
+                        T_KOJI.HOMON_SBT,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI_FILEPATH.FILEPATH_ID
+                        FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
+                        WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
+                        AND T_KOJI.HOMON_SBT="02"
+                        AND T_KOJI.DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sql);
+                        $resultSet = array();
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row                    
+                            while ($row = $this->result->fetch_assoc()) {
+                                $row['SINGLE_SUMMARIZE'] = "02";
+                                $resultSet[] = $row;
+                            }
+                        }
+                    } else {
+                        $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                    }
+                } else {
+                    $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                }
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -301,28 +360,43 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['ID'])
-            ) {
-                $ID = $_GET['ID'];
-                $sql = ' SELECT FILEPATH,
-                ID,
-                FILEPATH_ID
-                FROM T_KOJI_FILEPATH
-                WHERE ID="' . $ID . '" 
-                AND FILE_KBN_CD="05"';
-                $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['SINGLE'][] = $row;
+            if (isset($_GET['JYUCYU_ID']) && isset($_GET['SINGLE_SUMMARIZE'])) {
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
+                $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
+                if ($SINGLE_SUMMARIZE == "01") {
+                    $sql = ' SELECT FILEPATH,
+                    ID, FILEPATH_ID
+                    FROM T_KOJI_FILEPATH
+                    WHERE ID="' . $JYUCYU_ID . '" 
+                    AND FILE_KBN_CD="05"';
+                    $this->result = $this->dbConnect->query($sql);
+                    $resultSet = array();
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $this->result->fetch_assoc()) {
+                            $row['SINGLE_SUMMARIZE'] = "01";
+                            $resultSet[] = $row;
+                        }
                     }
+                } else if ($SINGLE_SUMMARIZE == "02") {
+                    $sql = 'SELECT T_KOJI_FILEPATH.FILEPATH,
+                    T_KOJI.JYUCYU_ID, 
+                    T_KOJI.SYUYAKU_JYUCYU_ID
+                    FROM T_KOJI_FILEPATH LEFT JOIN T_KOJI ON T_KOJI_FILEPATH.ID=T_KOJI.JYUCYU_ID
+                    WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
+                    AND FILE_KBN_CD="05"';                    
+                    $this->result = $this->dbConnect->query($sql);
+                    $resultSet = array();
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $this->result->fetch_assoc()) {
+                            $row['SINGLE_SUMMARIZE'] = "02";
+                            $resultSet[] = $row;
+                        }
+                    }
+                } else {
+                    $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
                 }
-
-                $data_temp = array();
-                $resultSet['SUMMARIZE'][] = $data_temp;
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -340,20 +414,30 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['FILEPATH_ID'])) {
-                $FILEPATH_ID = $_GET['FILEPATH_ID'];
-                $sql = 'SELECT FILEPATH,
-                FILEPATH_ID
-                FROM T_KOJI_FILEPATH
-                WHERE FILEPATH_ID= "' . $FILEPATH_ID . '" AND FILE_KBN_CD="10" AND DEL_FLG=0';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+            if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST']) ) {
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
+                $KOJI_ST = $_GET['KOJI_ST'];
+                if($KOJI_ST == "03"){
+                    $sql = 'SELECT FILEPATH,
+                    FILEPATH_ID, 
+                    ID
+                    FROM T_KOJI_FILEPATH
+                    WHERE ID= "' . $JYUCYU_ID . '" 
+                    AND FILE_KBN_CD="10" 
+                    AND DEL_FLG=0';
+                    $this->result = $this->dbConnect->query($sql);
+                    $resultSet = array();
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row                    
+                        while ($row = $this->result->fetch_assoc()) {
+                            $row['KOJI_ST'] = $KOJI_ST;
+                            $resultSet[] = $row;
+                        }
                     }
+                } else {
+                    $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
                 }
+               
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');

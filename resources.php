@@ -137,107 +137,104 @@ class resources
     }
 
     /* ==================================================================== 投稿数更新 */
+    function checkCount()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        $flg = false;
+        if (isset($_POST['YMD']) && isset($_POST['JYUCYU_ID']) && isset($_POST['SETSAKI_ADDRESS'])) {
+            $YMD = $_POST['YMD'];
+            $SETSAKI_ADDRESS = $_POST['SETSAKI_ADDRESS'];
+            $JYUCYU_ID = $_POST['JYUCYU_ID'];
+
+            $count_jyucyu = null;
+            $count_syuyaku_jyucyu = null;
+
+            // Check exists
+            $sql = 'SELECT COUNT(*) 
+                FROM T_KOJI 
+                WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                AND KOJI_ST="02"
+                AND DEL_FLG= 0 ';
+            $this->result = $this->dbConnect->query($sql);
+            
+            if ($this->result->num_rows > 0) {
+                // output data of each row
+                while ($row = $this->result->fetch_assoc()) {
+                    $count_jyucyu = $row["COUNT(*)"];
+                }
+            }
+
+            if ($count_jyucyu > 0) {
+                $sql = 'SELECT COUNT(*) 
+                FROM T_KOJI 
+                WHERE SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
+                AND KOJI_YMD="' . $YMD . '"
+                AND KOJI_ST="02"
+                AND DEL_FLG= 0 ';
+                $this->result = $this->dbConnect->query($sql);     
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {                       
+                        $count_syuyaku_jyucyu = $row["COUNT(*)"];
+                    }
+                }
+            }
+          
+            if($count_syuyaku_jyucyu > 1){
+                return $flg = true;
+            }           
+        }
+        return $flg;
+    }
+
     function postCount()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD'])) {
-                $LOGIN_ID = $_POST['LOGIN_ID'];
-                $YMD = $_POST['YMD'];
-                $KOJI_TIRASISU = 1;
-                $RENKEI_YMD = 'NULL';
-                $UPD_PGID = "KOJ1110F";
-                $sql = 'UPDATE T_TIRASI SET  YMD="' . $YMD . '", 
-                RENKEI_YMD=' . $RENKEI_YMD . ', 
-                KOJI_TIRASISU=' . $KOJI_TIRASISU . ', 
-                UPD_PGID="' . $UPD_PGID . '", 
-                UPD_TANTCD= "' . $LOGIN_ID . '", 
-                UPD_YMD=' . date('Y-m-d H:i:s') . ' 
-                WHERE TANT_CD="' . $LOGIN_ID . '" 
-                AND YMD="' . $YMD . '"';
-                $this->result = $this->dbConnect->query($sql);
-
-                if (isset($_POST['SETSAKI_ADDRESS'])) {
-                    $SETSAKI_ADDRESS = $_POST['SETSAKI_ADDRESS'];
+        } else {           
+            if($this->checkCount()){
+                if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD']) && isset($_POST['JYUCYU_ID']) && isset($_POST['SETSAKI_ADDRESS'])) {
+                    $LOGIN_ID = $_POST['LOGIN_ID'];
                     $YMD = $_POST['YMD'];
                     $KOJI_TIRASISU = 1;
                     $RENKEI_YMD = 'NULL';
-                    $UPD_PGID = "KOJ1120F";
-                    $sql = 'UPDATE T_KOJI SET  SYUYAKU_JYUCYU_ID="' . $SETSAKI_ADDRESS . '",                    
+                    $UPD_PGID = "KOJ1110F";
+                    $sql = 'UPDATE T_TIRASI SET  YMD="' . $YMD . '", 
+                    RENKEI_YMD=' . $RENKEI_YMD . ', 
+                    KOJI_TIRASISU=' . $KOJI_TIRASISU . ', 
                     UPD_PGID="' . $UPD_PGID . '", 
                     UPD_TANTCD= "' . $LOGIN_ID . '", 
                     UPD_YMD=' . date('Y-m-d H:i:s') . ' 
                     WHERE TANT_CD="' . $LOGIN_ID . '" 
-                    AND KOJI_YMD="' . $YMD . '"
-                    AND DEL_FLG= 0 AND KOJI_ST="02" ';
+                    AND YMD="' . $YMD . '"';
                     $this->result = $this->dbConnect->query($sql);
-                    $this->dbReference->sendResponse(200, json_encode('success2', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    
+                    $SETSAKI_ADDRESS = $_POST['SETSAKI_ADDRESS'];
+                    $JYUCYU_ID = $_POST['JYUCYU_ID'];
+                    $RENKEI_YMD = 'NULL';
+                    $UPD_PGID2 = "KOJ1120F";
+                    $sql = 'UPDATE T_KOJI SET  SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '",                    
+                    UPD_PGID="' . $UPD_PGID2 . '", 
+                    UPD_TANTCD= "' . $LOGIN_ID . '", 
+                    UPD_YMD="' . date('Y-m-d H:i:s') . '"
+                    WHERE SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
+                    AND KOJI_YMD="' . $YMD . '"
+                    AND DEL_FLG= 0 
+                    AND KOJI_ST="02" ';                   
+                    $this->result = $this->dbConnect->query($sql);
+    
+                    $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
                 }
-                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
-            }
+            }            
         }
-    }
-
-    function postPostCountKoji()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (
-                isset($_POST['setsaki_address']) &&
-                isset($_POST['koji_ymd']) &&
-                isset($_POST['koji_st']) &&
-                $_POST['koji_st'] == '2'
-            ) {
-
-                $setsakiAddress = $_POST['setsaki_address'];
-                $kojiYmd = $_POST['koji_ymd'];
-                $kojiSt = $_POST['koji_st'];
-
-                $sql = ' SELECT SYUYAKU_JYUCYU_ID, UPD_PGID, UPD_TANTCD, UPD_YMD FROM T_KOJI WHERE SETSAKI_ADDRESS="' . $setsakiAddress . '" AND KOJI_YMD="' . $kojiYmd . '" AND KOJI_ST="' . $kojiSt . '" AND DEL_FLG="0" ';
-                $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                    foreach ($resultSet as $key => $value) {
-                        //Edit Key Array
-                        $this->changeKey = new systemEditor();
-                        $oldKeyArr = [
-                            'SYUYAKU_JYUCYU_ID',
-                            'UPD_PGID',
-                            'UPD_TANTCD',
-                            'UPD_YMD',
-                        ];
-                        $newKeyArr = [
-                            'syuyaku_jyucyu_id',
-                            'update_pgid',
-                            'update_id',
-                            'update_dt',
-                        ];
-                        $resultSet[$key] = $this->changeKey->change_key($value, $oldKeyArr, $newKeyArr);
-
-                        //Add Message
-                        $resultSet[$key]['message'] = 'OK';
-                    }
-                }
-
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
-            }
-        }
-    }
+    }    
 
     /* ==================================================================== 依頼書 */
     function getRequestForm()

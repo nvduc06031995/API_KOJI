@@ -2272,19 +2272,19 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['tan_cal_id'])
+                isset($_GET['JYOKEN_CD'])
             ) {
-                $tanCalId = $_GET['tan_cal_id'];
+                $JYOKEN_CD = $_GET['JYOKEN_CD'];
 
                 //Get data T_TBETUCALENDAR
                 $sql = 'SELECT MEMO_CD, YMD, START_TIME, END_TIME, NAIYO 
                             FROM T_TBETUCALENDAR 
-                            WHERE TAN_CAL_ID="' . $tanCalId . '" 
+                            WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
                                 AND DEL_FLG="0"';
                 $this->result = $this->dbConnect->query($sql);
 
                 //Get data M_KBN
-                $sqlPulldown = 'SELECT KBN_NAME, KBNMSAI_NAME 
+                $sqlPulldown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
                                     FROM M_KBN 
                                     WHERE KBN_CD="06" 
                                         AND DEL_FLG="0"';

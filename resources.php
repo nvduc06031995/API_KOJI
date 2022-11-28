@@ -1255,8 +1255,8 @@ class resources
                             $resultSet2[$TANT_CD][$SITAMI_YMD][] = $data;
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_NAME'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【ネット工事】
@@ -1356,8 +1356,8 @@ class resources
                             }
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_NAME'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【営業工事・営業下見（担当者欄）】
@@ -1396,8 +1396,8 @@ class resources
                             $resultSet2[$TANT_CD][$EIGYO_ANKEN_YMD][] = $data;
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_NAME'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【メモ（営業所欄）】
@@ -1435,8 +1435,8 @@ class resources
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_NAME'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【日予実】
@@ -1485,8 +1485,8 @@ class resources
                             $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_NAME'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【計予実】
@@ -1535,8 +1535,8 @@ class resources
                             $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_NAME'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
                 }
 

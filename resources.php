@@ -655,7 +655,7 @@ class resources
                     )
                     VALUES (
                     "' . $FILEPATH_ID . '",
-                    "'. $_GET['JYUCYU_ID'] .'",
+                    "' . $_GET['JYUCYU_ID'] . '",
                     NULL,
                     "08",
                     "KOJ1120F",
@@ -667,7 +667,6 @@ class resources
                     )';
                 $this->result = $this->dbConnect->query($sql);
                 $this->dbReference->sendResponse(200, "Success");
-
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -689,20 +688,20 @@ class resources
             ) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $SYUYAKU_JYUCYU_ID = $_POST['SYUYAKU_JYUCYU_ID'];
-                $BIKO = isset($_POST['BIKO']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
-                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
-                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['BEF_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
-                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['AFT_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
-                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"'.$_POST['OTHER_PHOTO_FOLDERPATH'].'"' : 'NULL';
+                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
 
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
                         KOJI_KEKKA = "01",
-                        BIKO = '.$BIKO.',
+                        BIKO = ' . $BIKO . ',
                         UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "'. $SYUYAKU_JYUCYU_ID .'",
+                        UPD_TANTCD = "' . $SYUYAKU_JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE SYUYAKU_JYUCYU_ID = "'. $SYUYAKU_JYUCYU_ID .'"
+                    WHERE SYUYAKU_JYUCYU_ID = "' . $SYUYAKU_JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
@@ -712,32 +711,31 @@ class resources
                         AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
                         OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
                         UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
 
                 $this->dbReference->sendResponse(200, "Success");
-            }
-            elseif (
+            } elseif (
                 isset($_POST['JYUCYU_ID'])
             ) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
 
-                $BIKO = isset($_POST['BIKO']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
-                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
-                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['BEF_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
-                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['AFT_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
-                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"'.$_POST['OTHER_PHOTO_FOLDERPATH'].'"' : 'NULL';
+                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
                         KOJI_KEKKA = "01",
-                        BIKO = '.$BIKO.',
+                        BIKO = ' . $BIKO . ',
                         UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
@@ -747,9 +745,9 @@ class resources
                         AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
                         OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
                         UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
 
@@ -829,19 +827,19 @@ class resources
             ) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
 
-                $BIKO = isset($_POST['BIKO']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
-                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"'.$_POST['BIKO'].'"' : 'NULL';
-                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['BEF_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
-                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"'.$_POST['AFT_SEKO_PHOTO_FILEPATH'].'"' : 'NULL';
-                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"'.$_POST['OTHER_PHOTO_FOLDERPATH'].'"' : 'NULL';
+                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
                         KOJI_KEKKA = "01",
-                        BIKO = '.$BIKO.',
+                        BIKO = ' . $BIKO . ',
                         UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
@@ -851,9 +849,9 @@ class resources
                         AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
                         OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
                         UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "'. $JYUCYU_ID .'",
+                        UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "'. $JYUCYU_ID .'"
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
 
@@ -1210,10 +1208,10 @@ class resources
                 }
 
                 $resultSet2 = array();
-                foreach ($list_tant_cd as $k => $v) {    
+                foreach ($list_tant_cd as $k => $v) {
                     $TANT_CD = $v['TANT_CD'];
                     $TANT_NAME = $v['TANT_NAME'];
-                    
+
                     //【ネット下見】
                     $sql = ' SELECT T_KOJI.JYUCYU_ID,
                     T_KOJI.SITAMIHOMONJIKAN,
@@ -1242,7 +1240,7 @@ class resources
                         while ($row = $this->result->fetch_assoc()) {
                             $resultSet2[$TANT_CD]['TANT_NAME'] = $TANT_NAME;
                             $resultSet2[$TANT_CD]['TANT_CD'] = $TANT_CD;
-                            $SITAMI_YMD = $row['SITAMI_YMD'];                            
+                            $SITAMI_YMD = $row['SITAMI_YMD'];
                             $data = array();
                             $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                             $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
@@ -1310,7 +1308,7 @@ class resources
                                 $data['TYPE'] = 2;
                                 if (empty($resultSet2[$TANT_CD1])) {
                                     $resultSet2[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
-                                    $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;                                 
+                                    $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;
                                 }
                                 $resultSet2[$TANT_CD1][$KOJI_YMD][] = $data;
                             }
@@ -1986,7 +1984,7 @@ class resources
                     }
                 }
 
-                $sql2 = ' SELECT TAG_KBN,
+                $sql = ' SELECT TAG_KBN,
                 KOJIHOMONJIKAN,
                 KOJIHOMONJIKAN_END,
                 KOJI_JININ,
@@ -1997,7 +1995,7 @@ class resources
                 KOJI_KANSAN_POINT,
                 JYUCYU_ID,
                 MEMO  FROM T_KOJI WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG= 0';
-                $this->result2 = $this->dbConnect->query($sql2);
+                $this->result2 = $this->dbConnect->query($sql);
                 if ($this->result2->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result2->fetch_assoc()) {
@@ -2017,8 +2015,9 @@ class resources
                     }
                 }
 
-                $sql3 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 05 AND DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql3);
+                $sql = 'SELECT KBN_CD, KBN_NAME , KBNMSAI_CD, KBNMSAI_NAME FROM M_KBN WHERE KBN_CD= "05" AND DEL_FLG= 0';
+
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -2117,7 +2116,7 @@ class resources
                 GUEST_NAME,
                 ATTEND_NAME1,
                 ATTEND_NAME2,
-                ATTEND_NAME3 FROM T_EIGYO_ANKEN WHERE TAN_EIG_ID= ' . $TAN_EIG_ID . ' AND DEL_FLG= 0';
+                ATTEND_NAME3 FROM T_EIGYO_ANKEN WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -2127,7 +2126,7 @@ class resources
                     }
                 }
 
-                $sql2 = ' SELECT KBN_NAME  FROM M_KBN WHERE KBN_CD= 10 AND DEL_FLG= 0';
+                $sql2 = ' SELECT KBN_CODE,KBN_NAME,KBNMSAI_CD,KBNMSAI_NAME  FROM M_KBN WHERE KBN_CD= "10" AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql2);
                 if ($this->result->num_rows > 0) {
                     // output data of each row

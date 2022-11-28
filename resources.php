@@ -2287,7 +2287,7 @@ class resources
                 $this->result = $this->dbConnect->query($sql);
 
                 //Get data M_KBN
-                $sqlPulldown = 'SELECT KBN_NAME 
+                $sqlPulldown = 'SELECT KBN_NAME, KBNMSAI_NAME 
                                     FROM M_KBN 
                                     WHERE KBN_CD="06" 
                                         AND DEL_FLG="0"';
@@ -2296,12 +2296,12 @@ class resources
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['dataTBETUCALENDAR'] = $row;
+                        $resultSet['dataTBETUCALENDAR'][] = $row;
                     }
                 }
                 if ($getPullDown->num_rows > 0) {
                     while ($row = $getPullDown->fetch_assoc()) {
-                        $resultSet['pullDown'] = $row;
+                        $resultSet['pullDown'][] = $row;
                     }
                 }
 
@@ -2337,8 +2337,6 @@ class resources
                 $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
                 $COMMENT = isset($_POST['COMMENT']) ? '"' . $_POST['COMMENT'] . '"' : 'NULL';
 
-                $LOGIN_ID = isset($_POST['LOGIN_ID']) ? '"' . $_POST['LOGIN_ID'] . '"' : '000';
-
                 $sqlDataTBetucalendar = 'SELECT *
                         FROM T_TBETUCALENDAR 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
@@ -2356,7 +2354,7 @@ class resources
                             ALL_DAY_FLG=' . $ALL_DAY_FLG . ', 
                             RENKEI_YMD="' . date('Y-m-d') . '", 
                             UPD_PGID="KOJ1110F", 
-                            UPD_TANTCD=' . $LOGIN_ID . ', 
+                            UPD_TANTCD=' . $jyokenCd . ', 
                             UPD_YMD="' . date("Y-m-d H:i:s") . '" 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
@@ -2386,7 +2384,7 @@ class resources
                                         "' . $TAN_CAL_ID . '", "' . $_POST['JYOKEN_CD'] . '", "' . $_POST['JYOKEN_SYBET_FLG'] . '", 
                                         "' . $_POST['YMD'] . '", ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
                                         ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', ' . $ALL_DAY_FLG . ', "' . date('Y-m-d') . '", 0, 
-                                        "KOJ1110F", ' . $LOGIN_ID . ', "' . date("Y-m-d H:i:s") . '", "KOJ1110F", ' . $LOGIN_ID . ', "' . date("Y-m-d H:i:s") . '"
+                                        "KOJ1110F", ' . $jyokenCd . ', "' . date("Y-m-d H:i:s") . '", "KOJ1110F", ' . $jyokenCd . ', "' . date("Y-m-d H:i:s") . '"
                                     );';
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }

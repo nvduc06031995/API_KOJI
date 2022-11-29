@@ -2585,6 +2585,7 @@ class resources
                 if ($getDataTBetucalendar->num_rows > 0) {
                     $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
                         SET MEMO_CD=' . $MEMO_CD . ', 
+                            TAG_KBN=' . $TAG_KBN . ', 
                             YMD="' . $ymd . '", 
                             START_TIME=' . $START_TIME . ', 
                             END_TIME=' . $END_TIME . ', 

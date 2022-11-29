@@ -1357,6 +1357,7 @@ class resources
                         $data['GUEST_NAME'] = $row['GUEST_NAME'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
                         $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                         $data['YMD'] = $row['YMD'];
                         $data['TYPE'] = 1;

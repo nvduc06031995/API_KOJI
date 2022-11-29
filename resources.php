@@ -2696,7 +2696,8 @@ class resources
             if (
                 isset($_GET['TANT_CD']) &&
                 isset($_GET['HOLIDAY_YEAR']) &&
-                isset($_GET['GET_MONTH'])
+                isset($_GET['GET_MONTH']) &&
+                isset($_GET['GET_YEAR'])
             ) {
                 $tantCd = $_GET['TANT_CD'];
                 $holidayYear = $_GET['HOLIDAY_YEAR'];
@@ -2736,7 +2737,7 @@ class resources
                                 FROM T_TBETUCALENDAR 
                                 WHERE JYOKEN_CD="' . $tantCd . '" 
                                     AND MEMO_CD="04" 
-                                    AND MONTH(`YMD`)="'. $_GET['GET_MONTH'] .'"
+                                    AND YEAR(`YMD`)="'. $_GET['GET_YEAR'] .'"
                                     AND DEL_FLG="0"
                                 ';
                 $this->result = $this->dbConnect->query($sqlGetHolidayYear);

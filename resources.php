@@ -641,26 +641,62 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['JYUCYU_ID'])
+                isset($_GET['JYUCYU_ID']) &&
+                isset($_GET['KOJI_ST']) && 
+                isset($_GET['SINGLE_SUMMARIZE'])
             ) {
                 $jyucyuId = $_GET['JYUCYU_ID'];
-                $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
+                $kojiSt = $_GET['KOJI_ST'];
+                
+                $resultSet = array();
+                if($kojiSt == "01" || $kojiSt == "02") {
+                    if($_GET['SINGLE_SUMMARIZE'] == 1) {
+                        $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
                         FROM T_KOJIMSAI 
                         WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                        AND KOJIJITUIKA_FLG<>"0" 
-                        AND DEL_FLG="0"';
-                $this->result = $this->dbConnect->query($sqlNotReported);
+                            AND KOJIJITUIKA_FLG<>"0" 
+                            AND DEL_FLG="0"';
+                        $this->result = $this->dbConnect->query($sqlNotReported);
+    
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['constructionNotReport']['SINGLE'][] = $row;
+                            }
+                        }
+                    }
 
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['constructionNotReport'] = $row;
+                    if($_GET['SINGLE_SUMMARIZE'] == 2) {
+                        if(isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
+                            FROM T_KOJI 
+                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
+                                AND DEL_FLG="0"';
+                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
+                            echo $this->result; die;
+                            
+    
+    
+                            $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
+                            FROM T_KOJIMSAI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                                AND KOJIJITUIKA_FLG<>"0" 
+                                AND DEL_FLG="0"';
+                            $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+        
+                            if ($this->result->num_rows > 0) {
+                                // output data of each row
+                                while ($row = $this->result->fetch_assoc()) {
+                                    $resultSet['constructionNotReport']['SUMMARIZE'][] = $row;
+                                }
+                            }
+                        } else {
+                            $this->dbReference->sendResponse(404, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(404) . '}');
+                        }
+                        
                     }
                 }
-
-                $resultSet['constructionNotReportSummarize'] = "NaN";
-
+                
 
                 $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
                 FROM T_KOJIMSAI 
@@ -672,11 +708,11 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['constructionReport'] = $row;
+                        $resultSet['constructionReport'][] = $row;
                     }
                 }
 
-                $resultSet['constructionReportSummarize'] = "NaN";
+                $resultSet['constructionReportSummarize'][] = "NaN";
 
 
                 $sqlPulldown = 'SELECT KBNMSAI_NAME 
@@ -1244,6 +1280,7 @@ class resources
                         $data['GUEST_NAME'] = $row['GUEST_NAME'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YMD'] = $row['YMD'];
                         $data['TYPE'] = 1;
                         $resultSet['OFFICE'][$EIGYO_ANKEN_YMD][] = $data;
                     }
@@ -1253,7 +1290,8 @@ class resources
                 $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
                 T_TBETUCALENDAR.TAN_CAL_ID,
                 T_TBETUCALENDAR.END_TIME, NAIYO, 
-                T_TBETUCALENDAR.YMD,
+                T_TBETUCALENDAR.YMD, 
+                T_TBETUCALENDAR.JYOKEN_CD, 
                 M_KBN.KBNMSAI_NAME, 
                 M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
@@ -1273,6 +1311,9 @@ class resources
                         $data['NAIYO'] = $row['NAIYO'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YMD'] = $row['YMD'];
+                        $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
+                        $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
                         $data['TYPE'] = 2;
                         $resultSet['OFFICE'][$TBETUCALENDAR_YMD][] = $data;
                     }
@@ -2356,14 +2397,14 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_GET['JYOKEN_CD'])
+                isset($_GET['TAN_CAL_ID'])
             ) {
-                $JYOKEN_CD = $_GET['JYOKEN_CD'];
+                $TAN_CAL_ID = $_GET['TAN_CAL_ID'];
 
                 //Get data T_TBETUCALENDAR
                 $sql = 'SELECT MEMO_CD, YMD, START_TIME, END_TIME, NAIYO 
                             FROM T_TBETUCALENDAR 
-                            WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
+                            WHERE TAN_CAL_ID="' . $TAN_CAL_ID . '" 
                                 AND DEL_FLG="0"';
                 $this->result = $this->dbConnect->query($sql);
 

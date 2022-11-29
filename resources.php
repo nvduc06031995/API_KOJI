@@ -449,19 +449,31 @@ class resources
     function uploadFileImg($file)
     {
         if (!empty($file)) {
-            // $imageFileType = strtolower(pathinfo($FILE_NAME,PATHINFO_EXTENSION));
-            // var_dump($imageFileType); die;
-            $path = 'myfolder/myimage.png';
-            $type = pathinfo($path, PATHINFO_EXTENSION);
-            $data = file_get_contents($path);
-            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            $path = 'img/';
+            $target_file = $path . basename($file["name"]);
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $uploadOk = 1;
             // Check file size                
-            if ($FILE_NAME["size"] > 500000) {
+            if ($file["size"] > 500000) {
                 echo "Sorry, your file is too large.";
+                $uploadOk = 0;
             }
-            var_dump($_FILES['FILE_NAME']);
-            die;
+            if (
+                $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                && $imageFileType != "gif"
+            ) {
+                echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                $uploadOk = 0;
+            }
+            // Check if $uploadOk is set to 0 by an error
+            if ($uploadOk == 0) {
+                echo "Sorry, your file was not uploaded.";
+                // if everything is ok, try to upload file
+            } else {
+                move_uploaded_file($file["tmp_name"], $target_file);
+            }
         }
+        return $target_file;
     }
 
     function postPhotoSubmissionRegistration()
@@ -473,7 +485,7 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
-                $this->uploadFileImg($FILE_NAME);
+                $img_path = $this->uploadFileImg($FILE_NAME);
 
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
@@ -498,38 +510,40 @@ class resources
                 }
 
                 $FILEPATH_ID = sprintf('%010d', $num);
+                if (!empty($img_path)) {                
+                    $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
+                    ID,
+                    FILEPATH,
+                    FILE_KBN_CD,
+                    ADD_PGID,
+                    ADD_TANTCD,
+                    ADD_YMD,
+                    UPD_PGID,
+                    UPD_TANTCD,
+                    UPD_YMD
+                    ) VALUES (
+                    "' . $FILEPATH_ID . '",
+                    "' . $JYUCYU_ID . '",
+                    "' . $img_path .'",
+                    "' . $FILE_KBN_CD . '",
+                    "' . $ADD_PGID . '",
+                    "' . $ADD_TANTCD . '",
+                    "' . $ADD_YMD . '",
+                    "' . $UPD_PGID . '",
+                    "' . $UPD_TANTCD . '",
+                    "' . $UPD_YMD . '")';
+                    $this->result = $this->dbConnect->query($sql);
 
-                $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
-                ID,
-                FILEPATH,
-                FILE_KBN_CD,
-                ADD_PGID,
-                ADD_TANTCD,
-                ADD_YMD,
-                UPD_PGID,
-                UPD_TANTCD,
-                UPD_YMD
-                ) VALUES (
-                "' . $FILEPATH_ID . '",
-                "' . $JYUCYU_ID . '",
-                "' . $FILEPATH . $FILE_NAME . '",
-                "' . $FILE_KBN_CD . '",
-                "' . $ADD_PGID . '",
-                "' . $ADD_TANTCD . '",
-                "' . $ADD_YMD . '",
-                "' . $UPD_PGID . '",
-                "' . $UPD_TANTCD . '",
-                "' . $UPD_YMD . '")';
-                $this->result = $this->dbConnect->query($sql);
+                    $sql = 'UPDATE T_KOJI SET KOJI_KEKKA="03",
+                    SKJ_RENKEI_YMD="' . $PRESENT_DATE . '",
+                    UPD_PGID="' . $UPD_PGID . '",
+                    UPD_TANTCD="' . $UPD_TANTCD . '",
+                    UPD_YMD="' . $UPD_YMD . '" 
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';
 
-                $sql = 'UPDATE T_KOJI SET KOJI_KEKKA="03",
-                SKJ_RENKEI_YMD="' . $PRESENT_DATE . '",
-                UPD_PGID="' . $UPD_PGID . '",
-                UPD_TANTCD="' . $UPD_TANTCD . '",
-                UPD_YMD="' . $UPD_YMD . '" 
-                WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';
+                    $this->result = $this->dbConnect->query($sql);
+                }
 
-                $this->result = $this->dbConnect->query($sql);
 
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -1321,7 +1335,7 @@ class resources
                         T_EIGYO_ANKEN.TAN_EIG_ID, 
                         T_EIGYO_ANKEN.END_TIME, 
                         T_EIGYO_ANKEN.GUEST_NAME, 
-                        T_EIGYO_ANKEN.ALL_DAY_FLG, 
+                        T_EIGYO_ANKEN.ALL_DAY_FLG,
                         T_EIGYO_ANKEN.YMD,
                         M_KBN.YOBIKOMOKU1, 
                         M_KBN.KBNMSAI_NAME
@@ -2448,7 +2462,7 @@ class resources
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD=' . $UPD_TANTCD . ',
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
+                    WHERE JYOKEN_CD="' . $JYOKEN_CD . '" AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
@@ -2489,8 +2503,8 @@ class resources
                     UPD_YMD                      
                     )
                     VALUES (
-                    ' . $TAN_EIG_ID . ',
-                    ' . $JYOKEN_CD . ',
+                    "' . $TAN_EIG_ID . '",
+                    "' . $JYOKEN_CD . '",
                     ' . $JYOKEN_SYBET_FLG . ',
                     "' . $YMD . '",
                     ' . $TAG_KBN . ',

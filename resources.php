@@ -673,7 +673,15 @@ class resources
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
                                 AND DEL_FLG="0"';
                             $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
-                            echo $this->result; die;
+
+                            $listJyucyuIdKoji = array();
+                            if ($this->result->num_rows > 0) {
+                                // output data of each row
+                                while ($row = $this->result->fetch_assoc()) {
+                                    $listJyucyuIdKoji[] = $row;
+                                }
+                            }
+                            
                             
     
     
@@ -1526,6 +1534,8 @@ class resources
                     $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
                     T_TBETUCALENDAR.END_TIME, NAIYO, 
                     T_TBETUCALENDAR.YMD,
+                    T_TBETUCALENDAR.TAN_CAL_ID,
+                    T_TBETUCALENDAR.JYOKEN_CD,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1,
                     M_TANT.TANT_CD,
@@ -1553,6 +1563,9 @@ class resources
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
+                            $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
+                            $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                            $data['YMD'] = $row['YMD'];
                             $data['TYPE'] = 4;
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
                         }
@@ -1826,6 +1839,8 @@ class resources
                 $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
                     T_TBETUCALENDAR.END_TIME, NAIYO, 
                     T_TBETUCALENDAR.YMD,
+                    T_TBETUCALENDAR.TAN_CAL_ID,
+                    T_TBETUCALENDAR.JYOKEN_CD,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1,
                     M_TANT.TANT_CD          
@@ -1849,6 +1864,9 @@ class resources
                         $data['NAIYO'] = $row['NAIYO'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
+                        $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                        $data['YMD'] = $row['YMD'];
                         $data['TYPE'] = 4;
                         $resultSet[$TBETUCALENDAR_YMD][] = $data;
                     }

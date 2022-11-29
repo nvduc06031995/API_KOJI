@@ -2595,78 +2595,6 @@ class resources
         }
     }
 
-    function postMemoCreate() {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (
-                isset($_POST['JYOKEN_CD']) &&
-                isset($_POST['JYOKEN_SYBET_FLG']) &&
-                isset($_POST['YMD'])
-            ) {
-                $jyokenCd = $_POST['JYOKEN_CD'];
-                $jyokenSybetFlg = $_POST['JYOKEN_SYBET_FLG'];
-                $ymd = $_POST['YMD'];
-
-                $MEMO_CD = isset($_POST['MEMO_CD']) ? '"' . $_POST['MEMO_CD'] . '"' : 'NULL';
-                $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
-                $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
-                $NAIYO = isset($_POST['NAIYO']) ? '"' . $_POST['NAIYO'] . '"' : 'NULL';
-                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
-
-                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
-                $COMMENT = isset($_POST['COMMENT']) ? '"' . $_POST['COMMENT'] . '"' : 'NULL';
-
-                $sqlDataTBetucalendar = 'SELECT *
-                        FROM T_TBETUCALENDAR 
-                        WHERE JYOKEN_CD="' . $jyokenCd . '" 
-                            AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
-                            AND YMD="' . $ymd . '"
-                            AND TAG_KBN=' . $TAG_KBN . '
-                            AND MEMO_CD=' . $MEMO_CD . '
-                            ';
-                $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-
-                if ($getDataTBetucalendar->num_rows > 0) {
-                    $this->dbReference->sendResponse(404, '{"error_message": "This Memo already exists"}'); die;
-                } else {
-                    $sqlDataTBetucalendar = 'SELECT max(TAN_CAL_ID) as TANCALID_MAX
-                        FROM T_TBETUCALENDAR';
-                    $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-                    $num = 0;
-                    if ($getDataTBetucalendar->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $getDataTBetucalendar->fetch_assoc()) {
-                            $num = (int)$row['TANCALID_MAX'] + 1;
-                        }
-                    }
-
-                    $TAN_CAL_ID = sprintf('%010d', $num);
-                    $sqlInsert = 'INSERT INTO T_TBETUCALENDAR 
-                                    (
-                                        TAN_CAL_ID, JYOKEN_CD, JYOKEN_SYBET_FLG, YMD, TAG_KBN, START_TIME, END_TIME, 
-                                        MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, DEL_FLG, ADD_PGID, ADD_TANTCD, ADD_YMD, 
-                                        UPD_PGID, UPD_TANTCD, UPD_YMD
-                                    )
-                                VALUES 
-                                    (
-                                        "' . $TAN_CAL_ID . '", "' . $_POST['JYOKEN_CD'] . '", "' . $_POST['JYOKEN_SYBET_FLG'] . '", 
-                                        "' . $_POST['YMD'] . '", ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
-                                        ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', ' . $ALL_DAY_FLG . ', "' . date('Y-m-d') . '", 0, 
-                                        "KOJ1110F", "' . $jyokenCd . '", "' . date("Y-m-d H:i:s") . '", "KOJ1110F", "' . $jyokenCd . '", "' . date("Y-m-d H:i:s") . '"
-                                    );';
-                    $this->result = $this->dbConnect->query($sqlInsert);
-                }
-
-                $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": "ERROR"}');
-            }
-        }
-    }
-
     function postMemoUpdate()
     {
         $this->dbReference = new systemConfig();
@@ -2698,6 +2626,7 @@ class resources
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"
+                            AND DEL_FLG="0" 
                             AND START_TIME=' . $START_TIME . '
                         ';
                 $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
@@ -2717,7 +2646,8 @@ class resources
                             UPD_YMD="' . date("Y-m-d H:i:s") . '" 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
-                            AND YMD="' . $ymd . '"
+                            AND YMD="' . $ymd . '" 
+                            AND DEL_FLG="0" 
                             AND START_TIME=' . $START_TIME . '
                         ';
                     $this->result = $this->dbConnect->query($sqlUpdate);
@@ -2795,7 +2725,8 @@ class resources
         } else {
             if (
                 isset($_GET['TANT_CD']) &&
-                isset($_GET['HOLIDAY_YEAR'])
+                isset($_GET['HOLIDAY_YEAR']) &&
+                isset($_GET['GET_MONTH'])
             ) {
                 $tantCd = $_GET['TANT_CD'];
                 $holidayYear = $_GET['HOLIDAY_YEAR'];
@@ -2812,6 +2743,7 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
                         $totalHolidays = 0;
                         foreach ($row as $value) {
                             $totalHolidays = $totalHolidays + $value;
@@ -2819,6 +2751,27 @@ class resources
                         $resultSet['totalHolidays'] = $totalHolidays;
                     }
                 }
+
+                $sqlGetHolidayMonth = 'SELECT TAN_CAL_ID 
+                                FROM T_TBETUCALENDAR 
+                                WHERE JYOKEN_CD="' . $tantCd . '" 
+                                    AND MEMO_CD="04" 
+                                    AND MONTH(`YMD`)="'. $_GET['GET_MONTH'] .'"
+                                    AND DEL_FLG="0"
+                                ';
+                $this->result = $this->dbConnect->query($sqlGetHolidayMonth);
+                $resultSet['totalHolidaysPerMonth'] = $this->result->num_rows;
+
+                $sqlGetHolidayYear = 'SELECT TAN_CAL_ID 
+                                FROM T_TBETUCALENDAR 
+                                WHERE JYOKEN_CD="' . $tantCd . '" 
+                                    AND MEMO_CD="04" 
+                                    AND MONTH(`YMD`)="'. $_GET['GET_MONTH'] .'"
+                                    AND DEL_FLG="0"
+                                ';
+                $this->result = $this->dbConnect->query($sqlGetHolidayYear);
+                $resultSet['totalHolidaysPerYear'] = $this->result->num_rows;
+                
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {

@@ -2238,7 +2238,9 @@ class resources
                 JYUCYU_ID,
                 HOMON_SBT,
                 COMMENT,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG= 0';
+                MEMO  FROM T_KOJI 
+                WHERE JYUCYU_ID="' . $JYUCYU_ID . '" 
+                AND DEL_FLG= 0';
                 $this->result2 = $this->dbConnect->query($sql);
                 if ($this->result2->num_rows > 0) {
                     // output data of each row
@@ -2317,8 +2319,9 @@ class resources
                     UPD_PGID= "' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '"
-                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    MEMO="' . $MEMO . '"                  
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
@@ -2336,8 +2339,9 @@ class resources
                     UPD_PGID= "' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",            
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '"  
-                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    MEMO="' . $MEMO . '"                    
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
@@ -2367,7 +2371,9 @@ class resources
                 GUEST_NAME,
                 ATTEND_NAME1,
                 ATTEND_NAME2,
-                ATTEND_NAME3 FROM T_EIGYO_ANKEN WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" AND DEL_FLG= 0';
+                ATTEND_NAME3 FROM T_EIGYO_ANKEN 
+                WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" 
+                AND DEL_FLG= 0';               
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -2446,7 +2452,8 @@ class resources
                 WHERE JYOKEN_CD=' . $JYOKEN_CD . ' 
                 AND YMD="' . $YMD . '" 
                 AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
-                AND START_TIME='.$START_TIME.'';               
+                AND START_TIME='.$START_TIME.'
+                AND DEL_FLG=0';               
                 $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
 
                 if ($count_eigyo_anken->num_rows > 0) {
@@ -2466,7 +2473,10 @@ class resources
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD=' . $UPD_TANTCD . ',
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYOKEN_CD="' . $JYOKEN_CD . '" AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
+                    WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
+                    AND YMD="' . $YMD . '" 
+                    AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . ' 
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
@@ -2498,7 +2508,8 @@ class resources
                     ATTEND_NAME1,
                     ATTEND_NAME2,
                     ATTEND_NAME3,
-                    ALL_DAY_FLG,                    
+                    ALL_DAY_FLG,
+                    DEL_FLG,                    
                     ADD_PGID,
                     ADD_TANTCD,
                     ADD_YMD,
@@ -2520,7 +2531,8 @@ class resources
                     ' . $ATTEND_NAME1 . ',
                     ' . $ATTEND_NAME2 . ',
                     ' . $ATTEND_NAME3 . ',
-                    ' . $ALL_DAY_FLG . ',                    
+                    ' . $ALL_DAY_FLG . ',   
+                    0,                 
                     "' . $ADD_PGID . '",
                     ' . $ADD_TANTCD . ',
                     "' . $ADD_YMD . '",

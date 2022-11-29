@@ -92,7 +92,7 @@ class resources
                         $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
                         $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
-                        $data['ID'] = $LOGIN_ID;
+                        $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
                 }
@@ -124,7 +124,7 @@ class resources
                         $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
                         $data['KOJI_YMD'] = $row['KOJI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
-                        $data['ID'] = $LOGIN_ID;
+                        $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
                 }
@@ -185,8 +185,6 @@ class resources
 
                 if ($count_syuyaku_jyucyu > 1) {
                     $this->dbReference->sendResponse(200, json_encode($count_syuyaku_jyucyu, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
                 }
             } else {
                 $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
@@ -251,7 +249,7 @@ class resources
                 $HOMON_SBT = $_GET['HOMON_SBT'];
                 $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
 
-                if ($SINGLE_SUMMARIZE == "01") {
+                if ($SINGLE_SUMMARIZE == 1) {
                     if ($HOMON_SBT == "01") {
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                         T_KOJI.JYUCYU_ID,
@@ -270,7 +268,7 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
-                                $row['SINGLE_SUMMARIZE'] = "01";
+                                $row['SINGLE_SUMMARIZE'] = 1;
                                 $resultSet[] = $row;
                             }
                         }
@@ -292,14 +290,14 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
-                                $row['SINGLE_SUMMARIZE'] = "01";
+                                $row['SINGLE_SUMMARIZE'] = 1;
                                 $resultSet[] = $row;
                             }
                         }
                     } else {
                         $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
                     }
-                } else if ($SINGLE_SUMMARIZE == "02") {
+                } else if ($SINGLE_SUMMARIZE == 2) {
                     if ($HOMON_SBT == "01") {
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                         T_KOJI_FILEPATH.FILEPATH,
@@ -316,7 +314,7 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
-                                $row['SINGLE_SUMMARIZE'] = "02";
+                                $row['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $row;
                             }
                         }
@@ -336,7 +334,7 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
-                                $row['SINGLE_SUMMARIZE'] = "02";
+                                $row['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $row;
                             }
                         }
@@ -365,7 +363,7 @@ class resources
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['SINGLE_SUMMARIZE'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
-                if ($SINGLE_SUMMARIZE == "01") {
+                if ($SINGLE_SUMMARIZE == 1) {
                     $sql = ' SELECT FILEPATH,
                     ID, FILEPATH_ID
                     FROM T_KOJI_FILEPATH
@@ -376,11 +374,11 @@ class resources
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
-                            $row['SINGLE_SUMMARIZE'] = "01";
+                            $row['SINGLE_SUMMARIZE'] = 1;
                             $resultSet[] = $row;
                         }
                     }
-                } else if ($SINGLE_SUMMARIZE == "02") {
+                } else if ($SINGLE_SUMMARIZE == 2) {
                     $sql = 'SELECT T_KOJI_FILEPATH.FILEPATH,
                     T_KOJI.JYUCYU_ID, 
                     T_KOJI.SYUYAKU_JYUCYU_ID
@@ -392,7 +390,7 @@ class resources
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
-                            $row['SINGLE_SUMMARIZE'] = "02";
+                            $row['SINGLE_SUMMARIZE'] = 2;
                             $resultSet[] = $row;
                         }
                     }
@@ -448,6 +446,24 @@ class resources
     }
 
     /* ==================================================================== 写真提出-登録 */
+    function uploadFileImg($file)
+    {
+        if (!empty($file)) {
+            // $imageFileType = strtolower(pathinfo($FILE_NAME,PATHINFO_EXTENSION));
+            // var_dump($imageFileType); die;
+            $path = 'myfolder/myimage.png';
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            // Check file size                
+            if ($FILE_NAME["size"] > 500000) {
+                echo "Sorry, your file is too large.";
+            }
+            var_dump($_FILES['FILE_NAME']);
+            die;
+        }
+    }
+
     function postPhotoSubmissionRegistration()
     {
         $this->dbReference = new systemConfig();
@@ -457,12 +473,7 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
-                // Check file size                
-                if ($FILE_NAME["size"] > 500000) {
-                    echo "Sorry, your file is too large.";                   
-                }
-                var_dump($_FILES['FILE_NAME']);
-                die;
+                $this->uploadFileImg($FILE_NAME);
 
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
@@ -652,22 +663,22 @@ class resources
         } else {
             if (
                 isset($_GET['JYUCYU_ID']) &&
-                isset($_GET['KOJI_ST']) && 
+                isset($_GET['KOJI_ST']) &&
                 isset($_GET['SINGLE_SUMMARIZE'])
             ) {
                 $jyucyuId = $_GET['JYUCYU_ID'];
                 $kojiSt = $_GET['KOJI_ST'];
-                
+
                 $resultSet = array();
-                if($kojiSt == "01" || $kojiSt == "02") {
-                    if($_GET['SINGLE_SUMMARIZE'] == 1) {
+                if ($kojiSt == "01" || $kojiSt == "02") {
+                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
                         FROM T_KOJIMSAI 
                         WHERE JYUCYU_ID="' . $jyucyuId . '" 
                             AND KOJIJITUIKA_FLG<>"0" 
                             AND DEL_FLG="0"';
                         $this->result = $this->dbConnect->query($sqlNotReported);
-    
+
                         if ($this->result->num_rows > 0) {
                             // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
@@ -675,8 +686,8 @@ class resources
                             }
                         }
                     }
-                    if($_GET['SINGLE_SUMMARIZE'] == 2) {
-                        if(isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
+                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
                             $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
                             FROM T_KOJI 
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
@@ -690,8 +701,8 @@ class resources
                                     $listJyucyuIdKoji[] = $row;
                                 }
                             }
-                            
-                            foreach($listJyucyuIdKoji as $value) {
+
+                            foreach ($listJyucyuIdKoji as $value) {
                                 $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
                                     FROM T_KOJIMSAI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
@@ -706,12 +717,12 @@ class resources
                                 }
                             }
                         } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }'); die;
+                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
+                            die;
                         }
-                        
                     }
-                } elseif($kojiSt == "03") {
-                    if($_GET['SINGLE_SUMMARIZE'] == 1) {
+                } elseif ($kojiSt == "03") {
+                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
                             FROM T_KOJIMSAI 
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
@@ -726,8 +737,8 @@ class resources
                             }
                         }
                     }
-                    if($_GET['SINGLE_SUMMARIZE'] == 2) {
-                        if(isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
+                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
                             $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
                             FROM T_KOJI 
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
@@ -741,8 +752,8 @@ class resources
                                     $listJyucyuIdKoji[] = $row;
                                 }
                             }
-                            
-                            foreach($listJyucyuIdKoji as $value) {
+
+                            foreach ($listJyucyuIdKoji as $value) {
                                 $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
                                     FROM T_KOJIMSAI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
@@ -757,12 +768,13 @@ class resources
                                 }
                             }
                         } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }'); die;
+                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
+                            die;
                         }
-
                     }
                 } else {
-                    $this->dbReference->sendResponse(404, '{"error_message": KOJI_ST_value: 01 || 02 || 03 }'); die;
+                    $this->dbReference->sendResponse(404, '{"error_message": KOJI_ST_value: 01 || 02 || 03 }');
+                    die;
                 }
 
                 $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
@@ -1544,6 +1556,7 @@ class resources
                     T_EIGYO_ANKEN.GUEST_NAME, 
                     T_EIGYO_ANKEN.YMD,
                     T_EIGYO_ANKEN.JYOKEN_SYBET_FLG,
+                    T_EIGYO_ANKEN.TAN_EIG_ID,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1, 
                     M_TANT.TANT_NAME, 
@@ -1568,6 +1581,7 @@ class resources
                             $data['GUEST_NAME'] = $row['GUEST_NAME'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 3;
@@ -2345,14 +2359,14 @@ class resources
                 KBNMSAI_CD,
                 KBNMSAI_NAME FROM M_KBN 
                 WHERE KBN_CD= "10" 
-                AND DEL_FLG= 0';        
+                AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['PULLDOWN'][] = $row;
                     }
-                }                
+                }
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $sql = ' SELECT KBN_CD,
@@ -2360,14 +2374,14 @@ class resources
                 KBNMSAI_CD,
                 KBNMSAI_NAME FROM M_KBN 
                 WHERE KBN_CD= "10" 
-                AND DEL_FLG= 0';        
+                AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['PULLDOWN'][] = $row;
                     }
-                }        
+                }
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }

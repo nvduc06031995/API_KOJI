@@ -2418,7 +2418,7 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG'])
+                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG']) && isset($_POST['START_TIME'])
             ) {
                 $YMD = $_POST['YMD'];
                 $JYOKEN_CD = $_POST['JYOKEN_CD'];
@@ -2443,7 +2443,10 @@ class resources
                 $UPD_YMD  = date('Y-m-d H:i:s');
                 $query_eigyo_anken = 'SELECT TAN_EIG_ID 
                 FROM T_EIGYO_ANKEN 
-                WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . '';
+                WHERE JYOKEN_CD=' . $JYOKEN_CD . ' 
+                AND YMD="' . $YMD . '" 
+                AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
+                AND START_TIME='.$START_TIME.'';               
                 $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
 
                 if ($count_eigyo_anken->num_rows > 0) {

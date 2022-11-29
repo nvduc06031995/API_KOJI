@@ -449,19 +449,31 @@ class resources
     function uploadFileImg($file)
     {
         if (!empty($file)) {
-            // $imageFileType = strtolower(pathinfo($FILE_NAME,PATHINFO_EXTENSION));
-            // var_dump($imageFileType); die;
-            $path = 'myfolder/myimage.png';
-            $type = pathinfo($path, PATHINFO_EXTENSION);
-            $data = file_get_contents($path);
-            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            $path = 'img/';
+            $target_file = $path . basename($file["name"]);
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $uploadOk = 1;
             // Check file size                
-            if ($FILE_NAME["size"] > 500000) {
+            if ($file["size"] > 500000) {
                 echo "Sorry, your file is too large.";
+                $uploadOk = 0;
             }
-            var_dump($_FILES['FILE_NAME']);
-            die;
+            if (
+                $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                && $imageFileType != "gif"
+            ) {
+                echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                $uploadOk = 0;
+            }
+            // Check if $uploadOk is set to 0 by an error
+            if ($uploadOk == 0) {
+                echo "Sorry, your file was not uploaded.";
+                // if everything is ok, try to upload file
+            } else {
+                move_uploaded_file($file["tmp_name"], $target_file);
+            }
         }
+        return $target_file;
     }
 
     function postPhotoSubmissionRegistration()
@@ -473,7 +485,7 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
-                $this->uploadFileImg($FILE_NAME);
+                $img_path = $this->uploadFileImg($FILE_NAME);
 
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
@@ -498,38 +510,40 @@ class resources
                 }
 
                 $FILEPATH_ID = sprintf('%010d', $num);
+                if (!empty($img_path)) {
+                    $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
+                    ID,
+                    FILEPATH,
+                    FILE_KBN_CD,
+                    ADD_PGID,
+                    ADD_TANTCD,
+                    ADD_YMD,
+                    UPD_PGID,
+                    UPD_TANTCD,
+                    UPD_YMD
+                    ) VALUES (
+                    "' . $FILEPATH_ID . '",
+                    "' . $JYUCYU_ID . '",
+                    "' . $img_path . '",
+                    "' . $FILE_KBN_CD . '",
+                    "' . $ADD_PGID . '",
+                    "' . $ADD_TANTCD . '",
+                    "' . $ADD_YMD . '",
+                    "' . $UPD_PGID . '",
+                    "' . $UPD_TANTCD . '",
+                    "' . $UPD_YMD . '")';
+                    $this->result = $this->dbConnect->query($sql);
 
-                $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
-                ID,
-                FILEPATH,
-                FILE_KBN_CD,
-                ADD_PGID,
-                ADD_TANTCD,
-                ADD_YMD,
-                UPD_PGID,
-                UPD_TANTCD,
-                UPD_YMD
-                ) VALUES (
-                "' . $FILEPATH_ID . '",
-                "' . $JYUCYU_ID . '",
-                "' . $FILEPATH . $FILE_NAME . '",
-                "' . $FILE_KBN_CD . '",
-                "' . $ADD_PGID . '",
-                "' . $ADD_TANTCD . '",
-                "' . $ADD_YMD . '",
-                "' . $UPD_PGID . '",
-                "' . $UPD_TANTCD . '",
-                "' . $UPD_YMD . '")';
-                $this->result = $this->dbConnect->query($sql);
+                    $sql = 'UPDATE T_KOJI SET KOJI_KEKKA="03",
+                    SKJ_RENKEI_YMD="' . $PRESENT_DATE . '",
+                    UPD_PGID="' . $UPD_PGID . '",
+                    UPD_TANTCD="' . $UPD_TANTCD . '",
+                    UPD_YMD="' . $UPD_YMD . '" 
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';
 
-                $sql = 'UPDATE T_KOJI SET KOJI_KEKKA="03",
-                SKJ_RENKEI_YMD="' . $PRESENT_DATE . '",
-                UPD_PGID="' . $UPD_PGID . '",
-                UPD_TANTCD="' . $UPD_TANTCD . '",
-                UPD_YMD="' . $UPD_YMD . '" 
-                WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';
+                    $this->result = $this->dbConnect->query($sql);
+                }
 
-                $this->result = $this->dbConnect->query($sql);
 
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -546,63 +560,68 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_GET['JYUCYU_ID'])) {
+            if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql = 'SELECT T_KOJI.JYUCYU_ID,
-                T_KOJI.SETSAKI_NAME,
-                T_KOJI.KOJI_YMD,
-                T_KOJI.HOMON_TANT_NAME1,
-                T_KOJI.HOMON_TANT_NAME2,
-                T_KOJI.HOMON_TANT_NAME3,
-                T_KOJI.HOMON_TANT_NAME4,
-                T_KOJI.CO_NAME,
-                T_KOJI.CO_POSTNO,
-                T_KOJI.CO_ADDRESS,
-                T_KOJI.KOJIGYOSYA_CD,
-                M_GYOSYA.KOJIGYOSYA_NAME FROM T_KOJI 
-                LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
-                WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"              
-                AND HOJIN_FLG= 0 
-                AND T_KOJI.DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $row['STATUS'] = 'NOT_REPORTED';
-                        $resultSet[] = $row;
+                $KOJI_ST = $_GET['KOJI_ST'];
+                if (in_array($KOJI_ST, ["01", "02"])) {
+                    $sql = 'SELECT T_KOJI.JYUCYU_ID,
+                    T_KOJI.SETSAKI_NAME,
+                    T_KOJI.KOJI_YMD,
+                    T_KOJI.HOMON_TANT_NAME1,
+                    T_KOJI.HOMON_TANT_NAME2,
+                    T_KOJI.HOMON_TANT_NAME3,
+                    T_KOJI.HOMON_TANT_NAME4,
+                    T_KOJI.CO_NAME,
+                    T_KOJI.CO_POSTNO,
+                    T_KOJI.CO_ADDRESS,
+                    T_KOJI.KOJIGYOSYA_CD,
+                    M_GYOSYA.KOJIGYOSYA_NAME FROM T_KOJI 
+                    LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
+                    WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"              
+                    AND HOJIN_FLG= 0 
+                    AND T_KOJI.DEL_FLG= 0';
+                    $this->result = $this->dbConnect->query($sql);
+                    $resultSet = array();
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row                    
+                        while ($row = $this->result->fetch_assoc()) {
+                            $row['STATUS'] = 'NOT_REPORTED';
+                            $resultSet[] = $row;
+                        }
                     }
-                }
-
-                $sql = 'SELECT T_KOJI.JYUCYU_ID,
-                T_KOJI.SETSAKI_NAME,
-                T_KOJI.KOJI_YMD,
-                M_GYOSYA.KOJIGYOSYA_NAME,
-                T_KOJI.HOMON_TANT_NAME1,
-                T_KOJI.HOMON_TANT_NAME2,
-                T_KOJI.HOMON_TANT_NAME3,
-                T_KOJI.HOMON_TANT_NAME4,
-                T_KOJI.CO_NAME,
-                T_KOJI.CO_POSTNO,
-                T_KOJI.CO_ADDRESS,
-                T_KOJIMSAI.TUIKA_SYOHIN_NAME,
-                T_KOJIMSAI.TUIKA_JISYA_CD,
-                T_KOJIMSAI.SURYO,
-                T_KOJIMSAI.HANBAI_TANKA,
-                T_KOJIMSAI.KINGAK FROM T_KOJI 
-                LEFT JOIN T_KOJIMSAI ON T_KOJI.JYUCYU_ID=T_KOJIMSAI.JYUCYU_ID
-                LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
-                WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
-                AND T_KOJI.HOJIN_FLG= 0 
-                AND T_KOJI.DEL_FLG= 0 
-                AND KOJIJITUIKA_FLG= 1';
-                $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $row['STATUS'] = 'REPORTED';
-                        $resultSet[] = $row;
+                } else if ($KOJI_ST == "03") {
+                    $sql = 'SELECT T_KOJI.JYUCYU_ID,
+                    T_KOJI.SETSAKI_NAME,
+                    T_KOJI.KOJI_YMD,
+                    M_GYOSYA.KOJIGYOSYA_NAME,
+                    T_KOJI.HOMON_TANT_NAME1,
+                    T_KOJI.HOMON_TANT_NAME2,
+                    T_KOJI.HOMON_TANT_NAME3,
+                    T_KOJI.HOMON_TANT_NAME4,
+                    T_KOJI.CO_NAME,
+                    T_KOJI.CO_POSTNO,
+                    T_KOJI.CO_ADDRESS,
+                    T_KOJIMSAI.TUIKA_SYOHIN_NAME,
+                    T_KOJIMSAI.TUIKA_JISYA_CD,
+                    T_KOJIMSAI.SURYO,
+                    T_KOJIMSAI.HANBAI_TANKA,
+                    T_KOJIMSAI.KINGAK FROM T_KOJI 
+                    LEFT JOIN T_KOJIMSAI ON T_KOJI.JYUCYU_ID=T_KOJIMSAI.JYUCYU_ID
+                    LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
+                    WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
+                    AND T_KOJI.HOJIN_FLG= 0 
+                    AND T_KOJI.DEL_FLG= 0 
+                    AND KOJIJITUIKA_FLG= 1';
+                    $this->result = $this->dbConnect->query($sql);
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row                    
+                        while ($row = $this->result->fetch_assoc()) {
+                            $row['STATUS'] = 'REPORTED';
+                            $resultSet[] = $row;
+                        }
                     }
+                } else {
+                    $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
                 }
 
                 // $sql = 'SELECT SYOHIN_NAME,
@@ -615,6 +634,7 @@ class resources
                 //         $resultSet[] = $row;
                 //     }
                 // }
+
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
@@ -1321,7 +1341,7 @@ class resources
                         T_EIGYO_ANKEN.TAN_EIG_ID, 
                         T_EIGYO_ANKEN.END_TIME, 
                         T_EIGYO_ANKEN.GUEST_NAME, 
-                        T_EIGYO_ANKEN.ALL_DAY_FLG, 
+                        T_EIGYO_ANKEN.ALL_DAY_FLG,
                         T_EIGYO_ANKEN.YMD,
                         M_KBN.YOBIKOMOKU1, 
                         M_KBN.KBNMSAI_NAME
@@ -1343,6 +1363,7 @@ class resources
                         $data['GUEST_NAME'] = $row['GUEST_NAME'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
                         $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                         $data['YMD'] = $row['YMD'];
                         $data['TYPE'] = 1;
@@ -2223,7 +2244,9 @@ class resources
                 JYUCYU_ID,
                 HOMON_SBT,
                 COMMENT,
-                MEMO  FROM T_KOJI WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG= 0';
+                MEMO  FROM T_KOJI 
+                WHERE JYUCYU_ID="' . $JYUCYU_ID . '" 
+                AND DEL_FLG= 0';
                 $this->result2 = $this->dbConnect->query($sql);
                 if ($this->result2->num_rows > 0) {
                     // output data of each row
@@ -2302,8 +2325,9 @@ class resources
                     UPD_PGID= "' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '"
-                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    MEMO="' . $MEMO . '"                  
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
@@ -2321,8 +2345,9 @@ class resources
                     UPD_PGID= "' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",            
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '"  
-                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '';
+                    MEMO="' . $MEMO . '"                    
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
@@ -2352,7 +2377,9 @@ class resources
                 GUEST_NAME,
                 ATTEND_NAME1,
                 ATTEND_NAME2,
-                ATTEND_NAME3 FROM T_EIGYO_ANKEN WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" AND DEL_FLG= 0';
+                ATTEND_NAME3 FROM T_EIGYO_ANKEN 
+                WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" 
+                AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -2403,7 +2430,7 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             if (
-                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG'])
+                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG']) && isset($_POST['START_TIME'])
             ) {
                 $YMD = $_POST['YMD'];
                 $JYOKEN_CD = $_POST['JYOKEN_CD'];
@@ -2428,7 +2455,11 @@ class resources
                 $UPD_YMD  = date('Y-m-d H:i:s');
                 $query_eigyo_anken = 'SELECT TAN_EIG_ID 
                 FROM T_EIGYO_ANKEN 
-                WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . '';
+                WHERE JYOKEN_CD=' . $JYOKEN_CD . ' 
+                AND YMD="' . $YMD . '" 
+                AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
+                AND START_TIME=' . $START_TIME . '
+                AND DEL_FLG=0';
                 $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
 
                 if ($count_eigyo_anken->num_rows > 0) {
@@ -2448,7 +2479,10 @@ class resources
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD=' . $UPD_TANTCD . ',
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYOKEN_CD=' . $JYOKEN_CD . ' AND YMD="' . $YMD . '" AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . '';
+                    WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
+                    AND YMD="' . $YMD . '" 
+                    AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . ' 
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
@@ -2480,7 +2514,8 @@ class resources
                     ATTEND_NAME1,
                     ATTEND_NAME2,
                     ATTEND_NAME3,
-                    ALL_DAY_FLG,                    
+                    ALL_DAY_FLG,
+                    DEL_FLG,                    
                     ADD_PGID,
                     ADD_TANTCD,
                     ADD_YMD,
@@ -2489,8 +2524,8 @@ class resources
                     UPD_YMD                      
                     )
                     VALUES (
-                    ' . $TAN_EIG_ID . ',
-                    ' . $JYOKEN_CD . ',
+                    "' . $TAN_EIG_ID . '",
+                    "' . $JYOKEN_CD . '",
                     ' . $JYOKEN_SYBET_FLG . ',
                     "' . $YMD . '",
                     ' . $TAG_KBN . ',
@@ -2502,7 +2537,8 @@ class resources
                     ' . $ATTEND_NAME1 . ',
                     ' . $ATTEND_NAME2 . ',
                     ' . $ATTEND_NAME3 . ',
-                    ' . $ALL_DAY_FLG . ',                    
+                    ' . $ALL_DAY_FLG . ',   
+                    0,                 
                     "' . $ADD_PGID . '",
                     ' . $ADD_TANTCD . ',
                     "' . $ADD_YMD . '",
@@ -2656,6 +2692,7 @@ class resources
             }
         }
     }
+    
     function postMemoDelete()
     {
         $this->dbReference = new systemConfig();

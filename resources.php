@@ -1321,6 +1321,7 @@ class resources
                         T_EIGYO_ANKEN.TAN_EIG_ID, 
                         T_EIGYO_ANKEN.END_TIME, 
                         T_EIGYO_ANKEN.GUEST_NAME, 
+                        T_EIGYO_ANKEN.ALL_DAY_FLG, 
                         T_EIGYO_ANKEN.YMD,
                         M_KBN.YOBIKOMOKU1, 
                         M_KBN.KBNMSAI_NAME
@@ -1342,6 +1343,7 @@ class resources
                         $data['GUEST_NAME'] = $row['GUEST_NAME'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                         $data['YMD'] = $row['YMD'];
                         $data['TYPE'] = 1;
                         $resultSet['OFFICE'][$EIGYO_ANKEN_YMD][] = $data;
@@ -1559,6 +1561,7 @@ class resources
                     T_EIGYO_ANKEN.YMD,
                     T_EIGYO_ANKEN.JYOKEN_SYBET_FLG,
                     T_EIGYO_ANKEN.TAN_EIG_ID,
+                    T_EIGYO_ANKEN.ALL_DAY_FLG,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1, 
                     M_TANT.TANT_NAME, 
@@ -1584,6 +1587,7 @@ class resources
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
                             $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 3;

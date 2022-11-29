@@ -701,7 +701,7 @@ class resources
                         FROM T_KOJIMSAI 
                         WHERE JYUCYU_ID="' . $jyucyuId . '" 
                             AND KOJIJITUIKA_FLG<>"0" 
-                            AND DEL_FLG="0"';
+                            AND DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sqlNotReported);
 
                         if ($this->result->num_rows > 0) {
@@ -716,7 +716,7 @@ class resources
                             $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
                             FROM T_KOJI 
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
-                                AND DEL_FLG="0"';
+                                AND DEL_FLG=0';
                             $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
 
                             $listJyucyuIdKoji = array();
@@ -732,7 +732,7 @@ class resources
                                     FROM T_KOJIMSAI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                         AND KOJIJITUIKA_FLG<>"0" 
-                                        AND DEL_FLG="0"';
+                                        AND DEL_FLG=0';
                                 $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
                                 if ($this->result->num_rows > 0) {
                                     // output data of each row
@@ -752,7 +752,7 @@ class resources
                             FROM T_KOJIMSAI 
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                             AND KOJIJITUIKA_FLG<>"0" 
-                            AND DEL_FLG="0"';
+                            AND DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sqlReported);
 
                         if ($this->result->num_rows > 0) {
@@ -767,7 +767,7 @@ class resources
                             $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
                             FROM T_KOJI 
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
-                                AND DEL_FLG="0"';
+                                AND DEL_FLG=0';
                             $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
 
                             $listJyucyuIdKoji = array();
@@ -783,7 +783,7 @@ class resources
                                     FROM T_KOJIMSAI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                         AND KOJIJITUIKA_FLG<>"0" 
-                                        AND DEL_FLG="0"';
+                                        AND DEL_FLG=0';
                                 $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
                                 if ($this->result->num_rows > 0) {
                                     // output data of each row
@@ -1082,7 +1082,7 @@ class resources
                 //Get data T_KOJI
                 $sql = 'SELECT CANCEL_RIYU 
                         FROM T_KOJI 
-                        WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG="0"';
+                        WHERE JYUCYU_ID="' . $JYUCYU_ID . '" AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();
@@ -1116,7 +1116,7 @@ class resources
                 //Get data T_KOJI
                 $sql = 'SELECT FILEPATH 
                         FROM T_KOJI_FILEPATH 
-                        WHERE FILE_KBN_CD="' . $kojiFilePathFileKbnCd . '" AND DEL_FLG="0"';
+                        WHERE FILE_KBN_CD="' . $kojiFilePathFileKbnCd . '" AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();
@@ -1356,6 +1356,7 @@ class resources
                             AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '" 
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
+                            AND T_EIGYO_ANKEN.DEL_FLG=0 
                             AND M_KBN.KBN_CD="10"';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
@@ -1389,6 +1390,7 @@ class resources
                  CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="1" AND M_KBN.KBNMSAI_CD="01"
                  WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
                      AND T_TBETUCALENDAR.YMD <= "' . $end_date . '" 
+                     AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                      AND M_KBN.KBN_CD="06"';
                 $this->result = $this->dbConnect->query($sql);
@@ -1447,6 +1449,7 @@ class resources
                     WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
                     AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
+                    AND T_KOJI.DEL_FLG=0 
                     AND M_KBN.KBN_CD="05"
                     ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
                     $this->result = $this->dbConnect->query($sql);
@@ -1499,6 +1502,7 @@ class resources
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                        AND T_KOJI.DEL_FLG=0 
                         AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                         AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" )
                         AND M_KBN.KBN_CD="05"';
@@ -1596,6 +1600,7 @@ class resources
                     CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
+                    AND T_EIGYO_ANKEN.DEL_FLG=0 
                     AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '"
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"';
                     $this->result = $this->dbConnect->query($sql);
@@ -1638,7 +1643,8 @@ class resources
                     FROM T_TBETUCALENDAR 
                     CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
                     CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
-                    WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
+                    WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '" 
+                    AND T_TBETUCALENDAR.DEL_FLG=0 
                     AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"                                         
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
                     AND M_KBN.KBN_CD="06"';
@@ -1694,7 +1700,8 @@ class resources
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '" 
+                    AND T_KOJI.DEL_FLG=0 
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
                     AND M_KBN.KBN_CD="16"';
@@ -1747,6 +1754,7 @@ class resources
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    AND T_KOJI.DEL_FLG=0 
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
                     AND M_KBN.KBN_CD="16" ';
@@ -1835,6 +1843,7 @@ class resources
                     LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="02"
                     LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
+                    AND T_KOJI.DEL_FLG=0 
                     AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
                     AND M_TANT.TANT_CD=' . $ID . '
                     AND M_KBN.KBN_CD="05"  
@@ -1881,7 +1890,8 @@ class resources
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '" 
+                        AND T_KOJI.DEL_FLG=0 
                         AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                         AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' )
                         AND M_KBN.KBN_CD="05"';
@@ -1918,7 +1928,8 @@ class resources
                     FROM T_EIGYO_ANKEN 
                     CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD
-                    WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
+                    WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '" 
+                    AND T_EIGYO_ANKEN.DEL_FLG=0 
                     AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '"
                     AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG=0
                     AND M_TANT.TANT_CD=' . $ID . '
@@ -1951,7 +1962,8 @@ class resources
                     FROM T_TBETUCALENDAR 
                     CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD
                     CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD
-                    WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
+                    WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '" 
+                    AND T_TBETUCALENDAR.DEL_FLG=0 
                     AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"                     
                     AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     AND M_TANT.TANT_CD=' . $ID . '
@@ -2000,7 +2012,8 @@ class resources
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '" 
+                    AND T_KOJI.DEL_FLG=0 
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' OR M_TANT4.TANT_CD=' . $ID . ' )
                     AND M_KBN.KBN_CD="16" 
@@ -2045,7 +2058,8 @@ class resources
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '" 
+                    AND T_KOJI.DEL_FLG=0 
                     AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' OR M_TANT4.TANT_CD=' . $ID . ' )
                     AND M_KBN.KBN_CD="16" 
@@ -2171,7 +2185,7 @@ class resources
                 AND M_KBN.KBNMSAI_CD="01" 
                 AND T_KOJI_FILEPATH.ID="' . $JYUCYU_ID . '" 
                 AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04" OR T_KOJI_FILEPATH.FILE_KBN_CD="05")
-                AND T_KOJI.DEL_FLG="0"';
+                AND T_KOJI.DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
 
                 $resultSet = array();
@@ -2577,14 +2591,14 @@ class resources
                 $sql = 'SELECT MEMO_CD, YMD, START_TIME, END_TIME, NAIYO 
                             FROM T_TBETUCALENDAR 
                             WHERE TAN_CAL_ID="' . $TAN_CAL_ID . '" 
-                                AND DEL_FLG="0"';
+                                AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
 
                 //Get data M_KBN
                 $sqlPulldown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
                                     FROM M_KBN 
                                     WHERE KBN_CD="06" 
-                                        AND DEL_FLG="0"';
+                                        AND DEL_FLG=0';
                 $getPullDown = $this->dbConnect->query($sqlPulldown);
 
                 $resultSet = array();
@@ -2637,7 +2651,7 @@ class resources
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"
-                            AND DEL_FLG="0" 
+                            AND DEL_FLG=0 
                             AND START_TIME=' . $START_TIME . '
                         ';
                 $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
@@ -2658,7 +2672,7 @@ class resources
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '" 
-                            AND DEL_FLG="0" 
+                            AND DEL_FLG=0 
                             AND START_TIME=' . $START_TIME . '
                         ';
                     $this->result = $this->dbConnect->query($sqlUpdate);
@@ -2738,7 +2752,8 @@ class resources
             if (
                 isset($_GET['TANT_CD']) &&
                 isset($_GET['HOLIDAY_YEAR']) &&
-                isset($_GET['GET_MONTH'])
+                isset($_GET['GET_MONTH']) &&
+                isset($_GET['GET_YEAR'])
             ) {
                 $tantCd = $_GET['TANT_CD'];
                 $holidayYear = $_GET['HOLIDAY_YEAR'];
@@ -2769,7 +2784,7 @@ class resources
                                 WHERE JYOKEN_CD="' . $tantCd . '" 
                                     AND MEMO_CD="04" 
                                     AND MONTH(`YMD`)="'. $_GET['GET_MONTH'] .'"
-                                    AND DEL_FLG="0"
+                                    AND DEL_FLG=0
                                 ';
                 $this->result = $this->dbConnect->query($sqlGetHolidayMonth);
                 $resultSet['totalHolidaysPerMonth'] = $this->result->num_rows;
@@ -2778,8 +2793,8 @@ class resources
                                 FROM T_TBETUCALENDAR 
                                 WHERE JYOKEN_CD="' . $tantCd . '" 
                                     AND MEMO_CD="04" 
-                                    AND MONTH(`YMD`)="'. $_GET['GET_MONTH'] .'"
-                                    AND DEL_FLG="0"
+                                    AND YEAR(`YMD`)="'. $_GET['GET_YEAR'] .'"
+                                    AND DEL_FLG=0
                                 ';
                 $this->result = $this->dbConnect->query($sqlGetHolidayYear);
                 $resultSet['totalHolidaysPerYear'] = $this->result->num_rows;

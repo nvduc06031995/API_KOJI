@@ -576,6 +576,7 @@ class resources
                     T_KOJI.CO_ADDRESS,
                     T_KOJI.KOJIGYOSYA_CD,
                     T_KOJI.KOJI_ST,
+                    T_KOJI.HOJIN_FLG,
                     M_GYOSYA.KOJIGYOSYA_NAME FROM T_KOJI 
                     LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
                     WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"              
@@ -604,6 +605,7 @@ class resources
                     T_KOJI.CO_POSTNO,
                     T_KOJI.CO_ADDRESS,
                     T_KOJI.KOJI_ST,
+                    T_KOJI.HOJIN_FLG,
                     T_KOJIMSAI.TUIKA_SYOHIN_NAME,
                     T_KOJIMSAI.TUIKA_JISYA_CD,
                     T_KOJIMSAI.SURYO,
@@ -616,7 +618,6 @@ class resources
                     AND T_KOJI.DEL_FLG= 0 
                     AND KOJIJITUIKA_FLG= 1
                     AND T_KOJI.KOJI_ST="03"';
-                    // echo $sql; die;
                     $resultSet = array();
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
@@ -647,6 +648,7 @@ class resources
         }
     }
 
+    /* ==================================================================== 法人完了書 */
     function getCorporateCompletionForm()
     {
         $this->dbReference = new systemConfig();
@@ -656,11 +658,18 @@ class resources
         } else {
             if (isset($_GET['KBN_BIKO'])) {
                 $KBN_BIKO = $_GET['KBN_BIKO'];
+
                 $sql = 'SELECT YOBIKOMOKU1,
                 YOBIKOMOKU2,
                 YOBIKOMOKU3,
                 YOBIKOMOKU4,
-                YOBIKOMOKU5 FROM T_KOJI LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD WHERE HOJIN_FLG= 1 AND KBN_CD= 12 AND KBN_BIKO="' . $KBN_BIKO . '" AND M_KBN.DEL_FLG IS NULL';
+                YOBIKOMOKU5 
+                FROM T_KOJI 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD 
+                WHERE HOJIN_FLG= 1 
+                AND KBN_CD= "12" 
+                AND KBN_BIKO="' . $KBN_BIKO . '" 
+                AND M_KBN.DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -2496,12 +2505,12 @@ class resources
                     ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
                     RENKEI_YMD="' . $RENKEI_YMD . '",
                     UPD_PGID="' . $UPD_PGID . '",
-                    UPD_TANTCD=' . $UPD_TANTCD . ',
+                    UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '" 
                     WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
                     AND YMD="' . $YMD . '" 
                     AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . ' 
-                    AND DEL_FLG=0';
+                    AND DEL_FLG=0';                                        
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
@@ -2559,11 +2568,11 @@ class resources
                     ' . $ALL_DAY_FLG . ',   
                     0,                 
                     "' . $ADD_PGID . '",
-                    ' . $ADD_TANTCD . ',
+                    "' . $ADD_TANTCD . '",
                     "' . $ADD_YMD . '",
                     "' . $UPD_PGID . '",
-                    ' . $UPD_TANTCD . ',
-                    "' . $UPD_YMD . '" )';
+                    "' . $UPD_TANTCD . '",
+                    "' . $UPD_YMD . '" )';                    
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }

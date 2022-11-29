@@ -1354,6 +1354,7 @@ class resources
                 T_TBETUCALENDAR.END_TIME, NAIYO, 
                 T_TBETUCALENDAR.YMD, 
                 T_TBETUCALENDAR.JYOKEN_CD, 
+                T_TBETUCALENDAR.ALL_DAY_FLG, 
                 M_KBN.KBNMSAI_NAME, 
                 M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
@@ -1376,6 +1377,7 @@ class resources
                         $data['YMD'] = $row['YMD'];
                         $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                         $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                         $data['TYPE'] = 2;
                         $resultSet['OFFICE'][$TBETUCALENDAR_YMD][] = $data;
                     }
@@ -1597,7 +1599,8 @@ class resources
                     T_TBETUCALENDAR.END_TIME, NAIYO, 
                     T_TBETUCALENDAR.YMD,
                     T_TBETUCALENDAR.TAN_CAL_ID,
-                    T_TBETUCALENDAR.JYOKEN_CD,
+                    T_TBETUCALENDAR.JYOKEN_CD, 
+                    T_TBETUCALENDAR.ALL_DAY_FLG,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1,
                     M_TANT.TANT_CD,
@@ -1628,6 +1631,7 @@ class resources
                             $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                             $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
                             $data['YMD'] = $row['YMD'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                             $data['TYPE'] = 4;
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
                         }
@@ -2586,12 +2590,16 @@ class resources
                         FROM T_TBETUCALENDAR 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
-                            AND YMD="' . $ymd . '"';
+                            AND YMD="' . $ymd . '"
+                            AND TAG_KBN="' . $TAG_KBN . '"
+                            AND MEMO_CD="' . $MEMO_CD . '"
+                            ';
                 $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
 
                 if ($getDataTBetucalendar->num_rows > 0) {
                     $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
                         SET MEMO_CD=' . $MEMO_CD . ', 
+                            TAG_KBN=' . $TAG_KBN . ', 
                             YMD="' . $ymd . '", 
                             START_TIME=' . $START_TIME . ', 
                             END_TIME=' . $END_TIME . ', 
@@ -2599,7 +2607,7 @@ class resources
                             ALL_DAY_FLG=' . $ALL_DAY_FLG . ', 
                             RENKEI_YMD="' . date('Y-m-d') . '", 
                             UPD_PGID="KOJ1110F", 
-                            UPD_TANTCD=' . $jyokenCd . ', 
+                            UPD_TANTCD="' . $jyokenCd . '", 
                             UPD_YMD="' . date("Y-m-d H:i:s") . '" 
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
@@ -2629,7 +2637,7 @@ class resources
                                         "' . $TAN_CAL_ID . '", "' . $_POST['JYOKEN_CD'] . '", "' . $_POST['JYOKEN_SYBET_FLG'] . '", 
                                         "' . $_POST['YMD'] . '", ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
                                         ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', ' . $ALL_DAY_FLG . ', "' . date('Y-m-d') . '", 0, 
-                                        "KOJ1110F", ' . $jyokenCd . ', "' . date("Y-m-d H:i:s") . '", "KOJ1110F", ' . $jyokenCd . ', "' . date("Y-m-d H:i:s") . '"
+                                        "KOJ1110F", "' . $jyokenCd . '", "' . date("Y-m-d H:i:s") . '", "KOJ1110F", "' . $jyokenCd . '", "' . date("Y-m-d H:i:s") . '"
                                     );';
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }

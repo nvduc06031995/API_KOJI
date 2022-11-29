@@ -575,18 +575,20 @@ class resources
                     T_KOJI.CO_POSTNO,
                     T_KOJI.CO_ADDRESS,
                     T_KOJI.KOJIGYOSYA_CD,
+                    T_KOJI.KOJI_ST,
                     M_GYOSYA.KOJIGYOSYA_NAME FROM T_KOJI 
                     LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
                     WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"              
                     AND HOJIN_FLG= 0 
-                    AND T_KOJI.DEL_FLG= 0';
+                    AND T_KOJI.DEL_FLG= 0
+                    AND (T_KOJI.KOJI_ST="02" OR T_KOJI.KOJI_ST="01")';
                     $this->result = $this->dbConnect->query($sql);
                     $resultSet = array();
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
                             $row['STATUS'] = 'NOT_REPORTED';
-                            $resultSet[] = $row;
+                            $resultSet['KOJI_DATA'][] = $row;
                         }
                     }
                 } else if ($KOJI_ST == "03") {
@@ -601,6 +603,7 @@ class resources
                     T_KOJI.CO_NAME,
                     T_KOJI.CO_POSTNO,
                     T_KOJI.CO_ADDRESS,
+                    T_KOJI.KOJI_ST,
                     T_KOJIMSAI.TUIKA_SYOHIN_NAME,
                     T_KOJIMSAI.TUIKA_JISYA_CD,
                     T_KOJIMSAI.SURYO,
@@ -611,29 +614,31 @@ class resources
                     WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
                     AND T_KOJI.HOJIN_FLG= 0 
                     AND T_KOJI.DEL_FLG= 0 
-                    AND KOJIJITUIKA_FLG= 1';
+                    AND KOJIJITUIKA_FLG= 1
+                    AND T_KOJI.KOJI_ST="03"';
+                    // echo $sql; die;
+                    $resultSet = array();
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
                             $row['STATUS'] = 'REPORTED';
-                            $resultSet[] = $row;
+                            $resultSet['KOJI_DATA'][] = $row;
                         }
                     }
+                  
+                    $sql = 'SELECT * FROM M_KOJI_KAKAKU';
+                    $this->result = $this->dbConnect->query($sql);
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row                    
+                        while ($row = $this->result->fetch_assoc()) {
+                            $resultSet['TABLE_DATA'][] = $row;
+                        }
+                    }
+
                 } else {
                     $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-                }
-
-                // $sql = 'SELECT SYOHIN_NAME,
-                // KOJI_KAKAKU FROM M_KOJI_KAKAKU WHERE JISYA_CD= "KOJ' . $JISYA_CD . '" ';
-                // $this->result = $this->dbConnect->query($sql);
-                // $resultSet = array();
-                // if ($this->result->num_rows > 0) {
-                //     // output data of each row                    
-                //     while ($row = $this->result->fetch_assoc()) {
-                //         $resultSet[] = $row;
-                //     }
-                // }
+                }               
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {

@@ -627,7 +627,7 @@ class resources
                         }
                     }
                   
-                    $sql = 'SELECT * FROM M_KOJI_KAKAKU';
+                    $sql = 'SELECT * FROM M_KOJI_KAKAKU WHERE DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    

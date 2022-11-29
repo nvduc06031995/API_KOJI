@@ -665,7 +665,6 @@ class resources
                             }
                         }
                     }
-
                     if($_GET['SINGLE_SUMMARIZE'] == 2) {
                         if(isset($_GET['SYUYAKU_JYUCYU_ID'])) {
                             $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
@@ -682,56 +681,89 @@ class resources
                                 }
                             }
                             
-                            
-    
-    
-                            $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
-                            FROM T_KOJIMSAI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                                AND KOJIJITUIKA_FLG<>"0" 
-                                AND DEL_FLG="0"';
-                            $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
-        
-                            if ($this->result->num_rows > 0) {
-                                // output data of each row
-                                while ($row = $this->result->fetch_assoc()) {
-                                    $resultSet['constructionNotReport']['SUMMARIZE'][] = $row;
+                            foreach($listJyucyuIdKoji as $value) {
+                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
+                                    FROM T_KOJIMSAI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                        AND KOJIJITUIKA_FLG<>"0" 
+                                        AND DEL_FLG="0"';
+                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+                                if ($this->result->num_rows > 0) {
+                                    // output data of each row
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['constructionNotReport']['SUMMARIZE'][] = $row;
+                                    }
                                 }
                             }
                         } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(404) . '}');
+                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }'); die;
                         }
                         
                     }
-                }
-                
+                } elseif($kojiSt == "03") {
+                    if($_GET['SINGLE_SUMMARIZE'] == 1) {
+                        $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
+                            FROM T_KOJIMSAI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                            AND KOJIJITUIKA_FLG<>"0" 
+                            AND DEL_FLG="0"';
+                        $this->result = $this->dbConnect->query($sqlReported);
 
-                $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                FROM T_KOJIMSAI 
-                WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                AND KOJIJITUIKA_FLG<>"0" 
-                AND DEL_FLG="0"';
-                $this->result = $this->dbConnect->query($sqlReported);
-
-                if ($this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['constructionReport'][] = $row;
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['constructionReport']['SINGLE'][] = $row;
+                            }
+                        }
                     }
+                    if($_GET['SINGLE_SUMMARIZE'] == 2) {
+                        if(isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
+                            FROM T_KOJI 
+                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
+                                AND DEL_FLG="0"';
+                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
+
+                            $listJyucyuIdKoji = array();
+                            if ($this->result->num_rows > 0) {
+                                // output data of each row
+                                while ($row = $this->result->fetch_assoc()) {
+                                    $listJyucyuIdKoji[] = $row;
+                                }
+                            }
+                            
+                            foreach($listJyucyuIdKoji as $value) {
+                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
+                                    FROM T_KOJIMSAI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                        AND KOJIJITUIKA_FLG<>"0" 
+                                        AND DEL_FLG="0"';
+                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+                                if ($this->result->num_rows > 0) {
+                                    // output data of each row
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['constructionReport']['SUMMARIZE'][] = $row;
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }'); die;
+                        }
+
+                    }
+                } else {
+                    $this->dbReference->sendResponse(404, '{"error_message": KOJI_ST_value: 01 || 02 || 03 }'); die;
                 }
 
-                $resultSet['constructionReportSummarize'][] = "NaN";
-
-
-                $sqlPulldown = 'SELECT KBNMSAI_NAME 
-                        FROM M_KBN 
-                        WHERE KBN_CD="07"';
-                $this->result = $this->dbConnect->query($sqlPulldown);
+                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
+                    FROM M_KBN 
+                    WHERE KBN_CD="07"';
+                $this->result = $this->dbConnect->query($sqlGetPullDown);
 
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['Pulldown_KBNMSAI'] = $row;
+                        $resultSet['PULLDOWN'][] = $row;
                     }
                 }
 

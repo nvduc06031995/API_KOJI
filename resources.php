@@ -2577,8 +2577,8 @@ class resources
                         WHERE JYOKEN_CD="' . $jyokenCd . '" 
                             AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
                             AND YMD="' . $ymd . '"
-                            AND TAG_KBN="' . $TAG_KBN . '"
-                            AND MEMO_CD="' . $MEMO_CD . '"
+                            AND TAG_KBN=' . $TAG_KBN . '
+                            AND MEMO_CD=' . $MEMO_CD . '
                             ';
                 $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
 

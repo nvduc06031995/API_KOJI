@@ -2340,18 +2340,35 @@ class resources
                     }
                 }
 
-                $sql2 = ' SELECT KBN_CODE,KBN_NAME,KBNMSAI_CD,KBNMSAI_NAME  FROM M_KBN WHERE KBN_CD= "10" AND DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql2);
+                $sql = ' SELECT KBN_CD,
+                KBN_NAME,
+                KBNMSAI_CD,
+                KBNMSAI_NAME FROM M_KBN 
+                WHERE KBN_CD= "10" 
+                AND DEL_FLG= 0';        
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['PULLDOWN'][] = $row;
                     }
-                }
-
+                }                
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $sql = ' SELECT KBN_CD,
+                KBN_NAME,
+                KBNMSAI_CD,
+                KBNMSAI_NAME FROM M_KBN 
+                WHERE KBN_CD= "10" 
+                AND DEL_FLG= 0';        
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['PULLDOWN'][] = $row;
+                    }
+                }        
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

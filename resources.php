@@ -30,7 +30,7 @@ class resources
             if (isset($_POST['LOGIN_ID']) && isset($_POST['PASSWORD'])) {
                 $LOGIN_ID = $_POST['LOGIN_ID'];
                 $PASSWORD = $_POST['PASSWORD'];
-                $sql = 'SELECT * FROM M_TANT WHERE TANT_CD="' . $LOGIN_ID . '" AND PASSWORD="' . $PASSWORD . '" AND DEL_FLG= 0';
+                $sql = 'SELECT * FROM M_TANT WHERE TANT_CD="' . $LOGIN_ID . '" AND PASSWORD="' . $PASSWORD . '" AND DEL_FLG= 0';               
                 $this->result = $this->dbConnect->query($sql);
                 $resultSet = array();
                 if ($this->result->num_rows > 0) {
@@ -57,10 +57,10 @@ class resources
     function getConstructionList()
     {
         $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
+        $this->dbConnect = $this->dbReference->connectDB();        
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
+        } else {            
             if (isset($_GET['YMD']) && isset($_GET['LOGIN_ID'])) {
                 $YMD = $_GET['YMD'];
                 $LOGIN_ID = $_GET['LOGIN_ID'];
@@ -72,7 +72,8 @@ class resources
                 SITAMI_JIKAN,
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
-                SITAMI_YMD,            
+                SITAMI_YMD,   
+                HOMON_TANT_CD4,         
                 SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
                 AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
@@ -92,12 +93,13 @@ class resources
                         $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
                         $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
                 }
 
-                $sql2 = 'SELECT KOJIHOMONJIKAN,
+                $sql = 'SELECT KOJIHOMONJIKAN,
                 HOMON_SBT,
                 KOJI_ST,
                 JYUCYU_ID,
@@ -106,10 +108,13 @@ class resources
                 KOJI_ITEM,
                 SETSAKI_ADDRESS,
                 KOJI_YMD,
+                HOMON_TANT_CD1,
+                HOMON_TANT_CD2,
+                HOMON_TANT_CD3,
                 SETSAKI_NAME FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
                 AND (HOMON_TANT_CD1="' . $LOGIN_ID . '" OR HOMON_TANT_CD2="' . $LOGIN_ID . '" OR HOMON_TANT_CD3="' . $LOGIN_ID . '")
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
-                $this->result = $this->dbConnect->query($sql2);
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';               
+                $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
@@ -124,6 +129,9 @@ class resources
                         $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
                         $data['KOJI_YMD'] = $row['KOJI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                        $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                        $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
@@ -144,14 +152,15 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $flg = 0;
+            $count_jyucyu = null;
+            $count_syuyaku_jyucyu = null;
+
             if (isset($_GET['YMD']) && isset($_GET['JYUCYU_ID']) && isset($_GET['SETSAKI_ADDRESS'])) {
                 $YMD = $_GET['YMD'];
                 $SETSAKI_ADDRESS = $_GET['SETSAKI_ADDRESS'];
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
-
-                $count_jyucyu = null;
-                $count_syuyaku_jyucyu = null;
-
+                
                 // Check exists
                 $sql = 'SELECT COUNT(*) 
                     FROM T_KOJI 
@@ -166,7 +175,7 @@ class resources
                         $count_jyucyu = $row["COUNT(*)"];
                     }
                 }
-
+                
                 if ($count_jyucyu > 0) {
                     $sql = 'SELECT COUNT(*) 
                     FROM T_KOJI 
@@ -184,10 +193,14 @@ class resources
                 }
 
                 if ($count_syuyaku_jyucyu > 1) {
-                    $this->dbReference->sendResponse(200, json_encode($count_syuyaku_jyucyu, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    $flg = 1;
                 }
+            }
+
+            if($flg == 1 ) {
+                $this->dbReference->sendResponse(200, json_encode((int)$count_syuyaku_jyucyu, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
+                $this->dbReference->sendResponse(200, json_encode($count_syuyaku_jyucyu = 0, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -2510,7 +2523,7 @@ class resources
                     WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
                     AND YMD="' . $YMD . '" 
                     AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . ' 
-                    AND DEL_FLG=0';                                        
+                    AND DEL_FLG=0';                                                      
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
@@ -2572,7 +2585,7 @@ class resources
                     "' . $ADD_YMD . '",
                     "' . $UPD_PGID . '",
                     "' . $UPD_TANTCD . '",
-                    "' . $UPD_YMD . '" )';                    
+                    "' . $UPD_YMD . '" )';                                       
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }

@@ -590,7 +590,6 @@ class resources
 
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
-                $FILEPATH = "img/";
                 $FILE_KBN_CD = "10";
                 $ADD_PGID = "KOJ1120F";
                 $ADD_TANTCD = isset($_POST['LOGIN_ID']) ? $_POST['LOGIN_ID'] : 'NULL';
@@ -640,13 +639,16 @@ class resources
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';
-
+                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"';                        
                     $this->result = $this->dbConnect->query($sql);
                 }
 
+                $domain =  $this->domain;
+                $data = array();
+                $data['IMG'] = $domain . $img_path;
+                $data['JYUCYU_ID'] = $JYUCYU_ID;
 
-                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
             }
@@ -2789,9 +2791,11 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            // $flg = 0 ;
             if (isset($_POST['JYUCYU_ID']) && isset($_POST['TAG_KBN'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $TAG_KBN = $_POST['TAG_KBN'];
+                $HOMON_SBT = $_POST['HOMON_SBT'];
                 $KBN = isset($_POST['KBN']) ? $_POST['KBN'] : NULL;
                 $JIKAN = isset($_POST['JIKAN']) ? $_POST['JIKAN'] : NULL;
                 $JIKAN_END = isset($_POST['JIKAN_END']) ? $_POST['JIKAN_END'] : NULL;
@@ -2803,7 +2807,7 @@ class resources
                 $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
                 $UPD_YMD = date("Y-m-d H:i:s");
                 $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
-                if (in_array($TAG_KBN, ["02", "04", "06"])) {
+                if ($HOMON_SBT == "01") {
                     $sql = ' UPDATE T_KOJI
                     SET TAG_KBN="' . $TAG_KBN . '",
                     SITAMIAPO_KBN="' . $KBN . '",
@@ -2823,7 +2827,7 @@ class resources
                     $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
 
-                if (in_array($TAG_KBN, ["01", "03", "05"])) {
+                if ($HOMON_SBT == "02") {
                     $sql = 'UPDATE T_KOJI 
                     SET TAG_KBN="' . $TAG_KBN . '",
                     KOJIAPO_KBN="' . $KBN . '",

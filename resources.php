@@ -139,7 +139,7 @@ class resources
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -257,6 +257,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $flg = 0;
+            $resultSet = array();
+
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT']) && isset($_GET['SINGLE_SUMMARIZE'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $HOMON_SBT = $_GET['HOMON_SBT'];
@@ -275,9 +278,8 @@ class resources
                         WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
                         AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
                         AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI_FILEPATH.DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sql);
-                        $resultSet = array();
+                        AND T_KOJI_FILEPATH.DEL_FLG=0';                        
+                        $this->result = $this->dbConnect->query($sql);                       
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
@@ -285,7 +287,9 @@ class resources
                                 $resultSet[] = $row;
                             }
                         }
-                    } else if ($HOMON_SBT == "02") {
+                    } 
+
+                    if ($HOMON_SBT == "02") {
                         $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
                         T_KOJI.JYUCYU_ID,
                         T_KOJI.HOMON_SBT,
@@ -297,9 +301,8 @@ class resources
                         WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
                         AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
                         AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI_FILEPATH.DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sql);
-                        $resultSet = array();
+                        AND T_KOJI_FILEPATH.DEL_FLG=0';                        
+                        $this->result = $this->dbConnect->query($sql);                       
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
@@ -307,9 +310,7 @@ class resources
                                 $resultSet[] = $row;
                             }
                         }
-                    } else {
-                        $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-                    }
+                    } 
                 } else if ($SINGLE_SUMMARIZE == 2) {
                     if ($HOMON_SBT == "01") {
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
@@ -323,7 +324,6 @@ class resources
                         AND T_KOJI.HOMON_SBT="01"
                         AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
-                        $resultSet = array();
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
@@ -331,7 +331,9 @@ class resources
                                 $resultSet[] = $row;
                             }
                         }
-                    } else if ($HOMON_SBT == "02") {
+                    } 
+
+                    if ($HOMON_SBT == "02") {
                         $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
                         T_KOJI_FILEPATH.FILEPATH,
                         T_KOJI.JYUCYU_ID,
@@ -341,9 +343,8 @@ class resources
                         FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
                         WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
                         AND T_KOJI.HOMON_SBT="02"
-                        AND T_KOJI.DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sql);
-                        $resultSet = array();
+                        AND T_KOJI.DEL_FLG=0';                        
+                        $this->result = $this->dbConnect->query($sql);                       
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
@@ -351,16 +352,19 @@ class resources
                                 $resultSet[] = $row;
                             }
                         }
-                    } else {
-                        $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
                     }
-                } else {
-                    $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-                }
+                } 
 
+                if(!empty($resultSet)){
+                    $flg = 1;
+                }
+                
+            } 
+
+            if($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+            } else {                
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -373,6 +377,8 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $flg = 0;
+            $resultSet = array();
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['SINGLE_SUMMARIZE'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
@@ -383,7 +389,7 @@ class resources
                     WHERE ID="' . $JYUCYU_ID . '" 
                     AND FILE_KBN_CD="05"';
                     $this->result = $this->dbConnect->query($sql);
-                    $resultSet = array();
+                    
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
@@ -391,15 +397,16 @@ class resources
                             $resultSet[] = $row;
                         }
                     }
-                } else if ($SINGLE_SUMMARIZE == 2) {
+                }
+                
+                if ($SINGLE_SUMMARIZE == 2) {
                     $sql = 'SELECT T_KOJI_FILEPATH.FILEPATH,
                     T_KOJI.JYUCYU_ID, 
                     T_KOJI.SYUYAKU_JYUCYU_ID
                     FROM T_KOJI_FILEPATH LEFT JOIN T_KOJI ON T_KOJI_FILEPATH.ID=T_KOJI.JYUCYU_ID
                     WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
                     AND FILE_KBN_CD="05"';
-                    $this->result = $this->dbConnect->query($sql);
-                    $resultSet = array();
+                    $this->result = $this->dbConnect->query($sql);                    
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
@@ -407,13 +414,17 @@ class resources
                             $resultSet[] = $row;
                         }
                     }
-                } else {
-                    $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-                }
+                }                 
+            } 
 
+            if(!empty($resultSet)){
+                $flg = 1;
+            }
+
+            if($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -427,6 +438,8 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $flg = 0;
+            $resultSet = array();
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $KOJI_ST = $_GET['KOJI_ST'];
@@ -439,7 +452,7 @@ class resources
                     AND FILE_KBN_CD="10" 
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
-                    $resultSet = array();
+                    
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
@@ -447,13 +460,15 @@ class resources
                             $resultSet[] = $row;
                         }
                     }
-                } else {
-                    $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-                }
+                } 
 
+                
+            }
+            
+            if($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

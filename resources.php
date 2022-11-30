@@ -464,7 +464,7 @@ class resources
 
                 
             }
-            
+
             if($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -617,6 +617,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $flg = 0;
+            $resultSet = array();
+
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $KOJI_ST = $_GET['KOJI_ST'];
@@ -641,7 +644,6 @@ class resources
                     AND T_KOJI.DEL_FLG= 0
                     AND (T_KOJI.KOJI_ST="02" OR T_KOJI.KOJI_ST="01")';
                     $this->result = $this->dbConnect->query($sql);
-                    $resultSet = array();
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
@@ -649,7 +651,9 @@ class resources
                             $resultSet['KOJI_DATA'][] = $row;
                         }
                     }
-                } else if ($KOJI_ST == "03") {
+                } 
+                
+                if ($KOJI_ST == "03") {
                     $sql = 'SELECT T_KOJI.JYUCYU_ID,
                     T_KOJI.SETSAKI_NAME,
                     T_KOJI.KOJI_YMD,
@@ -693,14 +697,17 @@ class resources
                             $resultSet['TABLE_DATA'][] = $row;
                         }
                     }
+                }                            
+            }
 
-                } else {
-                    $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
-                }               
+            if(!empty($resultSet)){
+                $flg = 1;
+            }
 
+            if($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -713,6 +720,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $flg = 0;
+            $resultSet = array();
+            
             if (isset($_GET['KBN_BIKO'])) {
                 $KBN_BIKO = $_GET['KBN_BIKO'];
 
@@ -728,16 +738,23 @@ class resources
                 AND KBN_BIKO="' . $KBN_BIKO . '" 
                 AND M_KBN.DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet[] = $row;
                     }
                 }
+                
+            }
+            
+            if(!empty($resultSet)){
+                $flg = 1;
+            }
+
+            if($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

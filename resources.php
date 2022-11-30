@@ -3289,13 +3289,14 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_POST['JYUCYU_ID'])
-            ) {
-                $JYUCYU_ID = $_GET['JYUCYU_ID'];
-                $sql = 'UPDATE KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $JYUCYU_ID . '" ';
-                $this->result = $this->dbConnect->query($sql);
-
+            if ( isset($_POST['JYUCYU_ID'])) {
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];               
+                $LIST_ID = json_decode($JYUCYU_ID);
+                foreach($LIST_ID as $k => $v){                   
+                    $sql = 'UPDATE T_KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $v . '" ';
+                    // echo $sql; die;
+                    $this->result = $this->dbConnect->query($sql);
+                }                
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');

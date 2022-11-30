@@ -529,7 +529,7 @@ class resources
             } else {
                 move_uploaded_file($file["tmp_name"], $target_file);
             }
-        }
+        } 
         return $target_file;
     }
 
@@ -3393,7 +3393,6 @@ class resources
                 $LIST_ID = json_decode($JYUCYU_ID);
                 foreach($LIST_ID as $k => $v){                   
                     $sql = 'UPDATE T_KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $v . '" ';
-                    // echo $sql; die;
                     $this->result = $this->dbConnect->query($sql);
                 }                
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

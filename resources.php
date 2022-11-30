@@ -722,7 +722,7 @@ class resources
         } else {
             $flg = 0;
             $resultSet = array();
-            
+
             if (isset($_GET['KBN_BIKO'])) {
                 $KBN_BIKO = $_GET['KBN_BIKO'];
 
@@ -3170,9 +3170,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['LOGIN_ID'])
-            ) {
+            $flg = 0;
+            $resultSet = array();
+            if (isset($_GET['LOGIN_ID'])) {
                 // 新着コメント
                 $LOGIN_ID = $_GET['LOGIN_ID'];
                 $sql = 'SELECT COMMENT , JYUCYU_ID
@@ -3181,11 +3181,10 @@ class resources
                 AND COMMENT IS NOT NULL 
                 AND READ_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
-                $resultSet = array();
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['COMMENT'][] = $row;
                     }
                 }
 
@@ -3216,9 +3215,8 @@ class resources
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
-                        $data[] = $row["COUNT(*)"];
-                        $data[] = 'NYUKOYOTEI_TOTAL';
-                        $resultSet[] = $data;
+                        $data['NYUKOYOTEI_TOTAL'] = $row["COUNT(*)"];                     
+                        $resultSet['TOTAL'][] = $data;
                     }
                 }
 
@@ -3232,10 +3230,9 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $data = array();
-                        $data[] = $row["COUNT(*)"];
-                        $data[] = 'KOJI_TOTAL';
-                        $resultSet[] = $data;
+                        $data = array();                   
+                        $data['KOJI_TOTAL'] = $row["COUNT(*)"];                     
+                        $resultSet['TOTAL'][] = $data;                       
                     }
                 }
 
@@ -3248,11 +3245,10 @@ class resources
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $data = array();
-                        $data[] = $row["COUNT(*)"];
-                        $data[] = 'SITAMI_TOTAL';
-                        $resultSet[] = $data;
+                    while ($row = $this->result->fetch_assoc()) {                      
+                        $data = array();                   
+                        $data['SITAMI_TOTAL'] = $row["COUNT(*)"];                     
+                        $resultSet['TOTAL'][] = $data;    
                     }
                 }
 
@@ -3266,17 +3262,22 @@ class resources
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $data = array();
-                        $data[] = $row["COUNT(*)"];
-                        $data[] = 'BUZAIHACYU_TOTAL';
-                        $resultSet[] = $data;
+                    while ($row = $this->result->fetch_assoc()) {                       
+                        $data = array();                   
+                        $data['BUZAIHACYU_TOTAL'] = $row["COUNT(*)"];                     
+                        $resultSet['TOTAL'][] = $data;    
                     }
-                }
+                }                
+            } 
 
+            if(!empty($resultSet)) {
+                $flg = 1;
+            }
+
+            if ($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

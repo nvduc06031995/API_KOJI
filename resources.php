@@ -2905,18 +2905,18 @@ class resources
                         $resultSet['totalHolidays'] = $totalHolidays;
                     }
                 } else {
-                    $resultSet['0']['HOLIDAY_JAN'] = 0;
-                    $resultSet['0']['HOLIDAY_FEB'] = 0;
-                    $resultSet['0']['HOIDAY_MAR'] = 0;
-                    $resultSet['0']['HOIDAY_APR'] = 0;
-                    $resultSet['0']['HOIDAY_MAY'] = 0;
-                    $resultSet['0']['HOIDAY_JUN'] = 0;
-                    $resultSet['0']['HOIDAY_JUL'] = 0;
-                    $resultSet['0']['HOIDAY_AUG'] = 0;
-                    $resultSet['0']['HOIDAY_SEP'] = 0;
-                    $resultSet['0']['HOIDAY_OCT'] = 0;
-                    $resultSet['0']['HOIDAY_NOV'] = 0;
-                    $resultSet['0']['HOIDAY_DEC'] = 0;
+                    $resultSet['0']['HOLIDAY_JAN'] = "0";
+                    $resultSet['0']['HOLIDAY_FEB'] = "0";
+                    $resultSet['0']['HOIDAY_MAR'] = "0";
+                    $resultSet['0']['HOIDAY_APR'] = "0";
+                    $resultSet['0']['HOIDAY_MAY'] = "0";
+                    $resultSet['0']['HOIDAY_JUN'] = "0";
+                    $resultSet['0']['HOIDAY_JUL'] = "0";
+                    $resultSet['0']['HOIDAY_AUG'] = "0";
+                    $resultSet['0']['HOIDAY_SEP'] = "0";
+                    $resultSet['0']['HOIDAY_OCT'] = "0";
+                    $resultSet['0']['HOIDAY_NOV'] = "0";
+                    $resultSet['0']['HOIDAY_DEC'] = "0";
                     $resultSet['totalHolidays'] = 0;
                 }
 

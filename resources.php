@@ -1012,22 +1012,6 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-<<<<<<< HEAD
-            if ($_POST['SINGLE_SUMMARIZE'] == 1) {
-                if (isset($_FILES['SIGN_FILE'])) {
-                    var_dump($_FILES['SIGN_FILE']);
-                    die;
-                } else {
-                    echo 2;
-                    die;
-                }
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
-                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
-                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
-                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
-                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
-=======
             $json_string  = file_get_contents('php://input');
             $json_request = json_decode($json_string, true);
             $json_request = (array)$json_request;
@@ -1038,7 +1022,6 @@ class resources
                 $BEF_SEKO_PHOTO_FILEPATH = isset($json_request['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $json_request['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $AFT_SEKO_PHOTO_FILEPATH = isset($json_request['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $json_request['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $OTHER_PHOTO_FOLDERPATH = isset($json_request['OTHER_PHOTO_FOLDERPATH']) ? '"' . $json_request['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
->>>>>>> 24375c6b30f8008ff314d713eb751b2ff398da10
 
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
@@ -1047,8 +1030,7 @@ class resources
                         UPD_PGID = "KOJ1120F",
                         UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
-                    ';
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
 
                 $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
@@ -1109,16 +1091,6 @@ class resources
                 )';
                 $this->result = $this->dbConnect->query($sqlInsert);
             }
-<<<<<<< HEAD
-            if ($_POST['SINGLE_SUMMARIZE'] == 2) {
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $SYUYAKU_JYUCYU_ID = $_POST['SYUYAKU_JYUCYU_ID'];
-                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
-                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
-                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
-                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
-                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
-=======
             if($json_request['SINGLE_SUMMARIZE'] == 2 && isset($json_request['JYUCYU_ID'])
                 && isset($json_request['SYUYAKU_JYUCYU_ID'])) {
                 $JYUCYU_ID = $json_request['JYUCYU_ID'];
@@ -1128,7 +1100,6 @@ class resources
                 $BEF_SEKO_PHOTO_FILEPATH = isset($json_request['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $json_request['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $AFT_SEKO_PHOTO_FILEPATH = isset($json_request['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $json_request['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $OTHER_PHOTO_FOLDERPATH = isset($json_request['OTHER_PHOTO_FOLDERPATH']) ? '"' . $json_request['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
->>>>>>> 24375c6b30f8008ff314d713eb751b2ff398da10
 
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
@@ -1153,13 +1124,8 @@ class resources
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
             }
-<<<<<<< HEAD
-            if (isset($_POST['NEW_DETAIL'])) {
-                foreach ($_POST['NEW_DETAIL'] as $value) {
-=======
             if(!empty($json_request['NEW_DETAIL'])) {
                 foreach($json_request['NEW_DETAIL'] as $value) {
->>>>>>> 24375c6b30f8008ff314d713eb751b2ff398da10
                     $query_max = 'SELECT max(JYUCYUMSAI_ID) as JYUCYUMSAI_ID_MAX
                         FROM T_KOJIMSAI';
                     $rs_max = $this->dbConnect->query($query_max);

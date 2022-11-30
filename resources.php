@@ -476,6 +476,35 @@ class resources
         return $target_file;
     }
 
+    function uploadFilePdf($file)
+    {
+        if (!empty($file)) {
+            $path = 'pdf/';
+            $target_file = $path . basename($file["name"]);
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $uploadOk = 1;
+            // Check file size                
+            if ($file["size"] > 500000) {
+                echo "Sorry, your file is too large.";
+                $uploadOk = 0;
+            }
+            if (
+                $imageFileType != "pdf"
+            ) {
+                echo "Sorry, only PDF files are allowed.";
+                $uploadOk = 0;
+            }
+            // Check if $uploadOk is set to 0 by an error
+            if ($uploadOk == 0) {
+                echo "Sorry, your file was not uploaded.";
+                // if everything is ok, try to upload file
+            } else {
+                move_uploaded_file($file["tmp_name"], $target_file);
+            }
+        }
+        return $target_file;
+    }
+
     function postPhotoSubmissionRegistration()
     {
         $this->dbReference = new systemConfig();
@@ -881,10 +910,7 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_POST['JYUCYU_ID']) &&
-                isset($_POST['SYUYAKU_JYUCYU_ID'])
-            ) {
+            if($_POST['SINGLE_SUMMARIZE'] == 1) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $SYUYAKU_JYUCYU_ID = $_POST['SYUYAKU_JYUCYU_ID'];
                 $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
@@ -892,6 +918,40 @@ class resources
                 $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
+                $CHECK_FLG = $_POST['CHECK_FLG'];
+
+                $sqlUpdateKOJI = 'UPDATE T_KOJI 
+                    SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
+                        KOJI_KEKKA = "01",
+                        BIKO = ' . $BIKO . ',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "' . $SYUYAKU_JYUCYU_ID . '",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "' . $SYUYAKU_JYUCYU_ID . '"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+
+                $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
+                    SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
+                        BEF_SEKO_PHOTO_FILEPATH = ' . $BEF_SEKO_PHOTO_FILEPATH . ',
+                        AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
+                        OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
+                        UPD_PGID = "KOJ1120F",
+                        UPD_TANTCD = "' . $JYUCYU_ID . '",
+                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
+                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
+                    ';
+                $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
+            }
+            if($_POST['SINGLE_SUMMARIZE'] == 2) {
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];
+                $SYUYAKU_JYUCYU_ID = $_POST['SYUYAKU_JYUCYU_ID'];
+                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
+                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
+                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
+                $CHECK_FLG = $_POST['CHECK_FLG'];
 
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
@@ -915,45 +975,117 @@ class resources
                     WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
-
-                $this->dbReference->sendResponse(200, "Success");
-            } elseif (
-                isset($_POST['JYUCYU_ID'])
-            ) {
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-
-                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
-                $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
-                $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
-                $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
-                $OTHER_PHOTO_FOLDERPATH = isset($_POST['OTHER_PHOTO_FOLDERPATH']) ? '"' . $_POST['OTHER_PHOTO_FOLDERPATH'] . '"' : 'NULL';
-                $sqlUpdateKOJI = 'UPDATE T_KOJI 
-                    SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
-                        KOJI_KEKKA = "01",
-                        BIKO = ' . $BIKO . ',
-                        UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "' . $JYUCYU_ID . '",
-                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
-                    ';
-                $this->result = $this->dbConnect->query($sqlUpdateKOJI);
-
-                $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
-                    SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
-                        BEF_SEKO_PHOTO_FILEPATH = ' . $BEF_SEKO_PHOTO_FILEPATH . ',
-                        AFT_SEKO_PHOTO_FILEPATH = ' . $AFT_SEKO_PHOTO_FILEPATH . ',
-                        OTHER_PHOTO_FOLDERPATH = ' . $OTHER_PHOTO_FOLDERPATH . ',
-                        UPD_PGID = "KOJ1120F",
-                        UPD_TANTCD = "' . $JYUCYU_ID . '",
-                        UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
-                    ';
-                $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
-
-                $this->dbReference->sendResponse(200, "Success");
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
+            if(isset($_POST['NEW_DETAIL'])) {
+                foreach($_POST['NEW_DETAIL'] as $value) {
+                    $query_max = 'SELECT max(JYUCYUMSAI_ID) as JYUCYUMSAI_ID_MAX
+                        FROM T_KOJIMSAI';
+                    $rs_max = $this->dbConnect->query($query_max);
+                    $num = 0;
+                    if ($rs_max->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $rs_max->fetch_assoc()) {
+                            $num = (int)$row['JYUCYUMSAI_ID_MAX'] + 1;
+                        }
+                    }
+
+                    $JYUCYUMSAI_ID = sprintf('%010d', $num);
+
+                    $sqlInsertKOJIMSAI = 'INSERT INTO T_KOJIMSAI 
+                    (
+                        JYUCYU_ID,
+                        JYUCYUMSAI_ID,
+                        JYUCYUMSAI_ID_KIKAN,
+                        HINBAN,
+                        MAKER_CD,
+                        CTGORY_CD,
+                        SURYO,
+                        HANBAI_TANKA,
+                        KINGAK,
+                        KISETU_HINBAN,
+                        KISETU_MAKER_CD,
+                        KENSETU_KEITAI,
+                        BEF_SEKO_PHOTO_FILEPATH,
+                        AFT_SEKO_PHOTO_FILEPATH,
+                        OTHER_PHOTO_FOLDERPATH,
+                        TUIKA_JISYA_CD,
+                        TUIKA_SYOHIN_NAME,
+                        KOJIJITUIKA_FLG,
+                        ADD_PGID,
+                        ADD_TANTCD,
+                        ADD_YMD,
+                        UPD_PGID,
+                        UPD_TANTCD,
+                        UPD_YMD,             
+                    )
+                    VALUES (
+                        "' . $JYUCYU_ID . '",
+                        "' . $JYUCYUMSAI_ID . '",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "' . $value['SURYO'] . '",
+                        "' . $value['HANBAI_TANKA'] . '",
+                        "' . $value['KINGAK'] . '",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "KOJ-'. $value['TUIKA_JISYA_CD'] .'",
+                        "' . $value['TUIKA_SYOHIN_NAME'] . '",
+                        "1",
+                        "KOJ1120F",
+                        "' . $JYUCYU_ID . '",
+                        "' . date('Y-m-d H:i:s') . '",
+                        "KOJ1120F",
+                        "' . $JYUCYU_ID . '",
+                        "' . date('Y-m-d H:i:s') . '"
+                    )';
+                
+                $this->result = $this->dbConnect->query($sqlInsertKOJIMSAI);
+                }
+                
+            }
+
+            $sqlInsertKOJICHECK = 'INSERT INTO T_KOJI_CHECK 
+                (
+                    JYUCYU_ID,
+                    CHECK_FLG1,
+                    CHECK_FLG2,
+                    CHECK_FLG3,
+                    CHECK_FLG4,
+                    CHECK_FLG5,
+                    CHECK_FLG6,
+                    CHECK_FLG7,
+                    ADD_PGID,
+                    ADD_TANTCD,
+                    ADD_YMD,
+                    UPD_PGID,
+                    UPD_TANTCD,
+                    UPD_YMD,             
+                )
+                VALUES (
+                "' . $JYUCYU_ID . '",
+                "' . $CHECK_FLG['1'] . '",
+                "' . $CHECK_FLG['2'] . '",
+                "' . $CHECK_FLG['3'] . '",
+                "' . $CHECK_FLG['4'] . '",
+                "' . $CHECK_FLG['5'] . '",
+                "' . $CHECK_FLG['6'] . '",
+                "' . $CHECK_FLG['7'] . '",
+                "KOJ1120F",
+                "' . $JYUCYU_ID . '",
+                "' . date('Y-m-d H:i:s') . '",
+                "KOJ1120F",
+                "' . $JYUCYU_ID . '",
+                "' . date('Y-m-d H:i:s') . '"
+                )';
+                
+            $this->result = $this->dbConnect->query($sqlInsertKOJICHECK);
+            $this->dbReference->sendResponse(200, "Success");
         }
     }
 
@@ -2772,6 +2904,20 @@ class resources
                         }
                         $resultSet['totalHolidays'] = $totalHolidays;
                     }
+                } else {
+                    $resultSet['0']['HOLIDAY_JAN'] = 0;
+                    $resultSet['0']['HOLIDAY_FEB'] = 0;
+                    $resultSet['0']['HOIDAY_MAR'] = 0;
+                    $resultSet['0']['HOIDAY_APR'] = 0;
+                    $resultSet['0']['HOIDAY_MAY'] = 0;
+                    $resultSet['0']['HOIDAY_JUN'] = 0;
+                    $resultSet['0']['HOIDAY_JUL'] = 0;
+                    $resultSet['0']['HOIDAY_AUG'] = 0;
+                    $resultSet['0']['HOIDAY_SEP'] = 0;
+                    $resultSet['0']['HOIDAY_OCT'] = 0;
+                    $resultSet['0']['HOIDAY_NOV'] = 0;
+                    $resultSet['0']['HOIDAY_DEC'] = 0;
+                    $resultSet['totalHolidays'] = 0;
                 }
 
                 $sqlGetHolidayMonth = 'SELECT TAN_CAL_ID 

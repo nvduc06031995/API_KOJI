@@ -593,7 +593,13 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
-                $img_path = $this->uploadFileImg($FILE_NAME);
+                $img_path = [];
+                $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+                
+                if(!empty($img_path['ERROR'])) {
+                    $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    die;
+                }
 
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
@@ -617,7 +623,7 @@ class resources
                 }
 
                 $FILEPATH_ID = sprintf('%010d', $num);
-                if (!empty($img_path)) {
+                if (!empty($img_path['FILEPATH'][0])) {
                     $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
                     ID,
                     FILEPATH,
@@ -631,7 +637,7 @@ class resources
                     ) VALUES (
                     "' . $FILEPATH_ID . '",
                     "' . $JYUCYU_ID . '",
-                    "' . $img_path . '",
+                    "' . $img_path['FILEPATH'][0] . '",
                     "' . $FILE_KBN_CD . '",
                     "' . $ADD_PGID . '",
                     "' . $ADD_TANTCD . '",
@@ -652,7 +658,7 @@ class resources
 
                 $domain =  $this->domain;
                 $data = array();
-                $data['IMG'] = $domain . $img_path;
+                $data['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $data['JYUCYU_ID'] = $JYUCYU_ID;
 
                 $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -1547,7 +1553,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1560,7 +1566,7 @@ class resources
                 }
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
@@ -1632,7 +1638,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1646,7 +1652,7 @@ class resources
 
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
@@ -1718,7 +1724,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1732,7 +1738,7 @@ class resources
 
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
@@ -1785,7 +1791,7 @@ class resources
                         $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
-                    
+
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1802,7 +1808,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1816,7 +1822,7 @@ class resources
 
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 

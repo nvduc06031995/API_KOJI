@@ -1624,7 +1624,13 @@ class resources
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
 
-                $this->dbReference->sendResponse(200, "Success");
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
+
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1698,7 +1704,13 @@ class resources
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
 
-                $this->dbReference->sendResponse(200, "Success");
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
+
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1770,7 +1782,13 @@ class resources
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
 
-                $this->dbReference->sendResponse(200, "Success");
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
+
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }

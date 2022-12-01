@@ -1456,6 +1456,7 @@ class resources
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                
 
                 if(isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
@@ -1472,6 +1473,7 @@ class resources
                     $FILEPATH_ID = sprintf('%010d', $num);
                     
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1499,8 +1501,13 @@ class resources
                     )';
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                $this->dbReference->sendResponse(200, "Success");
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }

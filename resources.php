@@ -537,20 +537,19 @@ class resources
             $uploadOk = 1;
             // Check file size                
             if ($file["size"] > 500000) {
-                echo "Sorry, your file is too large.";
+                // echo "Sorry, your file is too large.";
                 $uploadOk = 0;
             }
             if (
                 $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
                 && $imageFileType != "gif"
             ) {
-                echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                // echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
                 $uploadOk = 0;
             }
             // Check if $uploadOk is set to 0 by an error
             if ($uploadOk == 0) {
-                echo "Sorry, your file was not uploaded.";
-                // if everything is ok, try to upload file
+                return 0;
             } else {
                 move_uploaded_file($file["tmp_name"], $target_file);
             }
@@ -1510,6 +1509,7 @@ class resources
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                
 
                 if (isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
@@ -1526,6 +1526,11 @@ class resources
                     $FILEPATH_ID = sprintf('%010d', $num);
 
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+                    if($img_path == 0) {
+                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                        die;
+                    }
+
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1553,10 +1558,15 @@ class resources
                     )';
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                $this->dbReference->sendResponse(200, "Success");
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1600,6 +1610,10 @@ class resources
                     $FILEPATH_ID = sprintf('%010d', $num);
 
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+                    if($img_path == 0) {
+                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                        die;
+                    }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1628,9 +1642,15 @@ class resources
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
 
-                $this->dbReference->sendResponse(200, "Success");
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
+
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1674,6 +1694,10 @@ class resources
                     $FILEPATH_ID = sprintf('%010d', $num);
 
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+                    if($img_path == 0) {
+                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                        die;
+                    }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1702,9 +1726,15 @@ class resources
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
 
-                $this->dbReference->sendResponse(200, "Success");
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
+
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1746,6 +1776,10 @@ class resources
                     $FILEPATH_ID = sprintf('%010d', $num);
 
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+                    if($img_path == 0) {
+                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                        die;
+                    }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1774,9 +1808,15 @@ class resources
                     $this->result = $this->dbConnect->query($sqlInsert);
                 }
 
-                $this->dbReference->sendResponse(200, "Success");
+                $dataSuccess = array();
+                $domain =  $this->domain;
+                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
+                $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
+
+                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

@@ -522,29 +522,27 @@ class resources
     {
         if (!empty($file)) {
             $path = 'img/';
+            $dataUploadFile = array();
             $target_file = $path . basename($file["name"]);
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-            $uploadOk = 1;
+            // $uploadOk = 1;
             // Check file size                
             if ($file["size"] > 500000) {
                 // echo "Sorry, your file is too large.";
-                $uploadOk = 0;
+                $dataUploadFile['ERROR'][] = "Sorry, your file is too large.";
             }
             if (
                 $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
                 && $imageFileType != "gif"
             ) {
                 // echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-                $uploadOk = 0;
+                $dataUploadFile['ERROR'][] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
             }
             // Check if $uploadOk is set to 0 by an error
-            if ($uploadOk == 0) {
-                return 0;
-            } else {
-                move_uploaded_file($file["tmp_name"], $target_file);
-            }
+            move_uploaded_file($file["tmp_name"], $target_file);
         }
-        return $target_file;
+        $dataUploadFile['FILEPATH'][] = $target_file;
+        return $dataUploadFile;
     }
 
     function uploadFilePdf($file)
@@ -822,7 +820,7 @@ class resources
                 $kojiSt = $_GET['KOJI_ST'];
 
                 $resultSet = array();
-                if ($kojiSt == "01" || $kojiSt == "02") {
+                if ($kojiSt == 1 || $kojiSt == 2) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
                         FROM T_KOJIMSAI 
@@ -873,7 +871,7 @@ class resources
                             die;
                         }
                     }
-                } elseif ($kojiSt == "03") {
+                } elseif ($kojiSt == 3) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
                             FROM T_KOJIMSAI 
@@ -906,7 +904,7 @@ class resources
                             }
 
                             foreach ($listJyucyuIdKoji as $value) {
-                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
+                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
                                     FROM T_KOJIMSAI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                         AND KOJIJITUIKA_FLG<>"0" 
@@ -925,7 +923,7 @@ class resources
                         }
                     }
                 } else {
-                    $this->dbReference->sendResponse(404, '{"error_message": KOJI_ST_value: 01 || 02 || 03 }');
+                    $this->dbReference->sendResponse(400, json_encode(['Error_message' => "KOJI_ST_value: 1 || 2 || 3"], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     die;
                 }
 
@@ -1514,9 +1512,11 @@ class resources
 
                     $FILEPATH_ID = sprintf('%010d', $num);
 
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
 
@@ -1555,7 +1555,7 @@ class resources
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1598,9 +1598,11 @@ class resources
 
                     $FILEPATH_ID = sprintf('%010d', $num);
                     
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
@@ -1639,7 +1641,7 @@ class resources
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1682,9 +1684,11 @@ class resources
 
                     $FILEPATH_ID = sprintf('%010d', $num);
                     
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
@@ -1723,7 +1727,7 @@ class resources
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1764,9 +1768,11 @@ class resources
 
                     $FILEPATH_ID = sprintf('%010d', $num);
                     
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
@@ -1805,7 +1811,7 @@ class resources
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

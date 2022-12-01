@@ -2932,6 +2932,7 @@ class resources
                         JYUCYU_ID,
                         HOMON_SBT,
                         COMMENT,
+                        ALL_DAY_FLG,
                         MEMO  FROM T_KOJI 
                         WHERE JYUCYU_ID="' . $JYUCYU_ID . '" 
                         AND DEL_FLG= 0';
@@ -2952,6 +2953,7 @@ class resources
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['COMMENT'] = $row['COMMENT'];
+                                $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                                 $data['MEMO'] = $row['MEMO'];
                                 $resultSet['DATA'][] = $data;
                             }
@@ -2970,6 +2972,7 @@ class resources
                         JYUCYU_ID,
                         HOMON_SBT,
                         COMMENT,
+                        ALL_DAY_FLG,
                         MEMO  FROM T_KOJI 
                         WHERE JYUCYU_ID="' . $JYUCYU_ID . '" 
                         AND DEL_FLG= 0';
@@ -2990,6 +2993,7 @@ class resources
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['COMMENT'] = $row['COMMENT'];
+                                $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                                 $data['MEMO'] = $row['MEMO'];
                                 $resultSet['DATA'][] = $data;
                             }

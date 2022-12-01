@@ -532,29 +532,27 @@ class resources
     {
         if (!empty($file)) {
             $path = 'img/';
+            $dataUploadFile = array();
             $target_file = $path . basename($file["name"]);
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-            $uploadOk = 1;
+            // $uploadOk = 1;
             // Check file size                
             if ($file["size"] > 500000) {
                 // echo "Sorry, your file is too large.";
-                $uploadOk = 0;
+                $dataUploadFile['ERROR'][] = "Sorry, your file is too large.";
             }
             if (
                 $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
                 && $imageFileType != "gif"
             ) {
                 // echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-                $uploadOk = 0;
+                $dataUploadFile['ERROR'][] = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
             }
             // Check if $uploadOk is set to 0 by an error
-            if ($uploadOk == 0) {
-                return 0;
-            } else {
-                move_uploaded_file($file["tmp_name"], $target_file);
-            }
+            move_uploaded_file($file["tmp_name"], $target_file);
         }
-        return $target_file;
+        $dataUploadFile['FILEPATH'][] = $target_file;
+        return $dataUploadFile;
     }
 
     function uploadFilePdf($file)
@@ -595,7 +593,13 @@ class resources
         } else {
             if (isset($_POST['JYUCYU_ID'])) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
-                $img_path = $this->uploadFileImg($FILE_NAME);
+                $img_path = [];
+                $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+                
+                if(!empty($img_path['ERROR'])) {
+                    $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    die;
+                }
 
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
@@ -619,7 +623,7 @@ class resources
                 }
 
                 $FILEPATH_ID = sprintf('%010d', $num);
-                if (!empty($img_path)) {
+                if (!empty($img_path['FILEPATH'][0])) {
                     $sql = 'INSERT INTO T_KOJI_FILEPATH (FILEPATH_ID,
                     ID,
                     FILEPATH,
@@ -633,7 +637,7 @@ class resources
                     ) VALUES (
                     "' . $FILEPATH_ID . '",
                     "' . $JYUCYU_ID . '",
-                    "' . $img_path . '",
+                    "' . $img_path['FILEPATH'][0] . '",
                     "' . $FILE_KBN_CD . '",
                     "' . $ADD_PGID . '",
                     "' . $ADD_TANTCD . '",
@@ -654,7 +658,7 @@ class resources
 
                 $domain =  $this->domain;
                 $data = array();
-                $data['IMG'] = $domain . $img_path;
+                $data['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $data['JYUCYU_ID'] = $JYUCYU_ID;
 
                 $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -831,7 +835,7 @@ class resources
                 $kojiSt = $_GET['KOJI_ST'];
 
                 $resultSet = array();
-                if ($kojiSt == "01" || $kojiSt == "02") {
+                if ($kojiSt == 1 || $kojiSt == 2) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
                         FROM T_KOJIMSAI 
@@ -839,11 +843,22 @@ class resources
                             AND KOJIJITUIKA_FLG<>"0" 
                             AND DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sqlNotReported);
-
                         if ($this->result->num_rows > 0) {
                             // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['constructionNotReport']['SINGLE'][] = $row;
+                                $resultSet['constructionNotReportSINGLE'][] = $row;
+                            }
+                        }
+
+                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                            FROM T_KOJI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                        ';
+                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['constructionNotReportSINGLE']['HOJIN_FLG'] = $row['HOJIN_FLG'];
                             }
                         }
                     }
@@ -873,7 +888,19 @@ class resources
                                 if ($this->result->num_rows > 0) {
                                     // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['constructionNotReport']['SUMMARIZE'][] = $row;
+                                        $resultSet['constructionNotReportSUMMARIZE'][$value['JYUCYU_ID']][] = $row;
+                                    }
+                                }
+                                
+                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                                    FROM T_KOJI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                ';
+                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                                if ($this->result->num_rows > 0) {
+                                    // output data of each row
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['constructionNotReportSUMMARIZE'][$value['JYUCYU_ID']]['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                     }
                                 }
                             }
@@ -882,7 +909,7 @@ class resources
                             die;
                         }
                     }
-                } elseif ($kojiSt == "03") {
+                } elseif ($kojiSt == 3) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
                             FROM T_KOJIMSAI 
@@ -894,7 +921,19 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['constructionReport']['SINGLE'][] = $row;
+                                $resultSet['constructionReportSINGLE'][] = $row;
+                            }
+                        }
+
+                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                            FROM T_KOJI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                        ';
+                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                        if ($this->result->num_rows > 0) {
+                            // output data of each row
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['constructionReportSINGLE']['HOJIN_FLG'] = $row['HOJIN_FLG'];
                             }
                         }
                     }
@@ -915,7 +954,7 @@ class resources
                             }
 
                             foreach ($listJyucyuIdKoji as $value) {
-                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
+                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
                                     FROM T_KOJIMSAI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                         AND KOJIJITUIKA_FLG<>"0" 
@@ -924,7 +963,19 @@ class resources
                                 if ($this->result->num_rows > 0) {
                                     // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['constructionReport']['SUMMARIZE'][] = $row;
+                                        $resultSet['constructionReportSUMMARIZE'][$value['JYUCYU_ID']][] = $row;
+                                    }
+                                }
+
+                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                                    FROM T_KOJI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                ';
+                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                                if ($this->result->num_rows > 0) {
+                                    // output data of each row
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['constructionReportSUMMARIZE'][$value['JYUCYU_ID']]['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                     }
                                 }
                             }
@@ -934,7 +985,7 @@ class resources
                         }
                     }
                 } else {
-                    $this->dbReference->sendResponse(404, '{"error_message": KOJI_ST_value: 01 || 02 || 03 }');
+                    $this->dbReference->sendResponse(400, json_encode(['Error_message' => "KOJI_ST_value: 1 || 2 || 3"], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     die;
                 }
 
@@ -1525,9 +1576,11 @@ class resources
 
                     $FILEPATH_ID = sprintf('%010d', $num);
 
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
 
@@ -1547,7 +1600,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1560,13 +1613,13 @@ class resources
                 }
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1608,10 +1661,12 @@ class resources
                     }
 
                     $FILEPATH_ID = sprintf('%010d', $num);
-
+                    
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
@@ -1630,7 +1685,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1644,13 +1699,13 @@ class resources
 
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1692,12 +1747,14 @@ class resources
                     }
 
                     $FILEPATH_ID = sprintf('%010d', $num);
-
+                    
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
+                    
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1714,7 +1771,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1728,13 +1785,13 @@ class resources
 
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1774,12 +1831,14 @@ class resources
                     }
 
                     $FILEPATH_ID = sprintf('%010d', $num);
-
+                    
+                    $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if($img_path == 0) {
-                        $this->dbReference->sendResponse(200, json_encode(['ErrorImage' => "Sorry, your file was not uploaded."], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    if(!empty($img_path['ERROR'])) {
+                        $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
+
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1796,7 +1855,7 @@ class resources
                     VALUES (
                         "' . $FILEPATH_ID . '",
                         "' . $_POST['JYUCYU_ID'] . '",
-                        "' . $img_path . '",
+                        "' . $img_path['FILEPATH'][0] . '",
                         "10",
                         "KOJ1120F",
                         "' . $_POST['JYUCYU_ID'] . '",
@@ -1810,13 +1869,13 @@ class resources
 
                 $dataSuccess = array();
                 $domain =  $this->domain;
-                $dataSuccess['IMG'] = $domain . $img_path;
+                $dataSuccess['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
                 $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

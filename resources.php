@@ -3136,9 +3136,8 @@ class resources
                 // AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
                 // AND START_TIME=' . $START_TIME . '
                 // AND DEL_FLG=0';
-                // $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
-
-                if (!is_null($TAN_EIG_ID)) {
+                // $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);               
+                if ($TAN_EIG_ID != 'NULL') {
                     $sql = ' UPDATE T_EIGYO_ANKEN
                     SET                     
                     TAG_KBN=' . $TAG_KBN . ',
@@ -3218,7 +3217,7 @@ class resources
                     "' . $ADD_YMD . '",
                     "' . $UPD_PGID . '",
                     "' . $UPD_TANTCD . '",
-                    "' . $UPD_YMD . '" )';
+                    "' . $UPD_YMD . '" )';                    
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }

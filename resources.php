@@ -2110,12 +2110,13 @@ class resources
                     T_TBETUCALENDAR.TAN_CAL_ID,
                     T_TBETUCALENDAR.JYOKEN_CD, 
                     T_TBETUCALENDAR.ALL_DAY_FLG,
-                    M_KBN.KBNMSAI_NAME, 
+                    T_TBETUCALENDAR.MEMO_CD,                    
+                    M_KBN.KBNMSAI_CD, 
                     M_KBN.YOBIKOMOKU1,
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
-                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
+                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD
                     CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '" 
                     AND T_TBETUCALENDAR.DEL_FLG=0 
@@ -2126,6 +2127,16 @@ class resources
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
+
+                            $KBNMSAI_NAME = '';
+                            $sql_sub = 'SELECT KBNMSAI_CD, KBNMSAI_NAME FROM M_KBN WHERE KBNMSAI_CD="'.$row['MEMO_CD'].'" AND KBN_CD="06"';
+                            $result_sub = $this->dbConnect->query($sql_sub);
+                            if ($result_sub->num_rows > 0) {
+                                while ($row_sub = $result_sub->fetch_assoc()) {
+                                    $KBNMSAI_NAME = $row_sub['KBNMSAI_NAME'];
+                                }
+                            }
+
                             $TANT_CD = $row['TANT_CD'];
                             $TBETUCALENDAR_YMD = $row['YMD'];
                             $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
@@ -2134,12 +2145,14 @@ class resources
                             $data['START_TIME'] = $row['START_TIME'];
                             $data['END_TIME'] = $row['END_TIME'];
                             $data['NAIYO'] = $row['NAIYO'];
-                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_NAME'] = $KBNMSAI_NAME;
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                             $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                            $data['MEMO_CD'] = $row['MEMO_CD'];
                             $data['YMD'] = $row['YMD'];
                             $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                             $data['TYPE'] = 4;
@@ -2931,6 +2944,7 @@ class resources
                 $JYOKEN_CD = $_POST['JYOKEN_CD'];
                 $JYOKEN_SYBET_FLG = $_POST['JYOKEN_SYBET_FLG'];
 
+                $TAN_EIG_ID = isset($_POST['TAN_EIG_ID']) ? '"' . $_POST['TAN_EIG_ID'] . '"' : 'NULL';     
                 $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
                 $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
                 $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
@@ -2948,16 +2962,16 @@ class resources
                 $UPD_PGID = "KOJ1110F";
                 $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? '"' . $_POST['UPD_TANTCD'] . '"' : '00001';
                 $UPD_YMD  = date('Y-m-d H:i:s');
-                $query_eigyo_anken = 'SELECT TAN_EIG_ID 
-                FROM T_EIGYO_ANKEN 
-                WHERE JYOKEN_CD=' . $JYOKEN_CD . ' 
-                AND YMD="' . $YMD . '" 
-                AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
-                AND START_TIME=' . $START_TIME . '
-                AND DEL_FLG=0';
-                $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
+                // $query_eigyo_anken = 'SELECT TAN_EIG_ID 
+                // FROM T_EIGYO_ANKEN 
+                // WHERE JYOKEN_CD=' . $JYOKEN_CD . ' 
+                // AND YMD="' . $YMD . '" 
+                // AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
+                // AND START_TIME=' . $START_TIME . '
+                // AND DEL_FLG=0';
+                // $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);
 
-                if ($count_eigyo_anken->num_rows > 0) {
+                if (!is_null($TAN_EIG_ID)) {
                     $sql = ' UPDATE T_EIGYO_ANKEN
                     SET                     
                     TAG_KBN=' . $TAG_KBN . ',
@@ -2974,10 +2988,8 @@ class resources
                     UPD_PGID="' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE JYOKEN_CD="' . $JYOKEN_CD . '" 
-                    AND YMD="' . $YMD . '" 
-                    AND JYOKEN_SYBET_FLG= ' . $JYOKEN_SYBET_FLG . ' 
-                    AND DEL_FLG=0';
+                    WHERE TAN_EIG_ID="' . $TAN_EIG_ID . '"                
+                    AND DEL_FLG=0';                
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {

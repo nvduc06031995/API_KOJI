@@ -146,7 +146,7 @@ class resources
             if ($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -401,7 +401,7 @@ class resources
             if ($flg == 1) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -2680,6 +2680,7 @@ class resources
         } else {
             $flg = 0;
             $resultSet = array();
+            $domain = $this->domain;
 
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
@@ -2697,7 +2698,12 @@ class resources
                 $result_list_file = $this->dbConnect->query($sql_get_list_file);
                 if ($result_list_file->num_rows > 0) {
                     while ($row_list_file = $result_list_file->fetch_assoc()) {
-                        $arr_list_file[] = $row_list_file;
+                        $data_list_file = array();
+                        $data_list_file['FILEPATH_ID'] = $row_list_file['FILEPATH_ID'];
+                        $data_list_file['ID'] = $row_list_file['ID'];
+                        $data_list_file['FILEPATH'] = $domain . $row_list_file['FILEPATH'];
+                        $data_list_file['FILE_KBN_CD'] = $row_list_file['FILE_KBN_CD'];
+                        $arr_list_file[] = $data_list_file;
                     }
                 }
 
@@ -2739,6 +2745,7 @@ class resources
                                 $data['JININ'] = $row['SITAMI_JININ'];
                                 $data['HOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
                                 $data['HOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                                $data['JIKAN'] = $row['SITAMI_JIKAN'];
                                 $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
                                 $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
                                 $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
@@ -2750,8 +2757,9 @@ class resources
                                 $data['ADD_YMD'] = $row['ADD_YMD'];
                                 $data['UPD_TANTNM'] = $row['UPD_TANTNM'];
                                 $data['UPD_YMD'] = $row['UPD_YMD'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['MEMO'] = $row['MEMO'];
+                                $data['COMMENT'] = $row['COMMENT'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['FILEPATH'] = $arr_list_file;
@@ -2795,6 +2803,7 @@ class resources
                                 $data['JININ'] = $row['KOJI_JININ'];
                                 $data['HOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['HOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                                $data['JIKAN'] = $row['KOJI_JIKAN'];
                                 $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
                                 $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
                                 $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
@@ -2806,8 +2815,9 @@ class resources
                                 $data['ADD_YMD'] = $row['ADD_YMD'];
                                 $data['UPD_TANTNM'] = $row['UPD_TANTNM'];
                                 $data['UPD_YMD'] = $row['UPD_YMD'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['MEMO'] = $row['MEMO'];
+                                $data['COMMENT'] = $row['COMMENT'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['FILEPATH'] = $arr_list_file;
@@ -2904,10 +2914,10 @@ class resources
                         MEMO  FROM T_KOJI 
                         WHERE JYUCYU_ID="' . $JYUCYU_ID . '" 
                         AND DEL_FLG= 0';
-                        $this->result2 = $this->dbConnect->query($sql);
-                        if ($this->result2->num_rows > 0) {
+                        $this->result = $this->dbConnect->query($sql);
+                        if ($this->result->num_rows > 0) {
                             // output data of each row
-                            while ($row = $this->result2->fetch_assoc()) {
+                            while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['TAG_KBN'] = $row['TAG_KBN'];
                                 $data['HOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
@@ -2967,6 +2977,7 @@ class resources
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $flg = 0;
+            $error = [];
             if (isset($_POST['JYUCYU_ID']) && isset($_POST['TAG_KBN']) && isset($_POST['HOMON_SBT'])) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $TAG_KBN = $_POST['TAG_KBN'];
@@ -2975,14 +2986,15 @@ class resources
                 $JIKAN = isset($_POST['JIKAN']) ? $_POST['JIKAN'] : NULL;
                 $JIKAN_END = isset($_POST['JIKAN_END']) ? $_POST['JIKAN_END'] : NULL;
                 $JININ = isset($_POST['JININ']) ? $_POST['JININ'] : NULL;
+                $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
                 $KANSAN_POINT = isset($_POST['KANSAN_POINT']) ? $_POST['KANSAN_POINT'] : NULL;
                 $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? $_POST['ALL_DAY_FLG'] : NULL;
+                $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
                 $SKJ_RENKEI_YMD = date("Y-m-d");
                 $UPD_PGID = 'KOJ1110F';
-                $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
                 $UPD_YMD = date("Y-m-d H:i:s");
-                $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
 
+                
                 if ($HOMON_SBT == "01") {
                     $sql = ' UPDATE T_KOJI
                     SET TAG_KBN="' . $TAG_KBN . '",

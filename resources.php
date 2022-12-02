@@ -516,7 +516,7 @@ class resources
                 }
             }
 
-            if(!empty($resultSet)){
+            if (!empty($resultSet)) {
                 $flg = 1;
             }
 
@@ -596,8 +596,8 @@ class resources
                 $FILE_NAME = $_FILES['FILE_NAME'];
                 $img_path = [];
                 $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                
-                if(!empty($img_path['ERROR'])) {
+
+                if (!empty($img_path['ERROR'])) {
                     $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     die;
                 }
@@ -679,7 +679,7 @@ class resources
         } else {
             $flg = 0;
             $resultSet = array();
-
+            $list_jisya_cd = [];
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $KOJI_ST = $_GET['KOJI_ST'];
@@ -707,8 +707,23 @@ class resources
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
-                            $row['STATUS'] = 'NOT_REPORTED';
-                            $resultSet['KOJI_DATA'][] = $row;
+                            $data = array();
+                            $data['STATUS'] = $row['JYUCYU_ID'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_NAME1'] = $row['HOMON_TANT_NAME1'];
+                            $data['HOMON_TANT_NAME2'] = $row['HOMON_TANT_NAME2'];
+                            $data['HOMON_TANT_NAME3'] = $row['HOMON_TANT_NAME3'];
+                            $data['HOMON_TANT_NAME4'] = $row['HOMON_TANT_NAME4'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['KOJIGYOSYA_NAME'] = $row['KOJIGYOSYA_NAME'];
+                            $data['STATUS'] = 'NOT_REPORTED';
+                            $resultSet['KOJI_DATA'][] = $data;
                         }
                     }
 
@@ -729,32 +744,69 @@ class resources
                     T_KOJI.CO_ADDRESS,
                     T_KOJI.KOJI_ST,
                     T_KOJI.HOJIN_FLG,
+                    T_KOJI.KOJIGYOSYA_CD 
+                    FROM T_KOJI                    
+                    LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
+                    WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
+                    AND T_KOJI.HOJIN_FLG= 0 
+                    AND T_KOJI.DEL_FLG= 0';
+                    $this->result = $this->dbConnect->query($sql);
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row                    
+                        while ($row = $this->result->fetch_assoc()) {
+                            $data = array();
+                            $data['STATUS'] = $row['JYUCYU_ID'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_NAME1'] = $row['HOMON_TANT_NAME1'];
+                            $data['HOMON_TANT_NAME2'] = $row['HOMON_TANT_NAME2'];
+                            $data['HOMON_TANT_NAME3'] = $row['HOMON_TANT_NAME3'];
+                            $data['HOMON_TANT_NAME4'] = $row['HOMON_TANT_NAME4'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['KOJIGYOSYA_NAME'] = $row['KOJIGYOSYA_NAME'];                           
+                            $data['STATUS'] = 'REPORTED';                           
+
+                            $resultSet['KOJI_DATA'][] = $data;
+                        }
+                    }
+
+                    $sql = 'SELECT T_KOJI.JYUCYU_ID,                   
                     T_KOJIMSAI.TUIKA_SYOHIN_NAME,
                     T_KOJIMSAI.TUIKA_JISYA_CD,
                     T_KOJIMSAI.SURYO,
                     T_KOJIMSAI.HANBAI_TANKA,
                     T_KOJIMSAI.KINGAK FROM T_KOJI 
-                    LEFT JOIN T_KOJIMSAI ON T_KOJI.JYUCYU_ID=T_KOJIMSAI.JYUCYU_ID
-                    LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
+                    LEFT JOIN T_KOJIMSAI ON T_KOJI.JYUCYU_ID=T_KOJIMSAI.JYUCYU_ID                    
                     WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
                     AND T_KOJI.HOJIN_FLG= 0 
                     AND T_KOJI.DEL_FLG= 0 
-                    AND KOJIJITUIKA_FLG= 1';                    
+                    AND KOJIJITUIKA_FLG= 1';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
-                            $row['STATUS'] = 'REPORTED';
-                            $resultSet['KOJI_DATA'][] = $row;
+                            $data = array();
+                            $data['STATUS'] = $row['JYUCYU_ID'];                           
+                            $data['TUIKA_SYOHIN_NAME'] = $row['TUIKA_SYOHIN_NAME'];
+                            $data['TUIKA_JISYA_CD'] = substr($row['TUIKA_JISYA_CD'] , -4);
+                            $data['SURYO'] = $row['SURYO'];
+                            $data['HANBAI_TANKA'] = $row['HANBAI_TANKA'];
+                            $data['KINGAK'] = $row['KINGAK'];                           
+                            $resultSet['TABLE_DATA'][] = $data;
                         }
-                    }
+                    }                                    
 
                     $sql = 'SELECT * FROM M_KOJI_KAKAKU WHERE DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
                         while ($row = $this->result->fetch_assoc()) {
-                            $resultSet['TABLE_DATA'][] = $row;
+                            $resultSet['KOJI_KAKAKU'][] = $row;
                         }
                     }
                 }
@@ -882,7 +934,7 @@ class resources
 
                             foreach ($listJyucyuIdKoji as $value) {
                                 //Get HOJIN_FLG
-                                    $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
                                     FROM T_KOJI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
@@ -954,7 +1006,7 @@ class resources
                                     $listJyucyuIdKoji[] = $row;
                                 }
                             }
-                            
+
 
                             foreach ($listJyucyuIdKoji as $value) {
                                 //Get HOJIN_FLG
@@ -981,8 +1033,6 @@ class resources
                                         $resultSet['constructionReportSUMMARIZE'][] = $row;
                                     }
                                 }
-
-                                
                             }
                         } else {
                             $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
@@ -1567,7 +1617,7 @@ class resources
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
-                
+
 
                 if (isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
@@ -1585,8 +1635,8 @@ class resources
 
                     $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    
-                    if(!empty($img_path['ERROR'])) {
+
+                    if (!empty($img_path['ERROR'])) {
                         $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
@@ -1668,11 +1718,11 @@ class resources
                     }
 
                     $FILEPATH_ID = sprintf('%010d', $num);
-                    
+
                     $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    
-                    if(!empty($img_path['ERROR'])) {
+
+                    if (!empty($img_path['ERROR'])) {
                         $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
@@ -1754,14 +1804,14 @@ class resources
                     }
 
                     $FILEPATH_ID = sprintf('%010d', $num);
-                    
+
                     $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if(!empty($img_path['ERROR'])) {
+                    if (!empty($img_path['ERROR'])) {
                         $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
-                    
+
                     $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                     (
                         FILEPATH_ID,
@@ -1838,10 +1888,10 @@ class resources
                     }
 
                     $FILEPATH_ID = sprintf('%010d', $num);
-                    
+
                     $img_path = [];
                     $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
-                    if(!empty($img_path['ERROR'])) {
+                    if (!empty($img_path['ERROR'])) {
                         $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                         die;
                     }
@@ -3046,9 +3096,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;            
+            $flg = 0;
             if (isset($_POST['JYUCYU_ID'])) {
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];                               
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];
                 $TAG_KBN = $_POST['TAG_KBN'];
                 $KBN = isset($_POST['KBN']) ? $_POST['KBN'] : NULL;
                 $HOMONJIKAN = isset($_POST['HOMONJIKAN']) ? $_POST['HOMONJIKAN'] : NULL;
@@ -3064,7 +3114,7 @@ class resources
                 $SKJ_RENKEI_YMD = date("Y-m-d");
                 $UPD_PGID = 'KOJ1110F';
                 $UPD_YMD = date("Y-m-d H:i:s");
-                
+
                 if ($HOMON_SBT == "01") {
                     $sql = ' UPDATE T_KOJI
                     SET TAG_KBN="' . $TAG_KBN . '",
@@ -3301,7 +3351,7 @@ class resources
                     "' . $ADD_YMD . '",
                     "' . $UPD_PGID . '",
                     "' . $UPD_TANTCD . '",
-                    "' . $UPD_YMD . '" )';                    
+                    "' . $UPD_YMD . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
@@ -3711,4 +3761,66 @@ class resources
     /* * * * * * * * * *
     * * * * MENU END* * * * 
     * * * * * * * * */
+
+    function insert()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $sql = 'INSERT INTO `T_KOJI` 
+            (`JYUCYU_ID`, `SITAMI_YMD`, `KOJI_YMD`, 
+            `HOMON_TANT_CD1`, `HOMON_TANT_NAME1`, `HOMON_TANT_CD2`, `HOMON_TANT_NAME2`, `HOMON_TANT_CD3`, `HOMON_TANT_NAME3`, `HOMON_TANT_CD4`, `HOMON_TANT_NAME4`, 
+            `SETSAKI_NAME`, `SETSAKI_ADDRESS`, `KOJI_JININ`, `SITAMI_JININ`, `HOMON_SBT`, `KOJI_ST`, 
+            `KOJI_ITEM`, `SITAMI_KANSAN_POINT`, `KOJI_KANSAN_POINT`, 
+            `SITAMI_JIKAN`, `KOJI_JIKAN`, `KOJI_KEKKA`, `TENPO_CD`, `HOJIN_FLG`, `MALL_CD`, `KOJIGYOSYA_CD`, `TAG_KBN`, 
+            `SITAMIHOMONJIKAN`, `SITAMIHOMONJIKAN_END`, `KOJIHOMONJIKAN`, `KOJIHOMONJIKAN_END`, 
+            `KOJIIRAISYO_FILEPATH`, `SITAMIIRAISYO_FILEPATH`, 
+            `CANCEL_RIYU`, `SITAMIAPO_KBN`, `KOJIAPO_KBN`, `MTMORI_YMD`, `MEMO`, `COMMENT`, 
+            `READ_FLG`, `ATOBARAI`, `BIKO`, `SYUYAKU_JYUCYU_ID`, `REPORT_FLG`, `SITAMI_REPORT`, `ALL_DAY_FLG`, 
+            `CO_NAME`, `CO_POSTNO`, `CO_ADDRESS`, `KOJI_ITAKUHI`, `SKJ_RENKEI_YMD`, `KOJI_RENKEI_YMD`, `DEL_FLG`, 
+            `ADD_PGID`, `ADD_TANTCD`, `ADD_TANTNM`, `ADD_YMD`, `UPD_PGID`, `UPD_TANTCD`, `UPD_TANTNM`, `UPD_YMD`) 
+            VALUES 
+            ("0301416580", "2022-12-02", "2022-12-02", 
+            "00000", "AAAAA", "01010", "BBBBB", "02051", "CCCCC", "10018", "DDDDD", 
+            "EEEEE", "ADDRESS_TEST", "1", "1", "01", "01", 
+            "ITEM", "0.0", "0.0", 
+            "2", "2", "01", "01010", "0", "02", "00000", "05", 
+            "1000", "1300", "1000", "1500", 
+            "pdf/test.pdf", "pdf/test.pdf", 
+            NULL, "01", "01", "2022-12-02", "MEMO_ HELLO WORLD", "COMMENT_ HELLO WORLD", 
+            "1", NULL, NULL, NULL, NULL, NULL, NULL, 
+            "CO_NAME TEST", "6510084", "CO_ADDRESS TEST", "6000", "2022-12-02", "2022-12-02", "0", 
+            "KOJ1120F", "00000", "TEST", "2022-12-02 12:58:38", "KOJ1120F", "00000", "TEST", "2022-12-02 06:58:36.000000");';
+        }
+
+
+        $sql = 'INSERT INTO `T_KOJI_FILEPATH` 
+        (`FILEPATH_ID`, `ID`, `FILEPATH`, `FILE_KBN_CD`, `DEL_FLG`, 
+        `ADD_PGID`, `ADD_TANTCD`, `ADD_YMD`, `UPD_PGID`, `UPD_TANTCD`, `UPD_YMD`) 
+        VALUES 
+        ("1700154648", "0301416580", "pdf/test.pdf", "03", "0", 
+        "KOJ0060F", "00000", "2022-12-02 13:25:58", "KOJ0060F", "00000", "2022-12-02 07:25:57.000000")';
+
+        $sql = 'INSERT INTO `T_KOJIMSAI` 
+        (`JYUCYU_ID`, `JYUCYUMSAI_ID`, `JYUCYUMSAI_ID_KIKAN`, `HINBAN`, `MAKER_CD`, 
+        `CTGORY_CD`, `SURYO`, `HANBAI_TANKA`, `KINGAK`, `KISETU_HINBAN`, `KISETU_MAKER_CD`, `KENSETU_KEITAI`, 
+        `BEF_SEKO_PHOTO_FILEPATH`, `AFT_SEKO_PHOTO_FILEPATH`, `OTHER_PHOTO_FOLDERPATH`, 
+        `TUIKA_JISYA_CD`, `TUIKA_SYOHIN_NAME`, `KOJIJITUIKA_FLG`, `DEL_FLG`, `RENKEI_YMD`, 
+        `ADD_PGID`, `ADD_TANTCD`, `ADD_YMD`, `UPD_PGID`, `UPD_TANTCD`, `UPD_YMD`) 
+        VALUES 
+        ("0301416580", "0000000000", "0000000000", "KOJ-0000", "00000",
+         "000", "1", "1600", "1600", NULL, NULL, NULL, 
+         "img/pic.png", "img/pic.png", NULL, 
+         "KOJ-00000", "TUIKA_SYOHIN_NAME", "1", "0", NULL, 
+         NULL, "00000", "2022-12-02 13:28:39", NULL, "00000", "2022-12-02 07:28:38.000000");';
+
+        $sql = 'INSERT INTO `T_TIRASI` 
+        (`TANT_CD`, `YMD`, `KOJI_TIRASISU`, `RENKEI_YMD`, `DEL_FLG`, 
+        `ADD_PGID`, `ADD_TANTCD`, `ADD_YMD`, `UPD_PGID`, `UPD_TANTCD`, `UPD_YMD`) 
+        VALUES 
+        ("00000", "2022-12-02", "999", NULL, "0", 
+        "KOJ0990B", "00000", "2022-12-02 13:41:28", "KOJ0990B", "00000", "2022-12-02 07:41:28.000000");';
+    }
 }

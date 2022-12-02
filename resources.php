@@ -835,27 +835,41 @@ class resources
             $flg = 0;
             $resultSet = array();
 
-            if (isset($_GET['KBN_BIKO'])) {
-                $KBN_BIKO = $_GET['KBN_BIKO'];
+            if (isset($_GET['TENPO_CD']) && isset($_GET['JYUCYU_ID'])) {
+                $TENPO_CD = $_GET['TENPO_CD'];
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
 
                 $sql = 'SELECT YOBIKOMOKU1,
                 YOBIKOMOKU2,
                 YOBIKOMOKU3,
                 YOBIKOMOKU4,
                 YOBIKOMOKU5 
-                FROM T_KOJI 
-                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD 
-                WHERE HOJIN_FLG= 1 
-                AND KBN_CD= "12" 
-                AND KBN_BIKO="' . $KBN_BIKO . '" 
-                AND M_KBN.DEL_FLG=0';
+                FROM M_KBN
+                WHERE KBN_CD= "12" 
+                AND KBN_BIKO="' . $TENPO_CD . '" 
+                AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                        $resultSet['KBN'][] = $row;
                     }
                 }
+
+                $sql = 'SELECT FILEPATH,
+                FILEPATH_ID,
+                FILE_KBN_CD,
+                ID FROM T_KOJI_FILEPATH
+                WHERE ID="'.$JYUCYU_ID.'" 
+                AND DEL_FLG=0';
+                $this->result = $this->dbConnect->query($sql);
+                if ($this->result->num_rows > 0) {
+                    // output data of each row                    
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['FILE'][] = $row;
+                    }
+                }
+
             }
 
             if (!empty($resultSet)) {

@@ -2,6 +2,7 @@
 
 include('systemConfig.php');
 include('systemEditor.php');
+
 class resources
 {
     private $dbReference;
@@ -682,6 +683,7 @@ class resources
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $KOJI_ST = $_GET['KOJI_ST'];
+
                 if (in_array($KOJI_ST, ["01", "02"])) {
                     $sql = 'SELECT T_KOJI.JYUCYU_ID,
                     T_KOJI.SETSAKI_NAME,
@@ -700,8 +702,7 @@ class resources
                     LEFT JOIN M_GYOSYA ON T_KOJI.KOJIGYOSYA_CD=M_GYOSYA.KOJIGYOSYA_CD 
                     WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"              
                     AND HOJIN_FLG= 0 
-                    AND T_KOJI.DEL_FLG= 0
-                    AND (T_KOJI.KOJI_ST="02" OR T_KOJI.KOJI_ST="01")';
+                    AND T_KOJI.DEL_FLG= 0';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
@@ -710,6 +711,8 @@ class resources
                             $resultSet['KOJI_DATA'][] = $row;
                         }
                     }
+
+                    $resultSet['TABLE_DATA'][] = [];
                 }
 
                 if ($KOJI_ST == "03") {
@@ -736,8 +739,7 @@ class resources
                     WHERE T_KOJI.JYUCYU_ID= "' . $JYUCYU_ID . '"                
                     AND T_KOJI.HOJIN_FLG= 0 
                     AND T_KOJI.DEL_FLG= 0 
-                    AND KOJIJITUIKA_FLG= 1
-                    AND T_KOJI.KOJI_ST="03"';                    
+                    AND KOJIJITUIKA_FLG= 1';                    
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
                         // output data of each row                    
@@ -3039,31 +3041,31 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
-            $error = [];
-            if (isset($_POST['JYUCYU_ID']) && isset($_POST['TAG_KBN']) && isset($_POST['HOMON_SBT'])) {
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
+            $flg = 0;            
+            if (isset($_POST['JYUCYU_ID'])) {
+                $JYUCYU_ID = $_POST['JYUCYU_ID'];                               
                 $TAG_KBN = $_POST['TAG_KBN'];
-                $HOMON_SBT = $_POST['HOMON_SBT'];
                 $KBN = isset($_POST['KBN']) ? $_POST['KBN'] : NULL;
-                $JIKAN = isset($_POST['JIKAN']) ? $_POST['JIKAN'] : NULL;
-                $JIKAN_END = isset($_POST['JIKAN_END']) ? $_POST['JIKAN_END'] : NULL;
+                $HOMONJIKAN = isset($_POST['HOMONJIKAN']) ? $_POST['HOMONJIKAN'] : NULL;
+                $HOMONJIKAN_END = isset($_POST['HOMONJIKAN_END']) ? $_POST['HOMONJIKAN_END'] : NULL;
                 $JININ = isset($_POST['JININ']) ? $_POST['JININ'] : NULL;
-                $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
                 $KANSAN_POINT = isset($_POST['KANSAN_POINT']) ? $_POST['KANSAN_POINT'] : NULL;
                 $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? $_POST['ALL_DAY_FLG'] : NULL;
+                $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
+                $HOMON_SBT = $_POST['HOMON_SBT'];
+                $KBNMSAI_CD = $_POST['KBNMSAI_CD'];
+                $JIKAN = $_POST['JIKAN'];
                 $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
                 $SKJ_RENKEI_YMD = date("Y-m-d");
                 $UPD_PGID = 'KOJ1110F';
                 $UPD_YMD = date("Y-m-d H:i:s");
-
                 
                 if ($HOMON_SBT == "01") {
                     $sql = ' UPDATE T_KOJI
                     SET TAG_KBN="' . $TAG_KBN . '",
                     SITAMIAPO_KBN="' . $KBN . '",
-                    SITAMIHOMONJIKAN="' . $JIKAN . '",
-                    SITAMIHOMONJIKAN_END="' . $JIKAN_END . '",
+                    SITAMIHOMONJIKAN="' . $HOMONJIKAN . '",
+                    SITAMIHOMONJIKAN_END="' . $HOMONJIKAN_END . '",
                     SITAMI_JININ=' . $JININ . ',
                     SITAMI_KANSAN_POINT=' . $KANSAN_POINT . ',
                     ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
@@ -3071,7 +3073,8 @@ class resources
                     UPD_PGID= "' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '"                  
+                    MEMO="' . $MEMO . '",
+                    SITAMI_JIKAN="' . $JIKAN . '"                 
                     WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
@@ -3082,8 +3085,8 @@ class resources
                     $sql = 'UPDATE T_KOJI 
                     SET TAG_KBN="' . $TAG_KBN . '",
                     KOJIAPO_KBN="' . $KBN . '",
-                    KOJIHOMONJIKAN="' . $JIKAN . '",
-                    KOJIHOMONJIKAN_END="' . $JIKAN_END . '",
+                    KOJIHOMONJIKAN="' . $HOMONJIKAN . '",
+                    KOJIHOMONJIKAN_END="' . $HOMONJIKAN_END . '",
                     KOJI_JININ=' . $JININ . ',
                     KOJI_KANSAN_POINT=' . $KANSAN_POINT . ',
                     ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
@@ -3091,7 +3094,8 @@ class resources
                     UPD_PGID= "' . $UPD_PGID . '",
                     UPD_TANTCD="' . $UPD_TANTCD . '",            
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '"                    
+                    MEMO="' . $MEMO . '" ,
+                    KOJI_JIKAN="' . $JIKAN . '"       
                     WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);

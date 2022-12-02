@@ -837,15 +837,15 @@ class resources
                 $resultSet = array();
                 if ($kojiSt == 1 || $kojiSt == 2) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
+                        //Get HOJIN_FLG
                         $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
                             FROM T_KOJI 
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                         ';
                         $this->result = $this->dbConnect->query($sqlGetHojinFlg);
                         if ($this->result->num_rows > 0) {
-                            // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $dataHojin_Flg = $row['HOJIN_FLG'];
+                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
                             }
                         }
 
@@ -858,7 +858,6 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $row['HOJIN_FLG'] = $dataHojin_Flg;
                                 $resultSet['constructionNotReportSINGLE'][] = $row;
                             }
                         }
@@ -880,15 +879,15 @@ class resources
                             }
 
                             foreach ($listJyucyuIdKoji as $value) {
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                                //Get HOJIN_FLG
+                                    $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
                                     FROM T_KOJI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
                                 $this->result = $this->dbConnect->query($sqlGetHojinFlg);
                                 if ($this->result->num_rows > 0) {
-                                    // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
-                                        $dataHojin_Flg = $row['HOJIN_FLG'];
+                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                     }
                                 }
 
@@ -901,7 +900,6 @@ class resources
                                 if ($this->result->num_rows > 0) {
                                     // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
-                                        $row['HOJIN_FLG'] = $dataHojin_Flg;
                                         $resultSet['constructionNotReportSUMMARIZE'][] = $row;
                                     }
                                 }
@@ -913,15 +911,15 @@ class resources
                     }
                 } elseif ($kojiSt == 3) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
+                        //Get HOJIN_FLG
                         $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
                             FROM T_KOJI 
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                         ';
                         $this->result = $this->dbConnect->query($sqlGetHojinFlg);
                         if ($this->result->num_rows > 0) {
-                            // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $dataHojin_Flg = $row['HOJIN_FLG'];
+                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
                             }
                         }
 
@@ -935,7 +933,6 @@ class resources
                         if ($this->result->num_rows > 0) {
                             // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $row['HOJIN_FLG'] = $dataHojin_Flg;
                                 $resultSet['constructionReportSINGLE'][] = $row;
                             }
                         }
@@ -958,15 +955,15 @@ class resources
                             
 
                             foreach ($listJyucyuIdKoji as $value) {
+                                //Get HOJIN_FLG
                                 $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
                                     FROM T_KOJI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
                                 $this->result = $this->dbConnect->query($sqlGetHojinFlg);
                                 if ($this->result->num_rows > 0) {
-                                    // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
-                                        $dataHojin_Flg = $row['HOJIN_FLG'];
+                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                     }
                                 }
 
@@ -979,7 +976,6 @@ class resources
                                 if ($this->result->num_rows > 0) {
                                     // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
-                                        $row['HOJIN_FLG'] = $dataHojin_Flg;
                                         $resultSet['constructionReportSUMMARIZE'][] = $row;
                                     }
                                 }

@@ -906,7 +906,7 @@ class resources
                 if ($kojiSt == 1 || $kojiSt == 2) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         //Get HOJIN_FLG
-                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
                             FROM T_KOJI 
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                         ';
@@ -914,6 +914,7 @@ class resources
                         if ($this->result->num_rows > 0) {
                             while ($row = $this->result->fetch_assoc()) {
                                 $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
                             }
                         }
 
@@ -948,7 +949,7 @@ class resources
 
                             foreach ($listJyucyuIdKoji as $value) {
                                 //Get HOJIN_FLG
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                                    $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
                                     FROM T_KOJI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
@@ -956,6 +957,7 @@ class resources
                                 if ($this->result->num_rows > 0) {
                                     while ($row = $this->result->fetch_assoc()) {
                                         $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
                                     }
                                 }
 
@@ -980,7 +982,7 @@ class resources
                 } elseif ($kojiSt == 3) {
                     if ($_GET['SINGLE_SUMMARIZE'] == 1) {
                         //Get HOJIN_FLG
-                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
                             FROM T_KOJI 
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                         ';
@@ -988,6 +990,7 @@ class resources
                         if ($this->result->num_rows > 0) {
                             while ($row = $this->result->fetch_assoc()) {
                                 $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
                             }
                         }
 
@@ -1024,7 +1027,7 @@ class resources
 
                             foreach ($listJyucyuIdKoji as $value) {
                                 //Get HOJIN_FLG
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG 
+                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
                                     FROM T_KOJI 
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
@@ -1032,6 +1035,7 @@ class resources
                                 if ($this->result->num_rows > 0) {
                                     while ($row = $this->result->fetch_assoc()) {
                                         $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
                                     }
                                 }
 
@@ -1058,7 +1062,7 @@ class resources
                     die;
                 }
 
-                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
+                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME, KBN_BIKO 
                     FROM M_KBN 
                     WHERE KBN_CD="07"';
                 $this->result = $this->dbConnect->query($sqlGetPullDown);

@@ -1512,13 +1512,13 @@ class resources
                 isset($_GET['KOJI_ST'])
             ) {
                 if ($_GET['KOJI_ST'] == "01" || $_GET['KOJI_ST'] == "02") {
-                    $this->dbReference->sendResponse(200, "「工事報告が未報告の場合は、写真提出が不可となります。」");
+                    $this->dbReference->sendResponse(200, json_encode(['Text' => "「工事報告が未報告の場合は、写真提出が不可となります。」"], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     die;
                 }
                 if ($_GET['KOJI_ST'] == "03") {
                     $sql = 'SELECT FILEPATH 
                     FROM T_KOJI_FILEPATH 
-                    WHERE FILE_KBN_CD="06" AND DEL_FLG=0';
+                    WHERE FILE_KBN_CD="10" AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
 
                     $resultSet = array();

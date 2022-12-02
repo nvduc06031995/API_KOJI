@@ -992,7 +992,7 @@ class resources
                     die;
                 }
 
-                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
+                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME, KBN_BIKO 
                     FROM M_KBN 
                     WHERE KBN_CD="07"';
                 $this->result = $this->dbConnect->query($sqlGetPullDown);

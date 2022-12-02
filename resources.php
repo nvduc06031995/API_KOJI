@@ -1521,11 +1521,13 @@ class resources
                     WHERE FILE_KBN_CD="10" AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
 
+                    $domain =  $this->domain;
+
                     $resultSet = array();
                     if ($this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
-                            $resultSet[] = $row;
+                            $resultSet[]['FILEPATH'] = $domain . $row['FILEPATH'];
                         }
                     }
 

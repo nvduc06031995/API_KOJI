@@ -837,7 +837,7 @@ class resources
         } else {
             $flg = 0;
             $resultSet = array();
-
+            $domain = $this->domain;
             if (isset($_GET['TENPO_CD']) && isset($_GET['JYUCYU_ID'])) {
                 $TENPO_CD = $_GET['TENPO_CD'];
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
@@ -869,7 +869,11 @@ class resources
                 if ($this->result->num_rows > 0) {
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['FILE'][] = $row;
+                        $data = array();
+                        $data['FILEPATH'] = $domain . $row['FILEPATH'];
+                        $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
+                        $data['FILE_KBN_CD'] = $row['FILE_KBN_CD'];
+                        $resultSet['FILE'][] = $data;
                     }
                 }
             }

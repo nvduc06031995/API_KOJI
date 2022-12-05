@@ -2,7 +2,7 @@
 
 include('systemConfig.php');
 include('systemEditor.php');
-// include('validate.php');
+include('validate.php');
 
 class resources
 {
@@ -272,6 +272,37 @@ class resources
         }
     }
 
+    function postTirasiUpdate() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD'])) {
+                $LOGIN_ID = $_POST['LOGIN_ID'];
+                $YMD = $_POST['YMD'];
+                $KOJI_TIRASISU = $_POST['KOJI_TIRASISU'];
+                $RENKEI_YMD = date('Y-m-d');
+                $UPD_PGID = "KOJ1110F";
+                $UPD_TANTCD = $LOGIN_ID;
+                $UPD_YMD = date('Y-m-d H:i:s') ;
+                $sql = 'UPDATE T_TIRASI SET  YMD="' . $YMD . '", 
+                    RENKEI_YMD="' . $RENKEI_YMD . '", 
+                    KOJI_TIRASISU=' . $KOJI_TIRASISU . ', 
+                    UPD_PGID="' . $UPD_PGID . '", 
+                    UPD_TANTCD= "' . $LOGIN_ID . '", 
+                    UPD_YMD="' . $UPD_YMD . '"
+                    WHERE TANT_CD="' . $LOGIN_ID . '" 
+                    AND YMD="' . $YMD . '"';                
+                $this->result = $this->dbConnect->query($sql);
+                                
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
+            }
+        }
+    }
+
     /* ==================================================================== 依頼書 */
     function getRequestForm()
     {
@@ -288,7 +319,7 @@ class resources
                 $HOMON_SBT = $_GET['HOMON_SBT'];
                 $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
 
-                if ($SINGLE_SUMMARIZE == 1) {
+                if ($SINGLE_SUMMARIZE == "01") {
                     if ($HOMON_SBT == "01") {
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                         T_KOJI.JYUCYU_ID,
@@ -298,10 +329,10 @@ class resources
                         T_KOJI_FILEPATH.FILEPATH 
                         FROM T_KOJI 
                         LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
+                        WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"
                         AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
                         AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI_FILEPATH.DEL_FLG=0';
+                        AND T_KOJI_FILEPATH.DEL_FLG=0';           
                         $this->result = $this->dbConnect->query($sql);
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
@@ -328,7 +359,7 @@ class resources
                         T_KOJI_FILEPATH.FILEPATH 
                         FROM T_KOJI 
                         LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE JYUCYU_ID= ' . $JYUCYU_ID . '
+                        WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"
                         AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
                         AND T_KOJI.DEL_FLG=0 
                         AND T_KOJI_FILEPATH.DEL_FLG=0';
@@ -349,7 +380,7 @@ class resources
                             }
                         }
                     }
-                } else if ($SINGLE_SUMMARIZE == 2) {
+                } else if ($SINGLE_SUMMARIZE == "02") {
                     if ($HOMON_SBT == "01") {
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                         T_KOJI_FILEPATH.FILEPATH,
@@ -2063,15 +2094,18 @@ class resources
                 T_TBETUCALENDAR.YMD, 
                 T_TBETUCALENDAR.JYOKEN_CD, 
                 T_TBETUCALENDAR.ALL_DAY_FLG, 
+                T_TBETUCALENDAR.MEMO_CD, 
+                M_KBN.KBNMSAI_CD, 
                 M_KBN.KBNMSAI_NAME, 
                 M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
-                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG="1" AND M_KBN.KBNMSAI_CD="01"
+                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.MEMO_CD=M_KBN.KBNMSAI_CD
                  WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
                      AND T_TBETUCALENDAR.YMD <= "' . $end_date . '" 
                      AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
-                     AND M_KBN.KBN_CD="06"';
+                     AND M_KBN.KBN_CD="06"
+                     AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=1';
                 $this->result = $this->dbConnect->query($sql);
                 if ($this->result->num_rows > 0) {
                     // output data of each row
@@ -2081,12 +2115,14 @@ class resources
                         $data['START_TIME'] = $row['START_TIME'];
                         $data['END_TIME'] = $row['END_TIME'];
                         $data['NAIYO'] = $row['NAIYO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
                         $data['YMD'] = $row['YMD'];
                         $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                         $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
                         $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['MEMO_CD'] = $row['MEMO_CD'];
                         $data['TYPE'] = 2;
                         $resultSet['OFFICE'][$TBETUCALENDAR_YMD][] = $data;
                     }
@@ -3276,11 +3312,12 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            // $validate = new Validate();
-            // $validate->validate([
-            //     'JYOKEN_CD' => 'required',
-            //     'YMD' => 'required',
-            // ]); 
+            // var_dump($_POST); die;
+            $validate = new Validate();
+            $validate->validate($_POST , [
+                'JYOKEN_CD' => 'required',
+                'YMD' => 'num',
+            ]); 
 
             if (
                 isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG']) && isset($_POST['START_TIME'])

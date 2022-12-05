@@ -2,6 +2,10 @@
 
 class Validate
 {
+    protected $data;
+    protected $condition;
+    protected $errors = [];
+
     function __construct()
     {
     }
@@ -10,13 +14,32 @@ class Validate
     {
     }
 
-    function validate($data)
+    function validate($data , $condition)
     {
-        var_dump($data);
-        die;
+        $this->data = $data;        
+        $this->condition = $condition;
+
+        foreach($this->condition as $k => $v) {
+            switch ($v) {
+                case 'required':
+                    $this->required($this->data[$k]);
+                  break;                
+                default:
+                  $errors = [];
+              }           
+        }
+        
+        if(!empty($errors)){
+            return $errors;
+        } else {
+            return $this->data;
+        }
     }
 
-    function required() {
-        echo 1; die;
+    function required($value = NULL) {
+        var_dump(empty($value)); die;
+        // if(empty($value)){
+
+        // }
     }
 }

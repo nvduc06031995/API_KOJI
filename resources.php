@@ -2,11 +2,13 @@
 
 include('systemConfig.php');
 include('systemEditor.php');
+// include('validate.php');
 
 class resources
 {
     private $dbReference;
     var $dbConnect;
+    var $validate;
     var $result;
     var $changeKey;
     var $domain = "https://koji-app.starboardasiavn.com/";
@@ -77,7 +79,10 @@ class resources
                 SETSAKI_ADDRESS,
                 SITAMI_YMD,   
                 HOMON_TANT_CD4,         
-                SETSAKI_NAME FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
+                SETSAKI_NAME,
+                KOJIHOMONJIKAN, 
+                KOJI_JININ,
+                KOJI_JIKAN FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
                 AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
@@ -96,6 +101,9 @@ class resources
                         $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
                         $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                         $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
@@ -113,7 +121,10 @@ class resources
                 HOMON_TANT_CD1,
                 HOMON_TANT_CD2,
                 HOMON_TANT_CD3,
-                SETSAKI_NAME FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
+                SETSAKI_NAME,
+                SITAMIHOMONJIKAN,
+                SITAMI_JININ,
+                SITAMI_JIKAN FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
                 AND (HOMON_TANT_CD1="' . $LOGIN_ID . '" OR HOMON_TANT_CD2="' . $LOGIN_ID . '" OR HOMON_TANT_CD3="' . $LOGIN_ID . '")
                 AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
@@ -134,6 +145,9 @@ class resources
                         $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
                         $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
                         $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                        $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
@@ -3262,6 +3276,12 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            // $validate = new Validate();
+            // $validate->validate([
+            //     'JYOKEN_CD' => 'required',
+            //     'YMD' => 'required',
+            // ]); 
+
             if (
                 isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG']) && isset($_POST['START_TIME'])
             ) {
@@ -3294,7 +3314,9 @@ class resources
                 // AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
                 // AND START_TIME=' . $START_TIME . '
                 // AND DEL_FLG=0';
-                // $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);               
+                // $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);    
+                
+                
                 if ($TAN_EIG_ID != 'NULL') {
                     $sql = ' UPDATE T_EIGYO_ANKEN
                     SET                     

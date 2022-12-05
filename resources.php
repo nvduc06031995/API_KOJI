@@ -1,5 +1,4 @@
 <?php
-
 include('systemConfig.php');
 include('systemEditor.php');
 include('validate.php');
@@ -198,7 +197,7 @@ class resources
                         $count_jyucyu = $row["COUNT(*)"];
                     }
                 }
-                
+
                 if ($count_jyucyu > 0) {
                     $sql = 'SELECT COUNT(*) 
                     FROM T_KOJI 
@@ -238,22 +237,8 @@ class resources
             if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD']) && isset($_POST['JYUCYU_ID']) && isset($_POST['SETSAKI_ADDRESS'])) {
                 $LOGIN_ID = $_POST['LOGIN_ID'];
                 $YMD = $_POST['YMD'];
-                $KOJI_TIRASISU = 1;
-                $RENKEI_YMD = 'NULL';
-                $UPD_PGID = "KOJ1110F";
-                $sql = 'UPDATE T_TIRASI SET  YMD="' . $YMD . '", 
-                    RENKEI_YMD=' . $RENKEI_YMD . ', 
-                    KOJI_TIRASISU=' . $KOJI_TIRASISU . ', 
-                    UPD_PGID="' . $UPD_PGID . '", 
-                    UPD_TANTCD= "' . $LOGIN_ID . '", 
-                    UPD_YMD=' . date('Y-m-d H:i:s') . ' 
-                    WHERE TANT_CD="' . $LOGIN_ID . '" 
-                    AND YMD="' . $YMD . '"';
-                $this->result = $this->dbConnect->query($sql);
-
                 $SETSAKI_ADDRESS = $_POST['SETSAKI_ADDRESS'];
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $RENKEI_YMD = 'NULL';
                 $UPD_PGID2 = "KOJ1120F";
                 $sql = 'UPDATE T_KOJI SET  SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '",                    
                     UPD_PGID="' . $UPD_PGID2 . '", 
@@ -272,7 +257,8 @@ class resources
         }
     }
 
-    function postTirasiUpdate() {
+    function postTirasiUpdate()
+    {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
@@ -285,17 +271,18 @@ class resources
                 $RENKEI_YMD = date('Y-m-d');
                 $UPD_PGID = "KOJ1110F";
                 $UPD_TANTCD = $LOGIN_ID;
-                $UPD_YMD = date('Y-m-d H:i:s') ;
+                $UPD_YMD = date('Y-m-d H:i:s');
                 $sql = 'UPDATE T_TIRASI SET  YMD="' . $YMD . '", 
                     RENKEI_YMD="' . $RENKEI_YMD . '", 
                     KOJI_TIRASISU=' . $KOJI_TIRASISU . ', 
                     UPD_PGID="' . $UPD_PGID . '", 
-                    UPD_TANTCD= "' . $LOGIN_ID . '", 
+                    UPD_TANTCD= "' . $UPD_TANTCD . '", 
                     UPD_YMD="' . $UPD_YMD . '"
                     WHERE TANT_CD="' . $LOGIN_ID . '" 
-                    AND YMD="' . $YMD . '"';                
+                    AND YMD="' . $YMD . '"';
+
                 $this->result = $this->dbConnect->query($sql);
-                                
+
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
@@ -332,7 +319,7 @@ class resources
                         WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"
                         AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
                         AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI_FILEPATH.DEL_FLG=0';           
+                        AND T_KOJI_FILEPATH.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
@@ -422,7 +409,7 @@ class resources
                         WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
                         AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04") 
                         AND T_KOJI.HOMON_SBT="02"
-                        AND T_KOJI.DEL_FLG=0';                        
+                        AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if ($this->result->num_rows > 0) {
                             // output data of each row                    
@@ -2900,6 +2887,7 @@ class resources
                 switch ($HOMON_SBT) {
                     case "01":
                         $sql = 'SELECT JYUCYU_ID, 
+                        T_KOJI.SITAMI_YMD, 
                         T_KOJI.SITAMI_JININ, 
                         T_KOJI.SITAMIHOMONJIKAN, 
                         T_KOJI.SITAMIHOMONJIKAN_END, 
@@ -2932,6 +2920,7 @@ class resources
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                                $data['YMD'] = $row['SITAMI_YMD'];
                                 $data['JININ'] = $row['SITAMI_JININ'];
                                 $data['HOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
                                 $data['HOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
@@ -2959,6 +2948,7 @@ class resources
                         break;
                     case "02":
                         $sql = 'SELECT JYUCYU_ID, 
+                        T_KOJI.KOJI_YMD,
                         T_KOJI.KOJI_JININ, 
                         T_KOJI.KOJIHOMONJIKAN, 
                         T_KOJI.KOJIHOMONJIKAN_END, 
@@ -2990,6 +2980,7 @@ class resources
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                                $data['YMD'] = $row['KOJI_YMD'];
                                 $data['JININ'] = $row['KOJI_JININ'];
                                 $data['HOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['HOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
@@ -3312,73 +3303,56 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            // var_dump($_POST); die;
             $validate = new Validate();
-            $validate->validate($_POST , [
+            $validated = $validate->validate($_POST, [
                 'JYOKEN_CD' => 'required',
-                'YMD' => 'num',
-            ]); 
+                'YMD' => 'required',
+                'TAG_KBN' => 'required',
+                'START_TIME' => 'required',
+                'END_TIME' => 'required',
+                'JININ' => 'required',
+                'JIKAN' => 'required',
+                'JYOKEN_SYBET_FLG' => 'required',
+                'GUEST_NAME' => 'nullable',
+                'ATTEND_NAME1' => 'nullable',
+                'ATTEND_NAME2' => 'nullable',
+                'ATTEND_NAME3' => 'nullable',
+                'ALL_DAY_FLG' => 'nullable',
+                'TAN_EIG_ID' => 'nullable',
+                'LOGIN_ID' => 'required'
+            ]);
 
-            if (
-                isset($_POST['JYOKEN_CD']) && isset($_POST['YMD'])  && isset($_POST['JYOKEN_SYBET_FLG']) && isset($_POST['START_TIME'])
-            ) {
-                $YMD = $_POST['YMD'];
-                $JYOKEN_CD = $_POST['JYOKEN_CD'];
-                $JYOKEN_SYBET_FLG = $_POST['JYOKEN_SYBET_FLG'];
-
-                $TAN_EIG_ID = isset($_POST['TAN_EIG_ID']) ? '"' . $_POST['TAN_EIG_ID'] . '"' : 'NULL';
-                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
-                $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
-                $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
-                $JININ = isset($_POST['JININ']) ? '"' . $_POST['JININ'] . '"' : 'NULL';
-                $JIKAN = isset($_POST['JIKAN']) ? '"' . $_POST['JIKAN'] . '"' : 'NULL';
-                $GUEST_NAME = isset($_POST['GUEST_NAME']) ? '"' . $_POST['GUEST_NAME'] . '"' : 'NULL';
-                $ATTEND_NAME1 = isset($_POST['ATTEND_NAME1']) ? '"' . $_POST['ATTEND_NAME1'] . '"' : 'NULL';
-                $ATTEND_NAME2 = isset($_POST['ATTEND_NAME2']) ? '"' . $_POST['ATTEND_NAME2'] . '"' : 'NULL';
-                $ATTEND_NAME3 = isset($_POST['ATTEND_NAME3']) ? '"' . $_POST['ATTEND_NAME3'] . '"' : 'NULL';
-                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
+            if ($validated) {                                                         
                 $RENKEI_YMD = date('Y-m-d');
                 $ADD_PGID = "KOJ1110F";
-                $ADD_TANTCD = isset($_POST['ADD_TANTCD']) ? '"' . $_POST['ADD_TANTCD'] . '"' : '00001';
                 $ADD_YMD = date('Y-m-d H:i:s');
                 $UPD_PGID = "KOJ1110F";
-                $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? '"' . $_POST['UPD_TANTCD'] . '"' : '00001';
-                $UPD_YMD  = date('Y-m-d H:i:s');
-                // $query_eigyo_anken = 'SELECT TAN_EIG_ID 
-                // FROM T_EIGYO_ANKEN 
-                // WHERE JYOKEN_CD=' . $JYOKEN_CD . ' 
-                // AND YMD="' . $YMD . '" 
-                // AND JYOKEN_SYBET_FLG=' . $JYOKEN_SYBET_FLG . ' 
-                // AND START_TIME=' . $START_TIME . '
-                // AND DEL_FLG=0';
-                // $count_eigyo_anken = $this->dbConnect->query($query_eigyo_anken);    
-                
-                
-                if ($TAN_EIG_ID != 'NULL') {
-                    $sql = ' UPDATE T_EIGYO_ANKEN
-                    SET                     
-                    TAG_KBN=' . $TAG_KBN . ',
-                    START_TIME=' . $START_TIME . ',
-                    END_TIME=' . $END_TIME . ',
-                    JININ=' . $JININ . ',
-                    JIKAN=' . $JIKAN . ',
-                    GUEST_NAME=' . $GUEST_NAME . ',
-                    ATTEND_NAME1=' . $ATTEND_NAME1 . ',
-                    ATTEND_NAME2=' . $ATTEND_NAME2 . ',
-                    ATTEND_NAME3=' . $ATTEND_NAME3 . ',
-                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
-                    RENKEI_YMD="' . $RENKEI_YMD . '",
-                    UPD_PGID="' . $UPD_PGID . '",
-                    UPD_TANTCD="' . $UPD_TANTCD . '",
-                    UPD_YMD="' . $UPD_YMD . '" 
-                    WHERE TAN_EIG_ID="' . $TAN_EIG_ID . '"                
-                    AND DEL_FLG=0';
+                $UPD_YMD  = date('Y-m-d H:i:s');                
+
+                if (isset($validated['TAN_EIG_ID']) && !is_null($validated['TAN_EIG_ID'])) {
+                    $sql = ' UPDATE T_EIGYO_ANKEN SET                     
+                        TAG_KBN="' . $validated['TAG_KBN'] . '",
+                        START_TIME="' .  $validated['START_TIME'] . '",
+                        END_TIME="' .  $validated['END_TIME'] . '",
+                        JININ="' .  $validated['JININ']. '",
+                        JIKAN="' .  $validated['JIKAN']. '",
+                        GUEST_NAME="' .  $validated['GUEST_NAME']. '",
+                        ATTEND_NAME1="' .  $validated['ATTEND_NAME1']. '",
+                        ATTEND_NAME2="' .  $validated['ATTEND_NAME2']. '",
+                        ATTEND_NAME3="' .  $validated['ATTEND_NAME3']. '",
+                        ALL_DAY_FLG=' .  $validated['ALL_DAY_FLG']. ',
+                        RENKEI_YMD="' . $RENKEI_YMD . '",
+                        UPD_PGID="' . $UPD_PGID . '",
+                        UPD_TANTCD="' . $validated['LOGIN_ID'] . '",
+                        UPD_YMD="' . $UPD_YMD . '" 
+                        WHERE TAN_EIG_ID="' . $validated['TAN_EIG_ID'] . '"                
+                        AND DEL_FLG=0';                    
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
                     //Caculate TAN_EIG_ID                    
                     $query_max_tan_eig_id = 'SELECT max(TAN_EIG_ID) as TANCALID_MAX
-                    FROM T_EIGYO_ANKEN';
+                        FROM T_EIGYO_ANKEN';
                     $rs_max = $this->dbConnect->query($query_max_tan_eig_id);
                     $num = 0;
                     if ($rs_max->num_rows > 0) {
@@ -3390,57 +3364,55 @@ class resources
 
                     $TAN_EIG_ID = sprintf('%010d', $num);
                     $sql = 'INSERT INTO T_EIGYO_ANKEN 
-                    (
-                    TAN_EIG_ID,
-                    JYOKEN_CD,
-                    JYOKEN_SYBET_FLG,
-                    YMD,
-                    TAG_KBN,
-                    START_TIME,
-                    END_TIME,
-                    JININ,
-                    JIKAN,
-                    GUEST_NAME,
-                    ATTEND_NAME1,
-                    ATTEND_NAME2,
-                    ATTEND_NAME3,
-                    ALL_DAY_FLG,
-                    DEL_FLG,                    
-                    ADD_PGID,
-                    ADD_TANTCD,
-                    ADD_YMD,
-                    UPD_PGID,
-                    UPD_TANTCD,
-                    UPD_YMD                      
-                    )
-                    VALUES (
-                    "' . $TAN_EIG_ID . '",
-                    "' . $JYOKEN_CD . '",
-                    ' . $JYOKEN_SYBET_FLG . ',
-                    "' . $YMD . '",
-                    ' . $TAG_KBN . ',
-                    ' . $START_TIME . ',
-                    ' . $END_TIME . ',
-                    ' . $JININ . ',
-                    ' . $JIKAN . ',
-                    ' . $GUEST_NAME . ',
-                    ' . $ATTEND_NAME1 . ',
-                    ' . $ATTEND_NAME2 . ',
-                    ' . $ATTEND_NAME3 . ',
-                    ' . $ALL_DAY_FLG . ',   
-                    0,                 
-                    "' . $ADD_PGID . '",
-                    "' . $ADD_TANTCD . '",
-                    "' . $ADD_YMD . '",
-                    "' . $UPD_PGID . '",
-                    "' . $UPD_TANTCD . '",
-                    "' . $UPD_YMD . '" )';
+                        (
+                        TAN_EIG_ID,
+                        JYOKEN_CD,
+                        JYOKEN_SYBET_FLG,
+                        YMD,
+                        TAG_KBN,
+                        START_TIME,
+                        END_TIME,
+                        JININ,
+                        JIKAN,
+                        GUEST_NAME,
+                        ATTEND_NAME1,
+                        ATTEND_NAME2,
+                        ATTEND_NAME3,
+                        ALL_DAY_FLG,
+                        DEL_FLG,                    
+                        ADD_PGID,
+                        ADD_TANTCD,
+                        ADD_YMD,
+                        UPD_PGID,
+                        UPD_TANTCD,
+                        UPD_YMD                      
+                        )
+                        VALUES (
+                        "' . $TAN_EIG_ID . '",
+                        "' . $validated['JYOKEN_CD'] . '",
+                        ' . $validated['JYOKEN_SYBET_FLG'] . ',
+                        "' . $validated['YMD'] . '",
+                        "' . $validated['TAG_KBN'] . '",
+                        "' . $validated['START_TIME'] . '",
+                        "' . $validated['END_TIME'] . '",
+                        "' . $validated['JININ'] . '",
+                        "' . $validated['JIKAN'] . '",
+                        "' . $validated['GUEST_NAME'] . '",
+                        "' . $validated['ATTEND_NAME1'] . '",
+                        "' . $validated['ATTEND_NAME2'] . '",
+                        "' . $validated['ATTEND_NAME3'] . '",
+                        ' . $validated['ALL_DAY_FLG'] . ',  
+                        0,                 
+                        "' . $ADD_PGID . '",
+                        "' . $validated['LOGIN_ID'] . '",
+                        "' . $ADD_YMD . '",
+                        "' . $UPD_PGID . '",
+                        "' . $validated['LOGIN_ID'] . '",
+                        "' . $UPD_YMD . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
+            } 
         }
     }
     /* ==================================================================== 営業工事営業下見内容 END*/
@@ -3904,19 +3876,20 @@ class resources
                 // VALUES 
                 // ("00000", "2022-12-0'.$i.'", "999", NULL, "0", 
                 // "KOJ0990B", "00000", "2022-12-02 13:41:28", "KOJ0990B", "00000", "2022-12-02 07:41:28")';
-                
+
                 $this->result = $this->dbConnect->query($sql);
             }
         }
     }
 
-    function update_syuyaku_jyucyu_id() {
+    function update_syuyaku_jyucyu_id()
+    {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $sql = 'UPDATE T_KOJI SET SYUYAKU_JYUCYU_ID=NULL WHERE SYUYAKU_JYUCYU_ID IS NOT NULL OR SYUYAKU_JYUCYU_ID=""';           
+            $sql = 'UPDATE T_KOJI SET SYUYAKU_JYUCYU_ID=NULL WHERE SYUYAKU_JYUCYU_ID IS NOT NULL OR SYUYAKU_JYUCYU_ID="0301447773"';
             $this->result = $this->dbConnect->query($sql);
         }
     }

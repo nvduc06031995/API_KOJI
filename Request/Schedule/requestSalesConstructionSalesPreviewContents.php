@@ -1,5 +1,6 @@
 <?php
 
-include('resources.php');
-$getEnterReason = new resources();
+include('./schedule.php');
+
+$getEnterReason = new Schedule();
 $getEnterReason->getSalesConstructionSalesPreviewContents();

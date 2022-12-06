@@ -1,9 +1,9 @@
 <?php
-include('systemConfig.php');
-include('systemEditor.php');
-include('validate.php');
+include('../../System/systemConfig.php');
+include('../../System/systemEditor.php');
+include('../../Validate/validate.php');
 
-class resources
+class Menu
 {
     private $dbReference;
     var $dbConnect;
@@ -33,8 +33,9 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
+
             if (isset($_GET['LOGIN_ID'])) {
                 // 新着コメント
                 $LOGIN_ID = $_GET['LOGIN_ID'];
@@ -44,7 +45,10 @@ class resources
                 AND COMMENT IS NOT NULL 
                 AND READ_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['COMMENT'][] = $row;
@@ -60,7 +64,10 @@ class resources
                 AND M_TANT.DEL_FLG= 0';
                 $temp_data = '';
                 $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $temp_data = $row['KOJIGYOSYA_CD'];
@@ -74,7 +81,10 @@ class resources
                 AND T_NYUKOYOTEI.DEL_FLG= 0';
 
                 $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
@@ -90,7 +100,10 @@ class resources
                 AND KOJI_YMD="' . date('d.m.Y', strtotime("-1 days")) . '" 
                 AND REPORT_FLG="02"';
                 $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
@@ -106,7 +119,10 @@ class resources
                 AND SITAMI_YMD="' . date('d.m.Y', strtotime("-1 days")) . '" 
                 AND REPORT_FLG="01"';
                 $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
@@ -123,7 +139,10 @@ class resources
                 AND T_BUZAIHACYU.HACYU_OKFLG= "01"
                 AND M_TANT.BUZAI_HACOK_FLG= 1';
                 $this->result = $this->dbConnect->query($sql);
-                if ($this->result->num_rows > 0) {
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
@@ -131,16 +150,14 @@ class resources
                         $resultSet['TOTAL'][] = $data;
                     }
                 }
-            }
+            } else {
+                $errors['msg'][] = 'Missing parameter LOGIN_ID ';
+            }           
 
-            if (!empty($resultSet)) {
-                $flg = 1;
-            }
-
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -158,6 +175,9 @@ class resources
                 foreach ($LIST_ID as $k => $v) {
                     $sql = 'UPDATE T_KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $v . '" ';
                     $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {

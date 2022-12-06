@@ -186,8 +186,7 @@ class resources
                 $sql = 'SELECT COUNT(*) 
                     FROM T_KOJI 
                     WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
-                    AND KOJI_YMD="' . $YMD . '"
-                    AND KOJI_ST="02"
+                    AND KOJI_YMD="' . $YMD . '"                    
                     AND DEL_FLG= 0 ';
                 $this->result = $this->dbConnect->query($sql);
 
@@ -202,8 +201,7 @@ class resources
                     $sql = 'SELECT COUNT(*) 
                     FROM T_KOJI 
                     WHERE SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
-                    AND KOJI_YMD="' . $YMD . '"
-                    AND KOJI_ST="02"
+                    AND KOJI_YMD="' . $YMD . '"                    
                     AND DEL_FLG= 0 ';
                     $this->result = $this->dbConnect->query($sql);
                     if ($this->result->num_rows > 0) {
@@ -227,33 +225,42 @@ class resources
         }
     }
 
-    function postCount()
+    function postUpdateSummarize()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD']) && isset($_POST['JYUCYU_ID']) && isset($_POST['SETSAKI_ADDRESS'])) {
-                $LOGIN_ID = $_POST['LOGIN_ID'];
-                $YMD = $_POST['YMD'];
-                $SETSAKI_ADDRESS = $_POST['SETSAKI_ADDRESS'];
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $UPD_PGID2 = "KOJ1120F";
+            $errors = [];
+            $validate = new Validate();
+            $validated = $validate->validate($_POST , [
+                'LOGIN_ID' => 'required',
+                'YMD' => 'required',
+                'JYUCYU_ID' => 'required',
+                'SETSAKI_ADDRESS' => 'required'
+            ]);
+
+            if($validated){
+                $UPD_PGID = "KOJ1120F";
                 $sql = 'UPDATE T_KOJI SET  SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '",                    
-                    UPD_PGID="' . $UPD_PGID2 . '", 
+                    UPD_PGID="' . $UPD_PGID . '", 
                     UPD_TANTCD= "' . $LOGIN_ID . '", 
                     UPD_YMD="' . date('Y-m-d H:i:s') . '"
                     WHERE SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
                     AND KOJI_YMD="' . $YMD . '"
-                    AND DEL_FLG= 0 
-                    AND KOJI_ST="02" ';
+                    AND DEL_FLG= 0 ';
                 $this->result = $this->dbConnect->query($sql);
-
+                if(!empty($this->dbConnect->error)){
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+            }
+            
+            if(empty($errors['msg'])){
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
-            }
+                $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }          
         }
     }
 
@@ -3303,6 +3310,7 @@ class resources
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $errors = [];
             $validate = new Validate();
             $validated = $validate->validate($_POST, [
                 'JYOKEN_CD' => 'required',
@@ -3348,7 +3356,9 @@ class resources
                         WHERE TAN_EIG_ID="' . $validated['TAN_EIG_ID'] . '"                
                         AND DEL_FLG=0';                    
                     $this->result = $this->dbConnect->query($sql);
-                    $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    if(!empty($this->dbConnect->error)){
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }                       
                 } else {
                     //Caculate TAN_EIG_ID                    
                     $query_max_tan_eig_id = 'SELECT max(TAN_EIG_ID) as TANCALID_MAX
@@ -3409,10 +3419,19 @@ class resources
                         "' . $UPD_PGID . '",
                         "' . $validated['LOGIN_ID'] . '",
                         "' . $UPD_YMD . '" )';
+                        // echo $sql; die;
                     $this->result = $this->dbConnect->query($sql);
-                    $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    if(!empty($this->dbConnect->error)){
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }                    
                 }
             } 
+
+            if(empty($errors['msg'])){
+                $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
         }
     }
     /* ==================================================================== 営業工事営業下見内容 END*/

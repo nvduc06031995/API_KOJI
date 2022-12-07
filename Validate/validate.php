@@ -62,6 +62,7 @@ class Validate
 
         if (!empty($errors)) {
             $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            die();
         } else {
             return $this->data;
         }

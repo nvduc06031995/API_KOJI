@@ -1274,72 +1274,81 @@ class Schedule
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
-            if (isset($_POST['JYUCYU_ID'])) {
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $TAG_KBN = $_POST['TAG_KBN'];
-                $KBN = isset($_POST['KBN']) ? $_POST['KBN'] : NULL;
-                $HOMONJIKAN = isset($_POST['HOMONJIKAN']) ? $_POST['HOMONJIKAN'] : NULL;
-                $HOMONJIKAN_END = isset($_POST['HOMONJIKAN_END']) ? $_POST['HOMONJIKAN_END'] : NULL;
-                $JININ = isset($_POST['JININ']) ? $_POST['JININ'] : NULL;
-                $KANSAN_POINT = isset($_POST['KANSAN_POINT']) ? $_POST['KANSAN_POINT'] : NULL;
-                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? $_POST['ALL_DAY_FLG'] : NULL;
-                $MEMO = isset($_POST['MEMO']) ? $_POST['MEMO'] : NULL;
-                $HOMON_SBT = $_POST['HOMON_SBT'];
-                $KBNMSAI_CD = $_POST['KBNMSAI_CD'];
-                $JIKAN = $_POST['JIKAN'];
-                $UPD_TANTCD = isset($_POST['UPD_TANTCD']) ? $_POST['UPD_TANTCD'] : '000001';
+            $errors = [];
+            $validate = new Validate();
+
+            $validated = $validate->validate($_POST , [
+                'JYUCYU_ID' => 'required',
+                'KBN' => 'required',
+                'HOMONJIKAN' => 'required',
+                'HOMONJIKAN_END' => 'required',
+                'JININ' => 'required',
+                'KANSAN_POINT' => 'required',
+                'MEMO' => 'required',
+                'ALL_DAY_FLG' => 'nullable',
+                'HOMON_SBT' => 'required',
+                'JIKAN' => 'required',
+                'KBNMSAI_CD' => 'required',
+                'TAG_KBN' => 'required',
+                'LOGIN_ID' => 'required'
+            ]);
+
+            if ($validated) {                                                                                                                            
                 $SKJ_RENKEI_YMD = date("Y-m-d");
                 $UPD_PGID = 'KOJ1110F';
                 $UPD_YMD = date("Y-m-d H:i:s");
 
-                if ($HOMON_SBT == "01") {
+                if ($validated['HOMON_SBT'] == "01") {
                     $sql = ' UPDATE T_KOJI
-                    SET TAG_KBN="' . $TAG_KBN . '",
-                    SITAMIAPO_KBN="' . $KBN . '",
-                    SITAMIHOMONJIKAN="' . $HOMONJIKAN . '",
-                    SITAMIHOMONJIKAN_END="' . $HOMONJIKAN_END . '",
-                    SITAMI_JININ=' . $JININ . ',
-                    SITAMI_KANSAN_POINT=' . $KANSAN_POINT . ',
-                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
+                    SET TAG_KBN="' . $validated['TAG_KBN'] . '",
+                    SITAMIAPO_KBN="' . $validated['KBN'] . '",
+                    SITAMIHOMONJIKAN="' . $validated['HOMONJIKAN'] . '",
+                    SITAMIHOMONJIKAN_END="' . $validated['HOMONJIKAN_END'] . '",
+                    SITAMI_JININ=' . $validated['JININ'] . ',
+                    SITAMI_KANSAN_POINT=' . $validated['KANSAN_POINT'] . ',
+                    ALL_DAY_FLG=' . $validated['ALL_DAY_FLG'] . ',
                     SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
                     UPD_PGID= "' . $UPD_PGID . '",
-                    UPD_TANTCD="' . $UPD_TANTCD . '",
+                    UPD_TANTCD="' . $validated['LOGIN_ID'] . '",
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '",
-                    SITAMI_JIKAN="' . $JIKAN . '"                 
-                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                    MEMO="' . $validated['MEMO'] . '",
+                    SITAMI_JIKAN="' . $validated['JIKAN'] . '"                 
+                    WHERE JYUCYU_ID="' . $validated['JYUCYU_ID'] . '"
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
-                    $this->result == true ? $flg = 1 : $flg = 0;
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
 
-                if ($HOMON_SBT == "02") {
+                if ($validated['HOMON_SBT'] == "02") {
                     $sql = 'UPDATE T_KOJI 
-                    SET TAG_KBN="' . $TAG_KBN . '",
-                    KOJIAPO_KBN="' . $KBN . '",
-                    KOJIHOMONJIKAN="' . $HOMONJIKAN . '",
-                    KOJIHOMONJIKAN_END="' . $HOMONJIKAN_END . '",
-                    KOJI_JININ=' . $JININ . ',
-                    KOJI_KANSAN_POINT=' . $KANSAN_POINT . ',
-                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
+                    SET TAG_KBN="' . $validated['TAG_KBN'] . '",
+                    KOJIAPO_KBN="' . $validated['KBN'] . '",
+                    KOJIHOMONJIKAN="' . $validated['HOMONJIKAN'] . '",
+                    KOJIHOMONJIKAN_END="' . $validated['HOMONJIKAN_END'] . '",
+                    KOJI_JININ=' . $validated['JININ'] . ',
+                    KOJI_KANSAN_POINT=' . $validated['KANSAN_POINT'] . ',
+                    ALL_DAY_FLG=' . $validated['ALL_DAY_FLG'] . ',
                     SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
                     UPD_PGID= "' . $UPD_PGID . '",
-                    UPD_TANTCD="' . $UPD_TANTCD . '",            
+                    UPD_TANTCD="' . $validated['LOGIN_ID'] . '",            
                     UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $MEMO . '" ,
-                    KOJI_JIKAN="' . $JIKAN . '"       
-                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
+                    MEMO="' . $validated['MEMO'] . '" ,
+                    KOJI_JIKAN="' . $validated['JIKAN'] . '"       
+                    WHERE JYUCYU_ID="' . $validated['JYUCYU_ID'] . '"
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
-                    $this->result == true ? $flg = 1 : $flg = 0;
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
             }
 
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1541,7 +1550,6 @@ class Schedule
                         "' . $UPD_PGID . '",
                         "' . $validated['LOGIN_ID'] . '",
                         "' . $UPD_YMD . '" )';
-                    // echo $sql; die;
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

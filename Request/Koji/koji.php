@@ -986,6 +986,10 @@ class Koji
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                         ';
                         $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
                         if ($this->result && $this->result->num_rows > 0) {
                             while ($row = $this->result->fetch_assoc()) {
                                 $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
@@ -999,6 +1003,10 @@ class Koji
                             AND KOJIJITUIKA_FLG<>"0" 
                             AND DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sqlNotReported);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
                         if ($this->result && $this->result->num_rows > 0) {
                             // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
@@ -1013,6 +1021,9 @@ class Koji
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
                                 AND DEL_FLG=0';
                             $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
+                            if (!empty($this->dbConnect->error)) {
+                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                            }
 
                             $listJyucyuIdKoji = array();
                             if ($this->result && $this->result->num_rows > 0) {
@@ -1029,6 +1040,10 @@ class Koji
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
                                 $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
                                 if ($this->result && $this->result->num_rows > 0) {
                                     while ($row = $this->result->fetch_assoc()) {
                                         $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
@@ -1042,6 +1057,10 @@ class Koji
                                         AND KOJIJITUIKA_FLG<>"0" 
                                         AND DEL_FLG=0';
                                 $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
                                 if ($this->result && $this->result->num_rows > 0) {
                                     // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
@@ -1062,6 +1081,10 @@ class Koji
                             WHERE JYUCYU_ID="' . $jyucyuId . '" 
                         ';
                         $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
                         if ($this->result && $this->result->num_rows > 0) {
                             while ($row = $this->result->fetch_assoc()) {
                                 $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
@@ -1075,6 +1098,9 @@ class Koji
                             AND KOJIJITUIKA_FLG<>"0" 
                             AND DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sqlReported);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
 
                         if ($this->result && $this->result->num_rows > 0) {
                             // output data of each row
@@ -1090,6 +1116,9 @@ class Koji
                             WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
                                 AND DEL_FLG=0';
                             $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
+                            if (!empty($this->dbConnect->error)) {
+                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                            }
 
                             $listJyucyuIdKoji = array();
                             if ($this->result && $this->result->num_rows > 0) {
@@ -1099,7 +1128,6 @@ class Koji
                                 }
                             }
 
-
                             foreach ($listJyucyuIdKoji as $value) {
                                 //Get HOJIN_FLG
                                 $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
@@ -1107,6 +1135,10 @@ class Koji
                                     WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
                                 ';
                                 $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
                                 if ($this->result && $this->result->num_rows > 0) {
                                     while ($row = $this->result->fetch_assoc()) {
                                         $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
@@ -1120,6 +1152,10 @@ class Koji
                                         AND KOJIJITUIKA_FLG<>"0" 
                                         AND DEL_FLG=0';
                                 $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
                                 if ($this->result && $this->result->num_rows > 0) {
                                     // output data of each row
                                     while ($row = $this->result->fetch_assoc()) {
@@ -1141,6 +1177,9 @@ class Koji
                     FROM M_KBN 
                     WHERE KBN_CD="07"';
                 $this->result = $this->dbConnect->query($sqlGetPullDown);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
@@ -1149,7 +1188,11 @@ class Koji
                     }
                 }
 
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } 
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1244,6 +1287,9 @@ class Koji
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
                     WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
                     SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
@@ -1256,11 +1302,18 @@ class Koji
                     WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 //Store Sign file
                 $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                     FROM T_KOJI_FILEPATH';
                 $rs_max = $this->dbConnect->query($query_max);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
                 $num = 0;
                 if ($rs_max->num_rows > 0) {
                     // output data of each row
@@ -1302,6 +1355,9 @@ class Koji
                     "' . date('Y-m-d H:i:s') . '"
                 )';
                 $this->result = $this->dbConnect->query($sqlInsert);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
             }
             if (
                 $json_request['SINGLE_SUMMARIZE'] == 2 && isset($json_request['JYUCYU_ID'])
@@ -1325,6 +1381,9 @@ class Koji
                     WHERE SYUYAKU_JYUCYU_ID = "' . $SYUYAKU_JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
                     SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
@@ -1337,12 +1396,19 @@ class Koji
                     WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
             }
             if (!empty($json_request['NEW_DETAIL'])) {
                 foreach ($json_request['NEW_DETAIL'] as $value) {
                     $query_max = 'SELECT max(JYUCYUMSAI_ID) as JYUCYUMSAI_ID_MAX
                         FROM T_KOJIMSAI';
                     $rs_max = $this->dbConnect->query($query_max);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+
                     $num = 0;
                     if ($rs_max->num_rows > 0) {
                         // output data of each row
@@ -1408,6 +1474,9 @@ class Koji
                     )';
 
                     $this->result = $this->dbConnect->query($sqlInsertKOJIMSAI);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
             }
 
@@ -1448,7 +1517,15 @@ class Koji
                 )';
 
             $this->result = $this->dbConnect->query($sqlInsertKOJICHECK);
-            $this->dbReference->sendResponse(200, "Success");
+            if (!empty($this->dbConnect->error)) {
+                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+            }
+
+            if(empty($errors['msg'])){
+                $this->dbReference->sendResponse(200, json_encode('Store success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }       
         }
     }
 
@@ -1532,6 +1609,10 @@ class Koji
                 $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                     FROM T_KOJI_FILEPATH';
                 $rs_max = $this->dbConnect->query($query_max);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
                 $num = 0;
                 if ($rs_max->num_rows > 0) {
                     // output data of each row
@@ -1576,6 +1657,9 @@ class Koji
                     "' . date('Y-m-d H:i:s') . '"
                 )';
                 $this->result = $this->dbConnect->query($sqlInsert);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
@@ -1586,6 +1670,9 @@ class Koji
                     WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 $sqlUpdateKOJIMSAI = 'UPDATE T_KOJIMSAI 
                     SET KENSETU_KEITAI = ' . $KENSETU_KEITAI . ',
@@ -1598,8 +1685,15 @@ class Koji
                     WHERE JYUCYU_ID = "' . $JYUCYU_ID . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
-                $this->dbReference->sendResponse(200, "Save success");
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode('Store success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }     
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1635,7 +1729,12 @@ class Koji
                         $resultSet[] = $row;
                     }
                 }
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode( $resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }     
             } elseif (
                 isset($_POST['JYUCYU_ID'])
             ) {
@@ -1655,10 +1754,19 @@ class Koji
                     ' . $MTMORI_YMD . ',
                 )';
                 $this->result = $this->dbConnect->query($sqlInsert);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
-                $this->dbReference->sendResponse(200, "Insert Success");
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode("Store Success", JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }   
+
+                
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(400, json_encode("Error", JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1697,7 +1805,11 @@ class Koji
                         }
                     }
 
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    if(empty($errors['msg'])){
+                        $this->dbReference->sendResponse(200, json_encode( $resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    } else {
+                        $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    }
                 }
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
@@ -1728,12 +1840,18 @@ class Koji
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
 
                 if (isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                         FROM T_KOJI_FILEPATH';
                     $rs_max = $this->dbConnect->query($query_max);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                     $num = 0;
                     if ($rs_max->num_rows > 0) {
                         // output data of each row
@@ -1778,6 +1896,9 @@ class Koji
                         "' . date('Y-m-d H:i:s') . '"
                     )';
                     $this->result = $this->dbConnect->query($sqlInsert);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
                 $dataSuccess = array();
                 $domain =  $this->domain;
@@ -1785,7 +1906,11 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -1815,11 +1940,18 @@ class Koji
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 if (isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                         FROM T_KOJI_FILEPATH';
                     $rs_max = $this->dbConnect->query($query_max);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+
                     $num = 0;
                     if ($rs_max->num_rows > 0) {
                         // output data of each row
@@ -1863,6 +1995,9 @@ class Koji
                         "' . date('Y-m-d H:i:s') . '"
                     )';
                     $this->result = $this->dbConnect->query($sqlInsert);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
 
                 $dataSuccess = array();
@@ -1871,7 +2006,11 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -1901,11 +2040,17 @@ class Koji
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 if (isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                         FROM T_KOJI_FILEPATH';
                     $rs_max = $this->dbConnect->query($query_max);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                     $num = 0;
                     if ($rs_max->num_rows > 0) {
                         // output data of each row
@@ -1949,6 +2094,9 @@ class Koji
                         "' . date('Y-m-d H:i:s') . '"
                     )';
                     $this->result = $this->dbConnect->query($sqlInsert);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
 
                 $dataSuccess = array();
@@ -1957,7 +2105,11 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -1985,11 +2137,18 @@ class Koji
                     WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
                 if (isset($_FILES['FILE_IMAGE'])) {
                     $query_max = 'SELECT max(FILEPATH_ID) as FILEPATH_ID_MAX
                         FROM T_KOJI_FILEPATH';
                     $rs_max = $this->dbConnect->query($query_max);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+
                     $num = 0;
                     if ($rs_max->num_rows > 0) {
                         // output data of each row
@@ -2033,6 +2192,9 @@ class Koji
                         "' . date('Y-m-d H:i:s') . '"
                     )';
                     $this->result = $this->dbConnect->query($sqlInsert);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
 
                 $dataSuccess = array();
@@ -2041,7 +2203,11 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if(empty($errors['msg'])){
+                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }

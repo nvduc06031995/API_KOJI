@@ -1525,7 +1525,6 @@ class Koji
             ) {
                 $JYUCYU_ID = $_POST['JYUCYU_ID'];
 
-                $BIKO = isset($_POST['BIKO']) ? '"' . $_POST['BIKO'] . '"' : 'NULL';
                 $KENSETU_KEITAI = isset($_POST['KENSETU_KEITAI']) ? '"' . $_POST['KENSETU_KEITAI'] . '"' : 'NULL';
                 $BEF_SEKO_PHOTO_FILEPATH = isset($_POST['BEF_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['BEF_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
                 $AFT_SEKO_PHOTO_FILEPATH = isset($_POST['AFT_SEKO_PHOTO_FILEPATH']) ? '"' . $_POST['AFT_SEKO_PHOTO_FILEPATH'] . '"' : 'NULL';
@@ -1544,6 +1543,14 @@ class Koji
 
                 $FILEPATH_ID = sprintf('%010d', $num);
 
+                $img_path = [];
+                $img_path = $this->uploadFileImg($_FILES['FILE_IMAGE']);
+
+                if (!empty($img_path['ERROR'])) {
+                    $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    die;
+                }
+
                 $sqlInsert = 'INSERT INTO T_KOJI_FILEPATH 
                 (
                     FILEPATH_ID,
@@ -1560,7 +1567,7 @@ class Koji
                 VALUES (
                     "' . $FILEPATH_ID . '",
                     "' . $JYUCYU_ID . '",
-                    "' . $_POST['FILE'] . '",
+                    "' . $img_path . '",
                     "09",
                     "KOJ1120F",
                     "' . $JYUCYU_ID . '",
@@ -1573,8 +1580,7 @@ class Koji
 
                 $sqlUpdateKOJI = 'UPDATE T_KOJI 
                     SET KOJI_RENKEI_YMD = "' . date('Y-m-d H:i:s') . '",
-                        KOJI_KEKKA = "01",
-                        BIKO = ' . $BIKO . ',
+                        KOJI_KEKKA = "工事OK",
                         UPD_PGID = "KOJ1120F",
                         UPD_TANTCD = "' . $JYUCYU_ID . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
@@ -1594,7 +1600,7 @@ class Koji
                     ';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJIMSAI);
 
-                $this->dbReference->sendResponse(200, "Success");
+                $this->dbReference->sendResponse(200, "Save success");
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }

@@ -152,7 +152,7 @@ class Menu
                 }
             } else {
                 $errors['msg'][] = 'Missing parameter LOGIN_ID ';
-            }           
+            }
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -169,9 +169,14 @@ class Menu
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_POST['JYUCYU_ID'])) {
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $LIST_ID = json_decode($JYUCYU_ID);
+            $errors = [];
+            $validate = new Validate();
+            $validated = $validate->validate($_POST, [
+                'JYUCYU_ID' => 'required',
+            ]);
+
+            if ($validated) {
+                $LIST_ID = json_decode($validated['JYUCYU_ID']);
                 foreach ($LIST_ID as $k => $v) {
                     $sql = 'UPDATE T_KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $v . '" ';
                     $this->result = $this->dbConnect->query($sql);
@@ -179,9 +184,12 @@ class Menu
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                     }
                 }
+            }
+           
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

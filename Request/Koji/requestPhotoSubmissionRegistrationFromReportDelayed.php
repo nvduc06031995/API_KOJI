@@ -1,5 +1,5 @@
 <?php
 
-include('resources.php');
-$postPhotoSubmissionRegistrationFromReportDelayed = new resources();
+include('./koji.php');
+$postPhotoSubmissionRegistrationFromReportDelayed = new Koji();
 $postPhotoSubmissionRegistrationFromReportDelayed->postPhotoSubmissionRegistrationFromReportDelayed();

@@ -1,5 +1,5 @@
 <?php
 
-include('resources.php');
-$postPhotoSubmissionRegistrationFromSendPhoto = new resources();
+include('./koji.php');
+$postPhotoSubmissionRegistrationFromSendPhoto = new Koji();
 $postPhotoSubmissionRegistrationFromSendPhoto->postPhotoSubmissionRegistrationFromSendPhoto();

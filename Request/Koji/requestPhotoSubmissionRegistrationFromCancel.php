@@ -1,5 +1,5 @@
 <?php
 
-include('resources.php');
-$postPhotoSubmissionRegistrationFromCancel = new resources();
+include('./koji.php');
+$postPhotoSubmissionRegistrationFromCancel = new Koji();
 $postPhotoSubmissionRegistrationFromCancel->postPhotoSubmissionRegistrationFromCancel();

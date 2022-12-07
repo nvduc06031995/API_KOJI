@@ -3,7 +3,7 @@ include('../../System/systemConfig.php');
 include('../../System/systemEditor.php');
 include('../../Validate/validate.php');
 
-class Koji
+class Common
 {
     private $dbReference;
     var $dbConnect;

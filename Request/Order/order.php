@@ -2,7 +2,7 @@
 include('../../System/systemConfig.php');
 include('../../Validate/validate.php');
 
-class Result
+class Order
 {
     private $dbReference;
     var $dbConnect;
@@ -21,7 +21,8 @@ class Result
     {
     }
 
-    function default()
+    /* =========================== 部材発注一覧 */
+    function getPartOrderList()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -30,23 +31,29 @@ class Result
         } else {
             $errors = [];
             $resultSet = array();
-            if (isset($_GET['TANT_CD']) && isset($_GET['JISEKI_YMD'])) {
-                $TANT_CD = $_GET['TANT_CD'];
-                $JISEKI_YMD = $_GET['JISEKI_YMD'];
-                
-                $sql = ' SELECT ITAKUHI_MIKAKUTEI,
-                ITAKUHI_KAKUTEI,
-                KOJI_COUNT,
-                SITAMI_COUNT,
-                ADD_KOJI_COUNT,
-                SALES_COUNT,
-                TANT_CD,
-                JISEKI_YMD
-                FROM T_JISEKISYUKEI 
-                WHERE TANT_CD="' . $TANT_CD . '"
-                AND DATE_FORMAT(JISEKI_YMD , "%Y/%m")="'.$JISEKI_YMD.'"
-                AND DEL_FLG=0';
 
+            if (isset($_GET['SYOZOKU_CD'])) {
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];                
+
+                $sql = ' SELECT T_BUZAIHACYU.BUZAI_HACYU_ID,
+                T_BUZAIHACYU.HACYU_YMD,
+                T_BUZAIHACYU.TANT_NAME,
+                T_BUZAIHACYU.HACYU_OKFLG,
+                T_BUZAIHACYUMSAI.JISYA_CD,
+                T_BUZAIHACYUMSAI.SYOHIN_NAME,
+                M_KBN.KBN_NAME,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME,
+                T_BUZAIHACYU.SYOZOKU_CD,
+                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+                FROM T_BUZAIHACYU 
+                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+                LEFT JOIN M_KBN ON T_BUZAIHACYU.HACYU_OKFLG = M_KBN.KBNMSAI_CD AND M_KBN.KNB_CD="08"
+                WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $SYOZOKU_CD . '"
+                AND MIN(T_BUZAIHACYUMSAI.BUZAI_HACYU_ID)                
+                AND DEL_FLG=0
+                ORDER BY T_BUZAIHACYU.HACYU_YMD DESC';
+                echo $sql; die;
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -58,9 +65,8 @@ class Result
                         $resultSet[] = $row;
                     }
                 }
-
             } else {
-                $errors['msg'][] = 'Missing parameter TANT_CD or JISEKI_YMD';
+                $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
             }
 
             if (empty($errors['msg'])) {
@@ -71,7 +77,7 @@ class Result
         }
     }
 
-    function getPullDownListPeople()
+    function getPullDownStatus()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -81,11 +87,12 @@ class Result
             $errors = [];
             $resultSet = array();
 
-            $sql = ' SELECT TANT_NAME,
-            TANT_CD 
-            FROM M_TANT 
-            WHERE TANT_KBN_CD="03"
-            AND DEL_FLG=0';
+            $sql = ' SELECT KBNMSAI_NAME,
+                KBNMSAI_CD, 
+                KBN_CD
+                FROM M_KBN 
+                WHERE KBN_CD="08"
+                AND DEL_FLG=0';
             $this->result = $this->dbConnect->query($sql);
             if (!empty($this->dbConnect->error)) {
                 $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -98,47 +105,6 @@ class Result
                 }
             }
 
-            if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-        }
-    }
-
-    function getPullDownListMoth()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            $errors = [];
-            $resultSet = array();
-
-            if (isset($_GET['TANT_CD'])) {
-                $TANT_CD = $_GET['TANT_CD'];
-                $sql = ' SELECT DATE_FORMAT(JISEKI_YMD , "%Y/%m") AS FORMATED_DATE,
-                TANT_CD 
-                FROM T_JISEKISYUKEI 
-                WHERE TANT_CD="' . $TANT_CD . '"
-                AND DEL_FLG=0
-                GROUP BY FORMATED_DATE';
-
-                $this->result = $this->dbConnect->query($sql);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
-
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-            } else {
-                $errors['msg'][] = 'Missing parameter TANT_CD';
-            }
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

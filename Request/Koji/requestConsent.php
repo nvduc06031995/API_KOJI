@@ -1,7 +1,7 @@
 <?php
 
-include('resources.php');
-$postConsent = new resources();
+include('./koji.php');
+$postConsent = new Koji();
 $postConsent->postConsent();
 
 // $postConsentCompiling = new resources();

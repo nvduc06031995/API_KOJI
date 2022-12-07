@@ -1,5 +1,5 @@
 <?php
 
-include('resources.php');
-$postPhotoSubmissionRegistrationFromReportNoQuoation = new resources();
+include('./koji.php');
+$postPhotoSubmissionRegistrationFromReportNoQuoation = new Koji();
 $postPhotoSubmissionRegistrationFromReportNoQuoation->postPhotoSubmissionRegistrationFromReportNoQuoation();

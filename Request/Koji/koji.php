@@ -288,9 +288,10 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
             $domain = $this->domain;
+            
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT']) && isset($_GET['SINGLE_SUMMARIZE'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $HOMON_SBT = $_GET['HOMON_SBT'];
@@ -429,17 +430,15 @@ class Koji
                             }
                         }
                     }
-                }
-
-                if (!empty($resultSet)) {
-                    $flg = 1;
-                }
+                }                
+            } else {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or HOMON_SBT or SINGLE_SUMMARIZE'; 
             }
 
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

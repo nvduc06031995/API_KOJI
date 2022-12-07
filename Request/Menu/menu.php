@@ -1,6 +1,5 @@
 <?php
 include('../../System/systemConfig.php');
-include('../../System/systemEditor.php');
 include('../../Validate/validate.php');
 
 class Menu

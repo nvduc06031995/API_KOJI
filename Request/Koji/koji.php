@@ -126,7 +126,7 @@ class Koji
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
-                }              
+                }
             } else {
                 $errors['msg'][] = 'Missing parameter YMD or LOGIN_ID';
             }
@@ -165,7 +165,7 @@ class Koji
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }            
+                }
                 if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
@@ -190,7 +190,6 @@ class Koji
                         }
                     }
                 }
-               
             } else {
                 $errors['msg'][] = 'Missing parameter YMD or JYUCYU_ID or SETSAKI_ADDRESS';
             }
@@ -212,14 +211,14 @@ class Koji
         } else {
             $errors = [];
             $validate = new Validate();
-            $validated = $validate->validate($_POST , [
+            $validated = $validate->validate($_POST, [
                 'LOGIN_ID' => 'required',
                 'YMD' => 'required',
                 'JYUCYU_ID' => 'required',
                 'SETSAKI_ADDRESS' => 'required'
             ]);
 
-            if($validated){
+            if ($validated) {
                 $UPD_PGID = "KOJ1120F";
                 $UPD_YMD = date('Y-m-d H:i:s');
                 $sql = 'UPDATE T_KOJI SET  SYUYAKU_JYUCYU_ID="' . $validated['JYUCYU_ID'] . '",                    
@@ -230,16 +229,16 @@ class Koji
                     AND KOJI_YMD="' . $validated['YMD'] . '"
                     AND DEL_FLG= 0 ';
                 $this->result = $this->dbConnect->query($sql);
-                if(!empty($this->dbConnect->error)){
+                if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                 }
             }
-            
-            if(empty($errors['msg'])){
+
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }          
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
         }
     }
 
@@ -250,31 +249,38 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (isset($_POST['LOGIN_ID']) && isset($_POST['YMD'])) {
-                $LOGIN_ID = $_POST['LOGIN_ID'];
-                $YMD = $_POST['YMD'];
-                $KOJI_TIRASISU = $_POST['KOJI_TIRASISU'];
+            $errors = [];
+            $validate = new Validate();
+            $validated = $validate->validate($_POST, [
+                'LOGIN_ID' => 'required',
+                'YMD' => 'required',
+                'KOJI_TIRASISU' => 'required',
+            ]);
+
+            if ($validated) {
                 $RENKEI_YMD = date('Y-m-d');
                 $UPD_PGID = "KOJ1110F";
-                $UPD_TANTCD = $LOGIN_ID;
                 $UPD_YMD = date('Y-m-d H:i:s');
-                $sql = 'UPDATE T_TIRASI SET  YMD="' . $YMD . '", 
+
+                $sql = 'UPDATE T_TIRASI SET  YMD="' . $validated['YMD'] . '", 
                     RENKEI_YMD="' . $RENKEI_YMD . '", 
-                    KOJI_TIRASISU=' . $KOJI_TIRASISU . ', 
+                    KOJI_TIRASISU=' . $validated['KOJI_TIRASISU'] . ', 
                     UPD_PGID="' . $UPD_PGID . '", 
-                    UPD_TANTCD= "' . $UPD_TANTCD . '", 
+                    UPD_TANTCD= "' . $validated['LOGIN_ID'] . '", 
                     UPD_YMD="' . $UPD_YMD . '"
-                    WHERE TANT_CD="' . $LOGIN_ID . '" 
-                    AND YMD="' . $YMD . '"';
+                    WHERE TANT_CD="' . $validated['LOGIN_ID'] . '" 
+                    AND YMD="' . $validated['YMD'] . '"';
 
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                 }
+            }
 
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(507, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(507) . '}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -287,9 +293,10 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
             $domain = $this->domain;
+
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT']) && isset($_GET['SINGLE_SUMMARIZE'])) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $HOMON_SBT = $_GET['HOMON_SBT'];
@@ -429,16 +436,14 @@ class Koji
                         }
                     }
                 }
-
-                if (!empty($resultSet)) {
-                    $flg = 1;
-                }
+            } else {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or HOMON_SBT or SINGLE_SUMMARIZE';
             }
 
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(200, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -451,7 +456,7 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
             $domain = $this->domain;
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['SINGLE_SUMMARIZE'])) {
@@ -506,16 +511,14 @@ class Koji
                         }
                     }
                 }
+            } else {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or SINGLE_SUMMARIZE';
             }
 
-            if (!empty($resultSet)) {
-                $flg = 1;
-            }
-
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -529,7 +532,7 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
             $domain = $this->domain;
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
@@ -559,16 +562,14 @@ class Koji
                         }
                     }
                 }
+            } else {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or KOJI_ST';
             }
 
-            if (!empty($resultSet)) {
-                $flg = 1;
-            }
-
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -581,7 +582,7 @@ class Koji
             $dataUploadFile = array();
             $target_file = $path . basename($file["name"]);
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-            
+
             $path_return = 'img/' . basename($file["name"]);
             // $uploadOk = 1;
             // Check file size                
@@ -598,11 +599,11 @@ class Koji
             }
             // Check if $uploadOk is set to 0 by an error
             move_uploaded_file($file["tmp_name"], $target_file);
-        }
+        } 
 
         $dataUploadFile['FILEPATH'][] = $path_return;
         return $dataUploadFile;
-    }
+    }  
 
     function uploadFilePdf($file)
     {
@@ -639,27 +640,36 @@ class Koji
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (isset($_POST['JYUCYU_ID'])) {
+        } else {         
+            $errors = [];
+            $resultSet = array();
+            $validate = new Validate();
+            
+            $validated = $validate->validate($_POST, [
+                'LOGIN_ID' => 'required',               
+                'JYUCYU_ID' => 'required',
+            ]);
+        
+            if ($validated) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
                 $img_path = [];
                 $img_path = $this->uploadFileImg($FILE_NAME);
-                
+
                 if (!empty($img_path['ERROR'])) {
                     $this->dbReference->sendResponse(400, json_encode($img_path['ERROR'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     die;
                 }
 
-                $JYUCYU_ID = $_POST['JYUCYU_ID'];
-                $FILE_NAME = isset($_POST['FILE_NAME']) ? $_POST['FILE_NAME'] : 'NULL';
+                $JYUCYU_ID = $validated['JYUCYU_ID'];              
                 $FILE_KBN_CD = "10";
                 $ADD_PGID = "KOJ1120F";
-                $ADD_TANTCD = isset($_POST['LOGIN_ID']) ? $_POST['LOGIN_ID'] : 'NULL';
+                $ADD_TANTCD = $validated['LOGIN_ID'];
                 $ADD_YMD = date('Y-m-d');
                 $UPD_PGID = 'KOJ1120F';
-                $UPD_TANTCD = isset($_POST['LOGIN_ID']) ? $_POST['LOGIN_ID'] : 'NULL';
+                $UPD_TANTCD = $validated['LOGIN_ID'];
                 $UPD_YMD = date('Y-m-d');
                 $PRESENT_DATE = date('Y-m-d');
+
                 $query_max_filepath_id = 'SELECT max(FILEPATH_ID) as TANCALID_MAX
                     FROM T_KOJI_FILEPATH';
                 $rs_max = $this->dbConnect->query($query_max_filepath_id);
@@ -711,14 +721,16 @@ class Koji
                     }
                 }
 
-                $domain =  $this->domain;
-                $data = array();
-                $data['IMG'] = $domain . $img_path['FILEPATH'][0];
-                $data['JYUCYU_ID'] = $JYUCYU_ID;
-
-                $this->dbReference->sendResponse(200, json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $domain =  $this->domain;                
+                $resultSet['IMG'] = $domain . $img_path['FILEPATH'][0];
+                $resultSet['JYUCYU_ID'] = $JYUCYU_ID;
+                
+            } 
+            
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(506, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(506) . '}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -731,7 +743,7 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
             $list_jisya_cd = [];
             if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
@@ -876,16 +888,14 @@ class Koji
                         }
                     }
                 }
+            } else {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or KOJI_ST';
             }
 
-            if (!empty($resultSet)) {
-                $flg = 1;
-            }
-
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -898,7 +908,7 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $flg = 0;
+            $errors = [];
             $resultSet = array();
             $domain = $this->domain;
             if (isset($_GET['TENPO_CD']) && isset($_GET['JYUCYU_ID'])) {
@@ -945,16 +955,14 @@ class Koji
                         $resultSet['FILE'][] = $data;
                     }
                 }
+            } else {
+                $errors['msg'][] = 'Missing parameter TENPO_CD or JYUCYU_ID';
             }
 
-            if (!empty($resultSet)) {
-                $flg = 1;
-            }
-
-            if ($flg == 1) {
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -2216,5 +2224,5 @@ class Koji
 
     /* * * * * * * * * *
     * * * * API仕様_工事報告 END * * * * 
-    * * * * * * * * */    
+    * * * * * * * * */
 }

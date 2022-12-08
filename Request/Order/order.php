@@ -124,8 +124,9 @@ class Order
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['SYOZOKU_CD'])) {
+            if (isset($_GET['SYOZOKU_CD']) && isset($_GET['JISYA_CD'])) {
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+                $JISYA_CD = $_GET['JISYA_CD'];
 
                 $sql = ' SELECT T_BUZAIHACYUMSAI_SAVE.MAKER_NAME,
                 T_BUZAIHACYUMSAI_SAVE.BUNRUI,
@@ -136,13 +137,14 @@ class Order
                 T_BUZAIHACYUMSAI_SAVE.KINGAK,
                 T_BUZAIHACYUMSAI_SAVE.HINBAN,
                 T_BUZAIHACYUMSAI_SAVE.SYOHIN_NAME,
+                T_BUZAIHACYUMSAI_SAVE.JISYA_CD,
+                T_BUZAIHACYUMSAI_SAVE.BUZAI_HACYUMSAI_ID,
                 M_TANT.SYOZOKU_CD
-                FROM T_TANAMSAI_SAVE 
-                LEFT JOIN M_TANT ON T_TANAMSAI_SAVE.SAVE_TANT_CD=M_TANT.TANT_CD
-                LEFT JOIN T_BUZAIHACYUMSAI_SAVE ON T_TANAMSAI_SAVE.JISYA_CD=T_BUZAIHACYUMSAI_SAVE.JISYA_CD
-                LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI_SAVE.JISYA_CD=T_BUZAIHACYUMSAI.JISYA_CD
-                WHERE M_TANT.SYOZOKU_CD="' . $SYOZOKU_CD . '"                              
-                AND T_TANAMSAI_SAVE.DEL_FLG=0';
+                FROM T_BUZAIHACYUMSAI_SAVE 
+                LEFT JOIN M_TANT ON T_BUZAIHACYUMSAI_SAVE.SAVE_TANT_CD=M_TANT.TANT_CD                
+                WHERE M_TANT.SYOZOKU_CD="' . $SYOZOKU_CD . '"  
+                AND T_BUZAIHACYUMSAI_SAVE.JISYA_CD="' . $JISYA_CD . '"                              
+                AND T_BUZAIHACYUMSAI_SAVE.DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -155,7 +157,104 @@ class Order
                     }
                 }
             } else {
-                $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
+                $errors['msg'][] = 'Missing parameter SYOZOKU_CD or JISYA_CD';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function getCheckList()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (isset($_GET['BUZAI_HACYU_ID'])) {
+                $BUZAI_HACYU_ID = $_GET['BUZAI_HACYU_ID'];
+
+                $sql = ' SELECT T_BUZAIHACYUMSAI.MAKER_NAME,
+                T_BUZAIHACYUMSAI.BUNRUI,
+                T_BUZAIHACYUMSAI.JISYA_CD,
+                T_BUZAIHACYUMSAI.SYOHIN_NAME,
+                T_BUZAIHACYUMSAI.LOT,
+                T_BUZAIHACYUMSAI.HACYU_TANKA,
+                T_BUZAIHACYUMSAI.SURYO,
+                T_BUZAIHACYUMSAI.TANI_CD,
+                T_BUZAIHACYUMSAI.KINGAK,
+                T_BUZAIHACYUMSAI.HINBAN,
+                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID,
+                T_BUZAIHACYUMSAI.BUZAI_HACYUMSAI_ID            
+                FROM T_BUZAIHACYU 
+                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=T_BUZAIHACYU.BUZAI_HACYU_ID                
+                WHERE T_BUZAIHACYU.BUZAI_HACYU_ID="' . $BUZAI_HACYU_ID . '"                              
+                AND T_BUZAIHACYU.DEL_FLG=0
+                AND T_BUZAIHACYUMSAI.DEL_FLG=0';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function getQR()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            $sql = ' SELECT MAKER_NAME,
+                MAKER_CD,
+                BUZAI_BUNRUI,
+                HINBAN,
+                SYOHIN_NAME,
+                BUZAI_KANRI_NO,            
+                SIIRE_NAME,
+                SIIRE_TANKA,
+                LOT,
+                TANI,
+                SORYO,
+                BIKO
+                FROM M_BUZAI                               
+                WHERE DEL_FLG=0';
+            $this->result = $this->dbConnect->query($sql);
+            if (!empty($this->dbConnect->error)) {
+                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+            }
+
+            if ($this->result && $this->result->num_rows > 0) {
+                // output data of each row
+                while ($row = $this->result->fetch_assoc()) {
+                    $resultSet[] = $row;
+                }
             }
 
             if (empty($errors['msg'])) {
@@ -282,10 +381,10 @@ class Order
                     }
                 }
 
-                $data_buzaihacyumsai_save = $data['T_BUZAIHACYU'];                
+                $data_buzaihacyumsai_save = $data['T_BUZAIHACYU'];
                 if (!empty($data_buzaihacyumsai_save['BUZAI_HACYUMSAI_ID'])); {
                     $list_buzai_hacyumsai_id = $data_buzaihacyumsai_save['BUZAI_HACYUMSAI_ID'];
-                    foreach($list_buzai_hacyumsai_id as $key => $value){
+                    foreach ($list_buzai_hacyumsai_id as $key => $value) {
                         $sql = 'UPDATE T_BUZAIHACYUMSAI_SAVE SET
                         DEL_FLG=1 WHERE SAVE_TANT_CD="' . $data_buzaihacyumsai_save['LOGIN_ID'] . '"
                         AND BUZAI_HACYUMSAI_ID=' . $value . '';
@@ -293,9 +392,9 @@ class Order
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
                         }
-                    }                    
+                    }
                 }
-               
+
                 $BUZAI_HACYU_ID = sprintf('%010d', $num);
 
                 $data_buzaihacyu = $data['T_BUZAIHACYU'];
@@ -356,10 +455,51 @@ class Order
         }
     }
 
+    function postClearSaved()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $errors_validate = [];
+
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+            
+            $errors_validate = $this->validateAddMaterialOrdering($data);
+
+            if (empty($errors_validate)) {                
+                $data_buzaihacyumsai_save = $data['T_BUZAIHACYU'];
+                if (!empty($data_buzaihacyumsai_save['BUZAI_HACYUMSAI_ID'])); {
+                    $list_buzai_hacyumsai_id = $data_buzaihacyumsai_save['BUZAI_HACYUMSAI_ID'];
+                    foreach ($list_buzai_hacyumsai_id as $key => $value) {
+                        $sql = 'UPDATE T_BUZAIHACYUMSAI_SAVE SET
+                        DEL_FLG=1 WHERE SAVE_TANT_CD="' . $data_buzaihacyumsai_save['LOGIN_ID'] . '"
+                        AND BUZAI_HACYUMSAI_ID=' . $value . '';                        
+                        $this->result = $this->dbConnect->query($sql);
+
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                        }
+                    }
+                }
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
     function validateAddMaterialOrdering($array)
     {
         $errors = [];
-        if ($array['T_BUZAIHACYUMSAI']) {
+        if (isset($array['T_BUZAIHACYUMSAI'])) {
             foreach ($array['T_BUZAIHACYUMSAI'] as $key => $values) {
                 if (!isset($values['MAKER_CD']) || empty($values['MAKER_CD'])) {
                     $errors[] = 'MAKER_CD' . ' ' . '[' . $key . ']' . ' is required ';
@@ -407,7 +547,7 @@ class Order
             if (!isset($array['T_BUZAIHACYU']['RENKEI_YMD']) || empty($array['T_BUZAIHACYU']['RENKEI_YMD'])) {
                 $errors[] = 'RENKEI_YMD is required ';
             }
-        }      
+        }
 
         return $errors;
     }
@@ -461,6 +601,4 @@ class Order
             }
         }
     }
-
-    
 }

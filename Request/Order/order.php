@@ -48,12 +48,11 @@ class Order
                 T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
                 FROM T_BUZAIHACYU 
                 LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
-                LEFT JOIN M_KBN ON T_BUZAIHACYU.HACYU_OKFLG = M_KBN.KBNMSAI_CD AND M_KBN.KNB_CD="08"
+                LEFT JOIN M_KBN ON T_BUZAIHACYU.HACYU_OKFLG = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="08"
                 WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $SYOZOKU_CD . '"
-                AND MIN(T_BUZAIHACYUMSAI.BUZAI_HACYU_ID)                
-                AND DEL_FLG=0
+                AND T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=(SELECT MIN(BUZAI_HACYU_ID) FROM T_BUZAIHACYUMSAI)                
+                AND T_BUZAIHACYU.DEL_FLG=0
                 ORDER BY T_BUZAIHACYU.HACYU_YMD DESC';
-                echo $sql; die;
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -179,7 +178,7 @@ class Order
 
             $validated = $validate->validate($_POST, [
                 'SYOZOKU_CD' => 'required',
-                'LOGIN_ID' => 'required',
+                'LOGIN_NAME' => 'required',
                 'RENKEI_YMD' => 'required',
                 'MAKER_CD' => 'required',
                 'MAKER_NAME' => 'required',
@@ -216,7 +215,7 @@ class Order
                 TANT_NAME,SYOZOKU_CD,HACNG_RIYU,SYONIN_FLG,RENKEI_YMD)
                 VALUES
                 ("' . $BUZAI_HACYU_ID . '" , "' . $HACYU_YMD . '" , "' . $HACYU_OKFLG . '" , 
-                "' . $validated['LOGIN_ID'] . '" , "' . $validated['SYOZOKU_CD'] . '" , "NULL" , ' . $SYONIN_FLG . ' , "' . $validated['RENKEI_YMD'] . '")';
+                "' . $validated['LOGIN_NAME'] . '" , "' . $validated['SYOZOKU_CD'] . '" , "NULL" , ' . $SYONIN_FLG . ' , "' . $validated['RENKEI_YMD'] . '")';
                 $this->result = $this->dbConnect->query($sql);
 
                 if (!empty($this->dbConnect->error)) {
@@ -267,7 +266,7 @@ class Order
             $validate = new Validate();        
 
             $validated = $validate->validate($_POST, [
-                'BUZAI_HACYU_ID' => 'required',
+                'BUZAI_HACYUMSAI_ID' => 'required',
                 'LOGIN_ID' => 'required',                
                 'MAKER_CD' => 'required',
                 'MAKER_NAME' => 'required',
@@ -298,23 +297,8 @@ class Order
                 FROM T_BUZAIHACYUMSAI_SAVE 
                 WHERE SAVE_TANT_CD="'.$validate['LOGIN_ID'].'"
                 AND BUZAI_HACYUMSAI_ID="'.$validated['BUZAI_HACYU_ID'].'"';
-
-                $BUZAI_HACYU_ID = sprintf('%010d', $num);
-                $HACYU_YMD = date('Y-m-d');
-                $HACYU_OKFLG = "01";                
-                $SYONIN_FLG = 1;
-
-                $sql = 'INSERT INTO T_BUZAIHACYU 
-                (BUZAI_HACYU_ID,HACYU_YMD,HACYU_OKFLG,
-                TANT_NAME,SYOZOKU_CD,HACNG_RIYU,SYONIN_FLG,RENKEI_YMD)
-                VALUES
-                ("' . $BUZAI_HACYU_ID . '" , "' . $HACYU_YMD . '" , "' . $HACYU_OKFLG . '" , 
-                "' . $validated['LOGIN_ID'] . '" , "' . $validated['SYOZOKU_CD'] . '" , "NULL" , ' . $SYONIN_FLG . ' , "' . $validated['RENKEI_YMD'] . '")';
-                $this->result = $this->dbConnect->query($sql);
-
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
-                }                                
+                echo $sql; die;
+                $BUZAI_HACYU_ID = sprintf('%010d', $num);                                                           
 
                 $arr = [1,2];
                 $lenght = count($arr);

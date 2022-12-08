@@ -1311,7 +1311,7 @@ class Schedule
                     UPD_TANTCD="' . $validated['LOGIN_ID'] . '",
                     UPD_YMD="' . $UPD_YMD . '",
                     MEMO="' . $validated['MEMO'] . '",
-                    SITAMI_JIKAN="' . $validated['JIKAN'] . '"                 
+                    SITAMI_JIKAN=' . $validated['JIKAN'] . '                 
                     WHERE JYUCYU_ID="' . $validated['JYUCYU_ID'] . '"
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
@@ -1334,7 +1334,7 @@ class Schedule
                     UPD_TANTCD="' . $validated['LOGIN_ID'] . '",            
                     UPD_YMD="' . $UPD_YMD . '",
                     MEMO="' . $validated['MEMO'] . '" ,
-                    KOJI_JIKAN="' . $validated['JIKAN'] . '"       
+                    KOJI_JIKAN=' . $validated['JIKAN'] . '       
                     WHERE JYUCYU_ID="' . $validated['JYUCYU_ID'] . '"
                     AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);

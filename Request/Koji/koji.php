@@ -391,12 +391,12 @@ class Koji
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['DOMAIN'] = $domain;
-                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . '/' . $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
-                                $data['FILEPATH'] = $domain . '/' . $row['FILEPATH'];
+                                $data['FILEPATH'] = $domain . $row['FILEPATH'];
                                 $data['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $data;
                             }

@@ -53,7 +53,7 @@ class Koji
                 KOJI_JININ,
                 KOJI_JIKAN FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';              
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -98,7 +98,7 @@ class Koji
                 SITAMI_JININ,
                 SITAMI_JIKAN FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
                 AND (HOMON_TANT_CD1="' . $LOGIN_ID . '" OR HOMON_TANT_CD2="' . $LOGIN_ID . '" OR HOMON_TANT_CD3="' . $LOGIN_ID . '")
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0'; 
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

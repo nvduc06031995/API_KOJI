@@ -266,9 +266,8 @@ class Order
             $validate = new Validate();        
 
             $validated = $validate->validate($_POST, [
-                'SYOZOKU_CD' => 'required',
-                'LOGIN_ID' => 'required',
-                'RENKEI_YMD' => 'required',
+                'BUZAI_HACYU_ID' => 'required',
+                'LOGIN_ID' => 'required',                
                 'MAKER_CD' => 'required',
                 'MAKER_NAME' => 'required',
                 'BUNRUI' => 'nullable',
@@ -293,6 +292,11 @@ class Order
                         $num = (int)$row['BUZAI_HACYU_ID_MAX'] + 1;
                     }
                 }
+
+                $sql = 'SELECT COUNT(*) 
+                FROM T_BUZAIHACYUMSAI_SAVE 
+                WHERE SAVE_TANT_CD="'.$validate['LOGIN_ID'].'"
+                AND BUZAI_HACYUMSAI_ID="'.$validated['BUZAI_HACYU_ID'].'"';
 
                 $BUZAI_HACYU_ID = sprintf('%010d', $num);
                 $HACYU_YMD = date('Y-m-d');

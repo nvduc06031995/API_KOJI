@@ -696,7 +696,7 @@ class Order
                 OR M_BUZAI.HINBAN="' . $HINBAN . '"
                 OR M_BUZAI.SYOHIN_NAME="' . $SYOHIN_NAME . '"
                 OR T_ZAIKO.JISYA_CD="' . $JISYA_CD . '"
-                AND T_ZAIKO.DEL_FLG=0';              
+                AND T_ZAIKO.DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -791,11 +791,11 @@ class Order
                     LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
                     LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
                     WHERE T_TANA.SOKO_CD="' . $SYOZOKU_CD . '"
-                        AND T_TANA.TANA_YM >= "'. $getSubMonthYear .'"
-                        AND T_TANA.TANA_YM <= "'. $getCurrentMonthYear .'"
+                        AND T_TANA.TANA_YM >= "' . $getSubMonthYear . '"
+                        AND T_TANA.TANA_YM <= "' . $getCurrentMonthYear . '"
                         AND T_TANA.DEL_FLG=0
-                        AND T_TANA.TANA_YMD >= "'. $getCurrentDate .'"
-                        AND T_SYUKKOJISEKI.SOKO_CD = "'. $SYOZOKU_CD .'"
+                        AND T_TANA.TANA_YMD >= "' . $getCurrentDate . '"
+                        AND T_SYUKKOJISEKI.SOKO_CD = "' . $SYOZOKU_CD . '"
                         AND T_SYUKKOJISEKI.SYUKKO_DATE = T_TANA.TANA_YMD
                         AND T_BUZAIHACYU.HACYU_YMD = T_TANA.TANA_YMD
                     ';
@@ -850,11 +850,11 @@ class Order
                     LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
                     LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
                     WHERE T_TANA.SOKO_CD="' . $SYOZOKU_CD . '"
-                        AND T_TANA.TANA_YM >= "'. $getSubMonthYear .'"
-                        AND T_TANA.TANA_YM <= "'. $getCurrentMonthYear .'"
+                        AND T_TANA.TANA_YM >= "' . $getSubMonthYear . '"
+                        AND T_TANA.TANA_YM <= "' . $getCurrentMonthYear . '"
                         AND T_TANA.DEL_FLG=0
-                        AND T_TANA.TANA_YMD >= "'. $getCurrentDate .'"
-                        AND T_SYUKKOJISEKI.SOKO_CD = "'. $SYOZOKU_CD .'"
+                        AND T_TANA.TANA_YMD >= "' . $getCurrentDate . '"
+                        AND T_SYUKKOJISEKI.SOKO_CD = "' . $SYOZOKU_CD . '"
                         AND T_SYUKKOJISEKI.SYUKKO_DATE = T_TANA.TANA_YMD
                         AND T_BUZAIHACYU.SYOZOKU_CD = T_TANA.TANA_YMD
                     ';
@@ -881,7 +881,7 @@ class Order
         }
     }
 
-    function deleteTanamsaiSave() 
+    function deleteTanamsaiSave()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -889,7 +889,7 @@ class Order
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $errors = [];
-            $validate = new Validate();        
+            $validate = new Validate();
 
             $validated = $validate->validate($_POST, [
                 'LOGIN_ID' => 'required'
@@ -903,7 +903,7 @@ class Order
 
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
-                }                                        
+                }
             }
 
             if (empty($errors['msg'])) {
@@ -996,7 +996,7 @@ class Order
                     SYOZOKU_CD,TANT_CD,RENKEI_YMD)
                     VALUES
                     ("' . $T_TANA_ID_MAX . '" , "' . $getCurrentMonthYear . '" , "' . $getCurrentDate . '" , 
-                    "' . $getCurrentYear . '" , "03" , "'. $getInfoLogin['SYOZOKU_CD'] . '" , "'. $getInfoLogin['SYOZOKU_CD'] . '", 
+                    "' . $getCurrentYear . '" , "03" , "' . $getInfoLogin['SYOZOKU_CD'] . '" , "' . $getInfoLogin['SYOZOKU_CD'] . '", 
                     "' . $getInfoLogin['LOGIN_ID'] . '", "' . $getCurrentDate . '")';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -1012,8 +1012,202 @@ class Order
                         "' . $value['JITUZAIKO_SU'] . '")';
                     $this->result = $this->dbConnect->query($sql);
                 }
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    /* =========================== 部材発注一覧(発注承認) */
+    function getPartOrderListApprove()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (isset($_GET['SYOZOKU_CD'])) {
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+
+                $sql = ' SELECT T_BUZAIHACYU.BUZAI_HACYU_ID,
+                T_BUZAIHACYU.HACYU_YMD,
+                T_BUZAIHACYU.TANT_NAME,
+                T_BUZAIHACYU.HACYU_OKFLG,
+                T_BUZAIHACYUMSAI.JISYA_CD,
+                T_BUZAIHACYUMSAI.SYOHIN_NAME,
+                M_KBN.KBN_NAME,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME,
+                T_BUZAIHACYU.SYOZOKU_CD,
+                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+                FROM T_BUZAIHACYU 
+                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+                LEFT JOIN M_KBN ON T_BUZAIHACYU.HACYU_OKFLG = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="08"
+                WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $SYOZOKU_CD . '"
+                AND T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=(SELECT MIN(BUZAI_HACYU_ID) FROM T_BUZAIHACYUMSAI)                
+                AND T_BUZAIHACYU.DEL_FLG=0
+                ORDER BY T_BUZAIHACYU.HACYU_YMD DESC';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    /* =========================== 発注承認 */
+    function getPurchaseOrderApproval()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (isset($_GET['BUZAI_HACYU_ID']) && $_GET['BUZAI_HACYU_ID'] != "") {
+                $BUZAI_HACYU_ID = $_GET['BUZAI_HACYU_ID'];
+
+                $sql = ' SELECT T_BUZAIHACYU.HACNG_RIYU,
+                T_BUZAIHACYU.HACYU_YMD,
+                T_BUZAIHACYU.HACYU_OKFLG,
+                T_BUZAIHACYU.TANT_NAME,
+                T_BUZAIHACYU.SYOZOKU_CD,
+                T_BUZAIHACYU.SYONIN_FLG,
+                T_BUZAIHACYU.RENKEI_YMD,          
+                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID,
+                T_BUZAIHACYUMSAI.BUZAI_HACYUMSAI_ID,
+                T_BUZAIHACYUMSAI.MAKER_CD,
+                T_BUZAIHACYUMSAI.MAKER_NAME,
+                T_BUZAIHACYUMSAI.BUNRUI,
+                T_BUZAIHACYUMSAI.HINBAN,
+                T_BUZAIHACYUMSAI.SYOHIN_NAME,
+                T_BUZAIHACYUMSAI.LOT,
+                T_BUZAIHACYUMSAI.HACYU_TANKA,
+                T_BUZAIHACYUMSAI.SURYO,
+                T_BUZAIHACYUMSAI.TANI_CD,
+                T_BUZAIHACYUMSAI.KINGAK          
+                FROM T_BUZAIHACYU 
+                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID               
+                WHERE T_BUZAIHACYU.BUZAI_HACYU_ID="' . $BUZAI_HACYU_ID . '"         
+                AND T_BUZAIHACYU.DEL_FLG=0
+                AND T_BUZAIHACYUMSAI.DEL_FLG=0';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postPurchaseOrderApproval()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $PRESENT_DATE = date('Y-m-d');
+
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+
+            $list_buzai_hacyu_id = $data['BUZAI_HACYU_ID'];
+           
+            if (!empty($list_buzai_hacyu_id)); {             
+                foreach ($list_buzai_hacyu_id as $key => $value) {
+                    $sql = 'UPDATE T_BUZAIHACYU SET
+                        RENKEI_YMD="'.$PRESENT_DATE.'",
+                        HACYU_OKFLG="03"
+                        WHERE BUZAI_HACYU_ID="' . $value . '"
+                        AND DEL_FLG=0';
+                    // echo $sql; die;
+                    $this->result = $this->dbConnect->query($sql);
+
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                    }
+                }
+            }
 
 
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postPurchaseOrderReject()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $PRESENT_DATE = date('Y-m-d');
+
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+
+            $list_buzai_hacyu_id = $data['BUZAI_HACYU_ID'];
+           
+            if (!empty($list_buzai_hacyu_id)); {             
+                foreach ($list_buzai_hacyu_id as $key => $value) {
+                    $sql = 'UPDATE T_BUZAIHACYU SET
+                        RENKEI_YMD="'.$PRESENT_DATE.'",
+                        HACYU_OKFLG="02"
+                        WHERE BUZAI_HACYU_ID="' . $value . '"
+                        AND DEL_FLG=0';
+                    $this->result = $this->dbConnect->query($sql);
+
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                    }
+                }
             }
 
             if (empty($errors['msg'])) {
@@ -1079,4 +1273,3 @@ class Order
     // 部材リスト_2 Inventory_List_MaterialList
 
 }
-

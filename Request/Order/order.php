@@ -781,7 +781,7 @@ class Order
                 $getCurrentMonthYear = date('Y') . date('m');
                 $getCurrentDate = date('Y-m-d');
 
-                $sql = ' SELECT T_TANAMSAI.BUZAI_KANRI_NO, T_TANAMSAI.HINBAN, T_TANAMSAI.SYOHIN_NAME, T_TANAMSAI.JITUZAIKO_SU, 
+                $sql = ' SELECT T_TANAMSAI.BUZAI_KANRI_NO, T_TANAMSAI.HINBAN, T_TANAMSAI.SYOHIN_NAME, T_TANAMSAI.JITUZAIKO_SU AS SENGETU_JITUZAIKO_SU, 
                                 M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, M_BUZAI.SIIRE_TANKA, 
                                 T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO, T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO
                     FROM T_TANA 
@@ -1286,12 +1286,64 @@ class Order
                 isset($_GET['SYOZOKU_CD'])
             ) {
 
-                $sql = ' SELECT *         
+                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, 
+                    M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO
                 FROM M_BUZAI 
-                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID               
-                WHERE T_BUZAIHACYU.BUZAI_HACYU_ID="' . $BUZAI_HACYU_ID . '"         
-                AND T_BUZAIHACYU.DEL_FLG=0
-                AND T_BUZAIHACYUMSAI.DEL_FLG=0';
+                LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
+                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
+                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
+                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
+                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
+                ';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function getInventoryListMaterialListSelect()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (isset($_GET['BUZAI_BUNRUI']) && 
+                isset($_GET['MAKER_NAME']) &&
+                isset($_GET['HINBAN']) &&
+                isset($_GET['SYOHIN_NAME']) &&
+                isset($_GET['SYOZOKU_CD'])
+            ) {
+
+                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, 
+                    M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO
+                FROM M_BUZAI 
+                LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
+                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
+                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
+                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
+                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
+                ';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

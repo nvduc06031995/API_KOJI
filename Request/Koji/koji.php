@@ -53,7 +53,7 @@ class Koji
                 KOJI_JININ,
                 KOJI_JIKAN FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';              
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -98,7 +98,7 @@ class Koji
                 SITAMI_JININ,
                 SITAMI_JIKAN FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
                 AND (HOMON_TANT_CD1="' . $LOGIN_ID . '" OR HOMON_TANT_CD2="' . $LOGIN_ID . '" OR HOMON_TANT_CD3="' . $LOGIN_ID . '")
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0'; 
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -391,12 +391,12 @@ class Koji
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['DOMAIN'] = $domain;
-                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . '/' . $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
-                                $data['FILEPATH'] = $domain . '/' . $row['FILEPATH'];
+                                $data['FILEPATH'] = $domain . $row['FILEPATH'];
                                 $data['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $data;
                             }

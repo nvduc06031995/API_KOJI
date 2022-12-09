@@ -1076,5 +1076,7 @@ class Order
         }
     }
 
+    // 部材リスト_2 Inventory_List_MaterialList
+
 }
 

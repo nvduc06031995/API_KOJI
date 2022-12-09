@@ -35,7 +35,7 @@ class Menu
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['LOGIN_ID'])) {
+            if (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "") {
                 // 新着コメント
                 $LOGIN_ID = $_GET['LOGIN_ID'];
                 $sql = 'SELECT COMMENT , JYUCYU_ID
@@ -169,22 +169,21 @@ class Menu
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $errors = [];
-            $validate = new Validate();
-            $validated = $validate->validate($_POST, [
-                'JYUCYU_ID' => 'required',
-            ]);
 
-            if ($validated) {
-                $LIST_ID = json_decode($validated['JYUCYU_ID']);
-                foreach ($LIST_ID as $k => $v) {
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+            
+            if(!empty($data['JYUCYU_ID'])){
+                foreach ($data['JYUCYU_ID'] as $k => $v) {
                     $sql = 'UPDATE T_KOJI SET READ_FLG= 1 WHERE JYUCYU_ID="' . $v . '" ';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                     }
                 }
-            }
-           
+            }            
+
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {

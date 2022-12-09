@@ -36,7 +36,9 @@ class Schedule
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['YMD']) && isset($_GET['KOJIGYOSYA_CD'])) {
+            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") &&
+                (isset($_GET['KOJIGYOSYA_CD']) && $_GET['KOJIGYOSYA_CD'] != "")
+            ) {
                 $YMD = $_GET['YMD'];
                 $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
@@ -568,7 +570,7 @@ class Schedule
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['YMD']) && isset($_GET['ID'])) {
+            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['ID']) && $_GET['ID'] != "")) {
                 $YMD = $_GET['YMD'];
                 $ID = $_GET['ID'];
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
@@ -958,7 +960,9 @@ class Schedule
             $resultSet = array();
             $domain = $this->domain;
 
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT'])) {
+            if ((isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['HOMON_SBT']) && $_GET['HOMON_SBT'] != "")
+            ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $HOMON_SBT = $_GET['HOMON_SBT'];
                 $sql_get_list_file = 'SELECT FILEPATH_ID, 
@@ -1142,7 +1146,9 @@ class Schedule
             $resultSet = array();
             $flg = 0;
 
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT'])) {
+            if ((isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['HOMON_SBT']) && $_GET['HOMON_SBT'] != "")
+            ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $HOMON_SBT = $_GET['HOMON_SBT'];
 
@@ -1276,7 +1282,7 @@ class Schedule
             $errors = [];
             $validate = new Validate();
 
-            $validated = $validate->validate($_POST , [
+            $validated = $validate->validate($_POST, [
                 'JYUCYU_ID' => 'required',
                 'KBN' => 'required',
                 'HOMONJIKAN' => 'required',
@@ -1292,7 +1298,7 @@ class Schedule
                 'LOGIN_ID' => 'required'
             ]);
 
-            if ($validated) {                                                                                                                            
+            if ($validated) {
                 $SKJ_RENKEI_YMD = date("Y-m-d");
                 $UPD_PGID = 'KOJ1110F';
                 $UPD_YMD = date("Y-m-d H:i:s");
@@ -1364,7 +1370,7 @@ class Schedule
             $resultSet = array();
             $errors = [];
 
-            if (isset($_GET['TAN_EIG_ID'])) {
+            if (isset($_GET['TAN_EIG_ID']) && $_GET['TAN_EIG_ID'] != "") {
                 $TAN_EIG_ID = $_GET['TAN_EIG_ID'];
                 $sql = ' SELECT TAG_KBN,
                 YMD, 
@@ -1422,7 +1428,7 @@ class Schedule
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['PULLDOWN'][] = $row;
                     }
-                }                
+                }
             }
 
             if (empty($errors['msg'])) {
@@ -1573,9 +1579,7 @@ class Schedule
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['TAN_CAL_ID'])
-            ) {
+            if (isset($_GET['TAN_CAL_ID']) && $_GET['TAN_CAL_ID'] != "") {
                 $TAN_CAL_ID = $_GET['TAN_CAL_ID'];
 
                 //Get data T_TBETUCALENDAR

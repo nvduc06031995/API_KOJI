@@ -346,7 +346,7 @@ class Order
     }
 
     /* 棚卸リスト */
-    function getInventoryList()
+    function getInventoryListForCreate()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -360,17 +360,25 @@ class Order
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
                 $getSubMonthYear = date('Y', strtotime("-1 months")) . date('m', strtotime("-1 months"));
                 $getCurrentMonthYear = date('Y') . date('m');
+                $getCurrentDate = date('Y-m-d');
 
-                $sql = ' SELECT T_TANA.SOKO_CD,
+                $sql = ' SELECT T_TANAMSAI.BUZAI_KANRI_NO, T_TANAMSAI.HINBAN, T_TANAMSAI.SYOHIN_NAME, T_TANAMSAI.JITUZAIKO_SU, 
+                                M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, M_BUZAI.SIIRE_TANKA, 
+                                T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO, T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO
                     FROM T_TANA 
                     LEFT JOIN T_TANAMSAI ON T_TANA.TANA_ID=T_TANAMSAI.TANA_ID
                     LEFT JOIN M_BUZAI ON T_TANAMSAI.BUZAI_KANRI_NO = M_BUZAI.BUZAI_KANRI_NO
                     LEFT JOIN T_SYUKKOJISEKI ON T_TANAMSAI.HINBAN = T_SYUKKOJISEKI.JISYA_CD
-                    WHERE T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '"
-                    AND T_TANA.TANA_YM >= "'. $getSubMonthYear .'"
-                    AND T_TANA.TANA_YM <= "'. $getCurrentMonthYear .'"
-                    AND T_TANA.DEL_FLG=0
-                    AND T_TANA.SOKO_CD <= "'. $SYOZOKU_CD .'"
+                    LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
+                    LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
+                    WHERE T_TANA.SOKO_CD="' . $SYOZOKU_CD . '"
+                        AND T_TANA.TANA_YM >= "'. $getSubMonthYear .'"
+                        AND T_TANA.TANA_YM <= "'. $getCurrentMonthYear .'"
+                        AND T_TANA.DEL_FLG=0
+                        AND T_TANA.TANA_YMD >= "'. $getCurrentDate .'"
+                        AND T_SYUKKOJISEKI.SOKO_CD = "'. $SYOZOKU_CD .'"
+                        AND T_SYUKKOJISEKI.SYUKKO_DATE = T_TANA.TANA_YMD
+                        AND T_BUZAIHACYU.HACYU_YMD = T_TANA.TANA_YMD
                     ';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -394,4 +402,179 @@ class Order
             }
         }
     }
+
+    function getInventoryListForEdit()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (isset($_GET['SYOZOKU_CD'])) {
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+                $getSubMonthYear = date('Y', strtotime("-1 months")) . date('m', strtotime("-1 months"));
+                $getCurrentMonthYear = date('Y') . date('m');
+                $getCurrentDate = date('Y-m-d');
+
+                $sql = ' SELECT T_TANAMSAI_SAVE.BUZAI_KANRI_NO, T_TANAMSAI_SAVE.HINBAN, T_TANAMSAI_SAVE.SYOHIN_NAME, 
+                                T_TANAMSAI_SAVE.SENGETU_JITUZAIKO_SU, T_TANAMSAI_SAVE.JITUZAIKO_SU, 
+                                M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, M_BUZAI.SIIRE_TANKA, 
+                                T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO, T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO
+                    FROM T_TANA 
+                    LEFT JOIN T_TANAMSAI ON T_TANA.TANA_ID=T_TANAMSAI.TANA_ID
+                    LEFT JOIN T_TANAMSAI_SAVE ON T_TANAMSAI.TANAMSAI_ID = T_TANAMSAI_SAVE.TANAMSAI_ID
+                    LEFT JOIN M_BUZAI ON T_TANAMSAI_SAVE.BUZAI_KANRI_NO = M_BUZAI.BUZAI_KANRI_NO
+                    LEFT JOIN T_SYUKKOJISEKI ON T_TANAMSAI_SAVE.HINBAN = T_SYUKKOJISEKI.JISYA_CD
+                    LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
+                    LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
+                    WHERE T_TANA.SOKO_CD="' . $SYOZOKU_CD . '"
+                        AND T_TANA.TANA_YM >= "'. $getSubMonthYear .'"
+                        AND T_TANA.TANA_YM <= "'. $getCurrentMonthYear .'"
+                        AND T_TANA.DEL_FLG=0
+                        AND T_TANA.TANA_YMD >= "'. $getCurrentDate .'"
+                        AND T_SYUKKOJISEKI.SOKO_CD = "'. $SYOZOKU_CD .'"
+                        AND T_SYUKKOJISEKI.SYUKKO_DATE = T_TANA.TANA_YMD
+                        AND T_BUZAIHACYU.SYOZOKU_CD = T_TANA.TANA_YMD
+                    ';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function deleteTanamsaiSave() 
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $validate = new Validate();        
+
+            $validated = $validate->validate($_POST, [
+                'LOGIN_ID' => 'required'
+            ]);
+
+            if ($validated) {
+                $sql = 'UPDATE T_TANAMSAI_SAVE SET DEL_FLG="1" 
+                    WHERE SAVE_TANT_CD="' . $_POST['LOGIN_ID'] . '"
+                ';
+                $this->result = $this->dbConnect->query($sql);
+
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                }                                        
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postInventoryListForCreateNotExist() 
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $validate = new Validate();
+
+            $validated = $validate->validate($_POST, [
+                'LOGIN_ID' => 'required',
+            ]);
+
+            if ($validated) {
+                $getCurrentMonthYear = date('Y') . date('m');
+                $getCurrentDate = date('Y-m-d');
+                $getCurrentYear = date('Y');
+
+                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD
+                                    FROM M_TANT';
+                $this->result = $this->dbConnect->query($sqlGetInfoLogin);
+                if ($this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $getInfoLogin['LOGIN_ID'] = $row['TANT_CD'];
+                        $getInfoLogin['SYOZOKU_CD'] = $row['SYOZOKU_CD'];
+                    }
+                }
+
+                $query_max = 'SELECT max(TANA_ID) as T_TANA_ID_MAX
+                    FROM T_TANA';
+                $rs_max = $this->dbConnect->query($query_max);
+                $num = 0;
+                if ($rs_max->num_rows > 0) {
+                    while ($row = $rs_max->fetch_assoc()) {
+                        $num = (int)$row['T_TANA_ID_MAX'] + 1;
+                    }
+                }
+
+                $T_TANA_ID_MAX = sprintf('%010d', $num);
+
+                $sql = 'INSERT INTO T_TANA 
+                    (TANA_ID,TANA_YM,TANA_YMD, MONTHLY_KEIJO_YM, BASYO_GYOSYA_SYBET_CD, SOKO_CD, 
+                    SYOZOKU_CD,TANT_CD,RENKEI_YMD)
+                    VALUES
+                    ("' . $T_TANA_ID_MAX . '" , "' . $getCurrentMonthYear . '" , "' . $getCurrentDate . '" , 
+                    "' . $getCurrentYear . '" , "03" , "'. $getInfoLogin['SYOZOKU_CD'] . '" , "'. $getInfoLogin['SYOZOKU_CD'] . '", 
+                    "' . $getInfoLogin['LOGIN_ID'] . '", "' . $getCurrentDate . '")';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                }
+
+                $sqlGetMBuzai = 'SELECT * FROM M_BUZAI';
+                $this->result = $this->dbConnect->query($sqlGetMBuzai);
+                if ($this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $getInfoMBuzai[] = $row;
+                    }
+                }
+
+                foreach($getInfoMBuzai as $item => $value) {
+                    $sql = 'INSERT INTO T_TANAMSAI 
+                        (TANA_ID,TANAMSAI_ID,BUZAI_KANRI_NO, JISYA_CD, HINBAN, SYOHIN_NAME, JITUZAIKO_SU)
+                        VALUES
+                        ("' . $T_TANA_ID_MAX . '" , "' . $getCurrentMonthYear . '" , "' . $getCurrentDate . '" , 
+                        "' . $getCurrentYear . '" , "03" , "'. $getInfoLogin['SYOZOKU_CD'] . '" , "'. $getInfoLogin['SYOZOKU_CD'] . '", 
+                        "' . $getInfoLogin['LOGIN_ID'] . '", "' . $getCurrentDate . '")';
+                    $this->result = $this->dbConnect->query($sql);
+                }
+
+
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
 }
+

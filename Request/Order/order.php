@@ -790,7 +790,7 @@ class Order
                     LEFT JOIN T_SYUKKOJISEKI ON T_TANAMSAI.HINBAN = T_SYUKKOJISEKI.JISYA_CD
                     LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
                     LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
-                    WHERE T_TANA.SOKO_CD="' . $SYOZOKU_CD . '"
+                    WHERE T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '"
                         AND T_TANA.TANA_YM >= "' . $getSubMonthYear . '"
                         AND T_TANA.TANA_YM <= "' . $getCurrentMonthYear . '"
                         AND T_TANA.DEL_FLG=0
@@ -849,14 +849,14 @@ class Order
                     LEFT JOIN T_SYUKKOJISEKI ON T_TANAMSAI_SAVE.HINBAN = T_SYUKKOJISEKI.JISYA_CD
                     LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
                     LEFT JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
-                    WHERE T_TANA.SOKO_CD="' . $SYOZOKU_CD . '"
+                    WHERE T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '"
                         AND T_TANA.TANA_YM >= "' . $getSubMonthYear . '"
                         AND T_TANA.TANA_YM <= "' . $getCurrentMonthYear . '"
                         AND T_TANA.DEL_FLG=0
                         AND T_TANA.TANA_YMD >= "' . $getCurrentDate . '"
                         AND T_SYUKKOJISEKI.SOKO_CD = "' . $SYOZOKU_CD . '"
                         AND T_SYUKKOJISEKI.SYUKKO_DATE = T_TANA.TANA_YMD
-                        AND T_BUZAIHACYU.SYOZOKU_CD = T_TANA.TANA_YMD
+                        AND T_BUZAIHACYU.HACYU_YMD = T_TANA.TANA_YMD
                     ';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -959,8 +959,6 @@ class Order
             $data = (array)$json_request;
 
             $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
-
-            var_dump($data); die;
 
             if (empty($errors_validate)) {
                 $getCurrentMonthYear = date('Y') . date('m');
@@ -1271,5 +1269,49 @@ class Order
     }
 
     // 部材リスト_2 Inventory_List_MaterialList
+    function getInventoryListMaterialListSearch()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
 
+            if (isset($_GET['BUZAI_BUNRUI']) && 
+                isset($_GET['MAKER_NAME']) &&
+                isset($_GET['HINBAN']) &&
+                isset($_GET['SYOHIN_NAME']) &&
+                isset($_GET['SYOZOKU_CD'])
+            ) {
+
+                $sql = ' SELECT *         
+                FROM M_BUZAI 
+                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID               
+                WHERE T_BUZAIHACYU.BUZAI_HACYU_ID="' . $BUZAI_HACYU_ID . '"         
+                AND T_BUZAIHACYU.DEL_FLG=0
+                AND T_BUZAIHACYUMSAI.DEL_FLG=0';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
 }

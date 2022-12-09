@@ -32,7 +32,7 @@ class Order
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['SYOZOKU_CD'])) {
+            if (isset($_GET['SYOZOKU_CD']) && $_GET['SYOZOKU_CD'] != "") {
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
 
                 $sql = ' SELECT T_BUZAIHACYU.BUZAI_HACYU_ID,
@@ -45,12 +45,14 @@ class Order
                 M_KBN.KBNMSAI_CD,
                 M_KBN.KBNMSAI_NAME,
                 T_BUZAIHACYU.SYOZOKU_CD,
-                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID,
+                T_BUZAIHACYUMSAI.BUZAI_HACYUMSAI_ID
                 FROM T_BUZAIHACYU 
                 LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
                 LEFT JOIN M_KBN ON T_BUZAIHACYU.HACYU_OKFLG = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="08"
                 WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $SYOZOKU_CD . '"
-                AND T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=(SELECT MIN(BUZAI_HACYU_ID) FROM T_BUZAIHACYUMSAI)                
+                AND T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=(SELECT MAX(BUZAI_HACYU_ID) FROM T_BUZAIHACYUMSAI)        
+                AND T_BUZAIHACYUMSAI.BUZAI_HACYUMSAI_ID=(SELECT MAX(BUZAI_HACYUMSAI_ID) FROM T_BUZAIHACYUMSAI)         
                 AND T_BUZAIHACYU.DEL_FLG=0
                 ORDER BY T_BUZAIHACYU.HACYU_YMD DESC';
                 $this->result = $this->dbConnect->query($sql);
@@ -124,7 +126,9 @@ class Order
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['SYOZOKU_CD']) && isset($_GET['JISYA_CD'])) {
+            if ((isset($_GET['SYOZOKU_CD']) && $_GET['SYOZOKU_CD'] != "") &&
+                (isset($_GET['JISYA_CD']) && $_GET['JISYA_CD'] != "")
+            ) {
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
                 $JISYA_CD = $_GET['JISYA_CD'];
 
@@ -178,7 +182,7 @@ class Order
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['BUZAI_HACYU_ID'])) {
+            if (isset($_GET['BUZAI_HACYU_ID']) && $_GET['BUZAI_HACYU_ID'] != "") {
                 $BUZAI_HACYU_ID = $_GET['BUZAI_HACYU_ID'];
 
                 $sql = ' SELECT T_BUZAIHACYUMSAI.MAKER_NAME,
@@ -563,7 +567,7 @@ class Order
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['SYOZOKU_CD'])) {
+            if (isset($_GET['SYOZOKU_CD']) && $_GET['SYOZOKU_CD'] != "") {
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
 
                 $sql = ' SELECT T_BUZAIHACYUMSAI_SAVE.MAKER_NAME,
@@ -1031,7 +1035,7 @@ class Order
             $errors = [];
             $resultSet = array();
 
-            if (isset($_GET['SYOZOKU_CD'])) {
+            if (isset($_GET['SYOZOKU_CD']) && $_GET['SYOZOKU_CD'] != "") {
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
 
                 $sql = ' SELECT T_BUZAIHACYU.BUZAI_HACYU_ID,
@@ -1044,14 +1048,17 @@ class Order
                 M_KBN.KBNMSAI_CD,
                 M_KBN.KBNMSAI_NAME,
                 T_BUZAIHACYU.SYOZOKU_CD,
-                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+                T_BUZAIHACYUMSAI.BUZAI_HACYU_ID,
+                T_BUZAIHACYUMSAI.BUZAI_HACYUMSAI_ID
                 FROM T_BUZAIHACYU 
                 LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
                 LEFT JOIN M_KBN ON T_BUZAIHACYU.HACYU_OKFLG = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="08"
                 WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $SYOZOKU_CD . '"
-                AND T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=(SELECT MIN(BUZAI_HACYU_ID) FROM T_BUZAIHACYUMSAI)                
+                AND T_BUZAIHACYUMSAI.BUZAI_HACYU_ID=(SELECT MAX(BUZAI_HACYU_ID) FROM T_BUZAIHACYUMSAI)
+                AND T_BUZAIHACYUMSAI.BUZAI_HACYUMSAI_ID=(SELECT MAX(BUZAI_HACYUMSAI_ID) FROM T_BUZAIHACYUMSAI)                
                 AND T_BUZAIHACYU.DEL_FLG=0
                 ORDER BY T_BUZAIHACYU.HACYU_YMD DESC';
+                // echo $sql; die;
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1151,11 +1158,11 @@ class Order
             $data = (array)$json_request;
 
             $list_buzai_hacyu_id = $data['BUZAI_HACYU_ID'];
-           
-            if (!empty($list_buzai_hacyu_id)); {             
+
+            if (!empty($list_buzai_hacyu_id)); {
                 foreach ($list_buzai_hacyu_id as $key => $value) {
                     $sql = 'UPDATE T_BUZAIHACYU SET
-                        RENKEI_YMD="'.$PRESENT_DATE.'",
+                        RENKEI_YMD="' . $PRESENT_DATE . '",
                         HACYU_OKFLG="03"
                         WHERE BUZAI_HACYU_ID="' . $value . '"
                         AND DEL_FLG=0';
@@ -1192,11 +1199,11 @@ class Order
             $data = (array)$json_request;
 
             $list_buzai_hacyu_id = $data['BUZAI_HACYU_ID'];
-           
-            if (!empty($list_buzai_hacyu_id)); {             
+
+            if (!empty($list_buzai_hacyu_id)); {
                 foreach ($list_buzai_hacyu_id as $key => $value) {
                     $sql = 'UPDATE T_BUZAIHACYU SET
-                        RENKEI_YMD="'.$PRESENT_DATE.'",
+                        RENKEI_YMD="' . $PRESENT_DATE . '",
                         HACYU_OKFLG="02"
                         WHERE BUZAI_HACYU_ID="' . $value . '"
                         AND DEL_FLG=0';

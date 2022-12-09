@@ -35,7 +35,7 @@ class Koji
             $resultSet = array();
             $errors = [];
 
-            if (isset($_GET['YMD']) && isset($_GET['LOGIN_ID'])) {
+            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "")) {
                 $YMD = $_GET['YMD'];
                 $LOGIN_ID = $_GET['LOGIN_ID'];
                 $sql = 'SELECT SITAMIHOMONJIKAN,
@@ -53,7 +53,7 @@ class Koji
                 KOJI_JININ,
                 KOJI_JIKAN FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';              
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -98,7 +98,7 @@ class Koji
                 SITAMI_JININ,
                 SITAMI_JIKAN FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
                 AND (HOMON_TANT_CD1="' . $LOGIN_ID . '" OR HOMON_TANT_CD2="' . $LOGIN_ID . '" OR HOMON_TANT_CD3="' . $LOGIN_ID . '")
-                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0'; 
+                AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -151,7 +151,9 @@ class Koji
             $count_jyucyu = null;
             $count_syuyaku_jyucyu = null;
 
-            if (isset($_GET['YMD']) && isset($_GET['JYUCYU_ID']) && isset($_GET['SETSAKI_ADDRESS'])) {
+            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['SETSAKI_ADDRESS']) && $_GET['SETSAKI_ADDRESS'] != "")
+            ) {
                 $YMD = $_GET['YMD'];
                 $SETSAKI_ADDRESS = $_GET['SETSAKI_ADDRESS'];
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
@@ -297,7 +299,10 @@ class Koji
             $resultSet = array();
             $domain = $this->domain;
 
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['HOMON_SBT']) && isset($_GET['SINGLE_SUMMARIZE'])) {
+            if ((isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['HOMON_SBT']) && $_GET['HOMON_SBT'] != "") &&
+                (isset($_GET['SINGLE_SUMMARIZE']) && $_GET['SINGLE_SUMMARIZE'] != "")
+            ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $HOMON_SBT = $_GET['HOMON_SBT'];
                 $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
@@ -459,7 +464,9 @@ class Koji
             $errors = [];
             $resultSet = array();
             $domain = $this->domain;
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['SINGLE_SUMMARIZE'])) {
+            if ((isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['SINGLE_SUMMARIZE']) && $_GET['SINGLE_SUMMARIZE'] != "")
+            ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
                 if ($SINGLE_SUMMARIZE == 1) {
@@ -535,7 +542,9 @@ class Koji
             $errors = [];
             $resultSet = array();
             $domain = $this->domain;
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
+            if ((isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['KOJI_ST']) && $_GET['KOJI_ST'] != "")
+            ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $KOJI_ST = $_GET['KOJI_ST'];
                 if ($KOJI_ST == "03") {
@@ -599,11 +608,11 @@ class Koji
             }
             // Check if $uploadOk is set to 0 by an error
             move_uploaded_file($file["tmp_name"], $target_file);
-        } 
+        }
 
         $dataUploadFile['FILEPATH'][] = $path_return;
         return $dataUploadFile;
-    }  
+    }
 
     function uploadFilePdf($file)
     {
@@ -640,16 +649,16 @@ class Koji
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {         
+        } else {
             $errors = [];
             $resultSet = array();
             $validate = new Validate();
-            
+
             $validated = $validate->validate($_POST, [
-                'LOGIN_ID' => 'required',               
+                'LOGIN_ID' => 'required',
                 'JYUCYU_ID' => 'required',
             ]);
-        
+
             if ($validated) {
                 $FILE_NAME = $_FILES['FILE_NAME'];
                 $img_path = [];
@@ -660,7 +669,7 @@ class Koji
                     die;
                 }
 
-                $JYUCYU_ID = $validated['JYUCYU_ID'];              
+                $JYUCYU_ID = $validated['JYUCYU_ID'];
                 $FILE_KBN_CD = "10";
                 $ADD_PGID = "KOJ1120F";
                 $ADD_TANTCD = $validated['LOGIN_ID'];
@@ -721,12 +730,11 @@ class Koji
                     }
                 }
 
-                $domain =  $this->domain;                
+                $domain =  $this->domain;
                 $resultSet['IMG'] = $domain . $img_path['FILEPATH'][0];
                 $resultSet['JYUCYU_ID'] = $JYUCYU_ID;
-                
-            } 
-            
+            }
+
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
@@ -746,7 +754,9 @@ class Koji
             $errors = [];
             $resultSet = array();
             $list_jisya_cd = [];
-            if (isset($_GET['JYUCYU_ID']) && isset($_GET['KOJI_ST'])) {
+            if ((isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['KOJI_ST']) && $_GET['KOJI_ST'] != "")
+            ) {
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
                 $KOJI_ST = $_GET['KOJI_ST'];
 
@@ -911,7 +921,9 @@ class Koji
             $errors = [];
             $resultSet = array();
             $domain = $this->domain;
-            if (isset($_GET['TENPO_CD']) && isset($_GET['JYUCYU_ID'])) {
+            if ((isset($_GET['TENPO_CD']) && $_GET['TENPO_CD'] != "") &&
+                (isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "")
+            ) {
                 $TENPO_CD = $_GET['TENPO_CD'];
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
 
@@ -1200,7 +1212,7 @@ class Koji
                     $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
                     $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } 
+                }
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1529,11 +1541,11 @@ class Koji
                 $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
             }
 
-            if(empty($errors['msg'])){
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('Store success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }       
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
         }
     }
 
@@ -1697,11 +1709,11 @@ class Koji
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                 }
 
-                if(empty($errors['msg'])){
+                if (empty($errors['msg'])) {
                     $this->dbReference->sendResponse(200, json_encode('Store success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                }     
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
             }
@@ -1738,11 +1750,11 @@ class Koji
                     }
                 }
 
-                if(empty($errors['msg'])){
-                    $this->dbReference->sendResponse(200, json_encode( $resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                }     
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } elseif (
                 isset($_POST['JYUCYU_ID'])
             ) {
@@ -1766,13 +1778,11 @@ class Koji
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                 }
 
-                if(empty($errors['msg'])){
+                if (empty($errors['msg'])) {
                     $this->dbReference->sendResponse(200, json_encode("Store Success", JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                }   
-
-                
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
             } else {
                 $this->dbReference->sendResponse(400, json_encode("Error", JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -1813,10 +1823,10 @@ class Koji
                         }
                     }
 
-                    if(empty($errors['msg'])){
-                        $this->dbReference->sendResponse(200, json_encode( $resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    if (empty($errors['msg'])) {
+                        $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     } else {
-                        $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                        $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                     }
                 }
             } else {
@@ -1914,10 +1924,10 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                if(empty($errors['msg'])){
-                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -2014,10 +2024,10 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                if(empty($errors['msg'])){
-                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -2113,10 +2123,10 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                if(empty($errors['msg'])){
-                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -2211,10 +2221,10 @@ class Koji
                 $dataSuccess['ID_KOJI_FILE_PATH'] = $FILEPATH_ID;
                 $dataSuccess['JYUCYU_ID_KOJI_UPDATE'] = $_POST['JYUCYU_ID'];
 
-                if(empty($errors['msg'])){
-                    $this->dbReference->sendResponse(200, json_encode( $dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($dataSuccess, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode( $errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
                 }
             } else {
                 $this->dbReference->sendResponse(400, json_encode([], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

@@ -914,7 +914,37 @@ class Order
         }
     }
 
-    function postInventoryListForCreateNotExist()
+    function validatePostInventoryListForCreateNotExist($array)
+    {
+        $errors = [];
+        if (isset($array['INVENTORY_DETAIL'])) {
+            foreach ($array['INVENTORY_DETAIL'] as $key => $values) {
+                if (!isset($values['BUZAI_KANRI_NO']) || $values['BUZAI_KANRI_NO'] == "") {
+                    $errors[] = 'BUZAI_KANRI_NO' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['JISYA_CD']) || $values['JISYA_CD'] == "") {
+                    $errors[] = 'JISYA_CD' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['HINBAN']) || $values['HINBAN'] == "") {
+                    $errors[] = 'HINBAN' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['SYOHIN_NAME']) || $values['SYOHIN_NAME'] == "") {
+                    $errors[] = 'SYOHIN_NAME' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['JITUZAIKO_SU']) || $values['JITUZAIKO_SU'] == "") {
+                    $errors[] = 'JITUZAIKO_SU' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+            }
+        }
+
+        if (!isset($array['LOGIN_ID']) || $array['LOGIN_ID'] == "") {
+            $errors[] = 'LOGIN_ID is required ';
+        }
+
+        return $errors;
+    }
+
+    function postInventoryListForCreateOrEdit() 
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -922,19 +952,25 @@ class Order
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $errors = [];
-            $validate = new Validate();
+            $errors_validate = [];
 
-            $validated = $validate->validate($_POST, [
-                'LOGIN_ID' => 'required',
-            ]);
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
 
-            if ($validated) {
+            $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
+
+            var_dump($data); die;
+
+            if (empty($errors_validate)) {
                 $getCurrentMonthYear = date('Y') . date('m');
                 $getCurrentDate = date('Y-m-d');
                 $getCurrentYear = date('Y');
 
                 $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD
-                                    FROM M_TANT';
+                                    FROM M_TANT
+                                    WHERE TANT_CD="' . $data['LOGIN_ID'] . '"
+                                    ';
                 $this->result = $this->dbConnect->query($sqlGetInfoLogin);
                 if ($this->result->num_rows > 0) {
                     while ($row = $this->result->fetch_assoc()) {
@@ -967,21 +1003,13 @@ class Order
                     $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
                 }
 
-                $sqlGetMBuzai = 'SELECT * FROM M_BUZAI';
-                $this->result = $this->dbConnect->query($sqlGetMBuzai);
-                if ($this->result->num_rows > 0) {
-                    while ($row = $this->result->fetch_assoc()) {
-                        $getInfoMBuzai[] = $row;
-                    }
-                }
-
-                foreach ($getInfoMBuzai as $item => $value) {
+                foreach($data['INVENTORY_DETAIL'] as $item => $value) {
                     $sql = 'INSERT INTO T_TANAMSAI 
                         (TANA_ID,TANAMSAI_ID,BUZAI_KANRI_NO, JISYA_CD, HINBAN, SYOHIN_NAME, JITUZAIKO_SU)
                         VALUES
-                        ("' . $T_TANA_ID_MAX . '" , "' . $getCurrentMonthYear . '" , "' . $getCurrentDate . '" , 
-                        "' . $getCurrentYear . '" , "03" , "' . $getInfoLogin['SYOZOKU_CD'] . '" , "' . $getInfoLogin['SYOZOKU_CD'] . '", 
-                        "' . $getInfoLogin['LOGIN_ID'] . '", "' . $getCurrentDate . '")';
+                        ("' . $T_TANA_ID_MAX . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
+                        "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "'. $value['SYOHIN_NAME'] . '" , 
+                        "' . $value['JITUZAIKO_SU'] . '")';
                     $this->result = $this->dbConnect->query($sql);
                 }
             }
@@ -1189,4 +1217,59 @@ class Order
             }
         }
     }
+
+    // Confirm
+    function getQRInventoryList()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+        if (isset($_GET['SYOZOKU_CD'])) {
+            $sql = ' SELECT MAKER_NAME,
+                MAKER_CD,
+                BUZAI_BUNRUI,
+                HINBAN,
+                SYOHIN_NAME,
+                BUZAI_KANRI_NO, 
+                SIIRE_NAME,
+                SIIRE_TANKA,
+                LOT,
+                TANI,
+                SORYO,
+                BIKO
+                FROM M_BUZAI
+                WHERE T_SYUKKOJISEKI.SOKO_CD="' . $_GET['SYOZOKU_CD'] . '"                              
+                AND T_BUZAIHACYU.DEL_FLG=0
+                AND T_BUZAIHACYUMSAI.DEL_FLG=0';
+            $this->result = $this->dbConnect->query($sql);
+            if (!empty($this->dbConnect->error)) {
+                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+            }
+
+            if ($this->result && $this->result->num_rows > 0) {
+                // output data of each row
+                while ($row = $this->result->fetch_assoc()) {
+                    $resultSet[] = $row;
+                }
+            }
+        } else {
+            $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
+        }
+            
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    // 部材リスト_2 Inventory_List_MaterialList
+
 }

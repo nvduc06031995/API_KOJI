@@ -139,6 +139,53 @@ class Koji
         }
     }
 
+    function getTirasi() {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $resultSet = array();
+            $errors = [];
+
+            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "")) {   
+                $YMD = $_GET['YMD'];
+                $LOGIN_ID = $_GET['LOGIN_ID'];
+
+                $sql = 'SELECT TANT_CD,
+                YMD,
+                KOJI_TIRASISU,
+                RENKEI_YMD FROM T_TIRASI
+                WHERE TANT_CD="' . $LOGIN_ID . '"
+                AND YMD="' . $YMD . '"
+                AND DEL_FLG=0';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row                    
+                    while ($row = $this->result->fetch_assoc()) {
+                        $data = array();
+                        $data['TANT_CD'] = $row['TANT_CD'];
+                        $data['YMD'] = $row['YMD'];
+                        $data['KOJI_TIRASISU'] = $row['KOJI_TIRASISU'];
+                        $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                        $resultSet['TIRASI'][] = $data;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter YMD or LOGIN_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
     /* ==================================================================== 投稿数更新 */
     function checkCount()
     {
@@ -327,7 +374,7 @@ class Koji
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];                          
+                                $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['SINGLE_SUMMARIZE'] = 1;
                                 $resultSet[] = $data;
                             }
@@ -354,7 +401,7 @@ class Koji
                                 $data['KOJIIRAISYO_FILEPATH'] = $KOJIIRAISYO_FILEPATH;
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];                               
+                                $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['SINGLE_SUMMARIZE'] = 1;
                                 $resultSet[] = $data;
                             }
@@ -410,7 +457,7 @@ class Koji
                                 $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];                             
+                                $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $data;
                             }

@@ -41,6 +41,7 @@ class Schedule
             ) {
                 $YMD = $_GET['YMD'];
                 $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
+                $YM = date('Y-m' , strtotime($YMD));                
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
                 $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($YMD)));
 
@@ -75,12 +76,11 @@ class Schedule
                         M_KBN.KBNMSAI_NAME
                         FROM T_EIGYO_ANKEN 
                         CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"                   
-                        WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
-                            AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '" 
+                        WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
                             AND T_EIGYO_ANKEN.DEL_FLG=0 
-                            AND M_KBN.KBN_CD="10"';
+                            AND M_KBN.KBN_CD="10"';                            
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -116,8 +116,7 @@ class Schedule
                 M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
                  CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.MEMO_CD=M_KBN.KBNMSAI_CD
-                 WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '"  
-                     AND T_TBETUCALENDAR.YMD <= "' . $end_date . '" 
+                 WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                     
                      AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                      AND M_KBN.KBN_CD="06"
@@ -183,8 +182,7 @@ class Schedule
                     FROM T_KOJI 
                     LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="02"
                     LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.SITAMI_YMD>="' . $start_date . '" 
-                    AND T_KOJI.SITAMI_YMD<="' . $end_date . '" 
+                    WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
                     AND T_KOJI.DEL_FLG=0 
                     AND M_KBN.KBN_CD="05"
@@ -241,9 +239,8 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
-                        AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
+                    WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '" 
+                        AND T_KOJI.DEL_FLG=0                         
                         AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" )
                         AND M_KBN.KBN_CD="05"';
                     $this->result = $this->dbConnect->query($sql);
@@ -342,9 +339,8 @@ class Schedule
                     FROM T_EIGYO_ANKEN 
                     CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
-                    WHERE T_EIGYO_ANKEN.YMD >= "' . $start_date . '"  
-                    AND T_EIGYO_ANKEN.DEL_FLG=0 
-                    AND T_EIGYO_ANKEN.YMD <= "' . $end_date . '"
+                    WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
+                    AND T_EIGYO_ANKEN.DEL_FLG=0                    
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
@@ -391,8 +387,7 @@ class Schedule
                     FROM T_TBETUCALENDAR 
                     LEFT JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.MEMO_CD=M_KBN.KBNMSAI_CD
                     LEFT JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
-                    WHERE T_TBETUCALENDAR.YMD >= "' . $start_date . '" 
-                    AND T_TBETUCALENDAR.YMD <= "' . $end_date . '"     
+                    WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
                     AND M_KBN.KBN_CD="06"';
@@ -453,9 +448,8 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '" 
-                    AND T_KOJI.DEL_FLG=0 
-                    AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
+                    WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
+                    AND T_KOJI.DEL_FLG=0                    
                     AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
                     AND M_KBN.KBN_CD="16"';
                     $this->result = $this->dbConnect->query($sql);
@@ -509,9 +503,8 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD>="' . $start_date . '"  
+                    WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0
-                    AND T_KOJI.KOJI_YMD<="' . $end_date . '" 
                     AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
                     AND M_KBN.KBN_CD="16" ';
                     $this->result = $this->dbConnect->query($sql);

@@ -1275,7 +1275,7 @@ class Order
         }
     }
 
-    // 部材リスト_2 Inventory_List_MaterialList
+    /* =========================== 部材リスト_2 */
     function getInventoryListMaterialListSearch()
     {
         $this->dbReference = new systemConfig();

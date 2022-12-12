@@ -371,6 +371,9 @@ class Koji
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
+                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
+                              
+                                $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
@@ -397,6 +400,9 @@ class Koji
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
+                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
+                              
+                                $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $KOJIIRAISYO_FILEPATH = $domain . $row['KOJIIRAISYO_FILEPATH'];
                                 $data['KOJIIRAISYO_FILEPATH'] = $KOJIIRAISYO_FILEPATH;
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
@@ -425,6 +431,9 @@ class Koji
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['DOMAIN'] = $domain;
+                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
+                              
+                                $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
@@ -454,6 +463,9 @@ class Koji
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['DOMAIN'] = $domain;
+                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
+                              
+                                $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];

@@ -312,15 +312,10 @@ class Koji
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                         T_KOJI.JYUCYU_ID,
                         T_KOJI.HOMON_SBT,
-                        T_KOJI.KOJI_ST,
-                        T_KOJI_FILEPATH.FILEPATH_ID,
-                        T_KOJI_FILEPATH.FILEPATH 
+                        T_KOJI.KOJI_ST                       
                         FROM T_KOJI 
-                        LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"
-                        AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
-                        AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI_FILEPATH.DEL_FLG=0';
+                        WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"             
+                        AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -332,9 +327,7 @@ class Koji
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];
-                                $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
-                                $data['FILEPATH'] = $domain . $row['FILEPATH'];
+                                $data['KOJI_ST'] = $row['KOJI_ST'];                          
                                 $data['SINGLE_SUMMARIZE'] = 1;
                                 $resultSet[] = $data;
                             }
@@ -345,15 +338,10 @@ class Koji
                         $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
                         T_KOJI.JYUCYU_ID,
                         T_KOJI.HOMON_SBT,
-                        T_KOJI.KOJI_ST,
-                        T_KOJI_FILEPATH.FILEPATH_ID,
-                        T_KOJI_FILEPATH.FILEPATH 
-                        FROM T_KOJI 
-                        LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"
-                        AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04")                
-                        AND T_KOJI.DEL_FLG=0 
-                        AND T_KOJI_FILEPATH.DEL_FLG=0';
+                        T_KOJI.KOJI_ST                     
+                        FROM T_KOJI                 
+                        WHERE JYUCYU_ID= "' . $JYUCYU_ID . '"                               
+                        AND T_KOJI.DEL_FLG=0 ';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -366,9 +354,7 @@ class Koji
                                 $data['KOJIIRAISYO_FILEPATH'] = $KOJIIRAISYO_FILEPATH;
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];
-                                $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
-                                $data['FILEPATH'] = $domain . $row['FILEPATH'];
+                                $data['KOJI_ST'] = $row['KOJI_ST'];                               
                                 $data['SINGLE_SUMMARIZE'] = 1;
                                 $resultSet[] = $data;
                             }
@@ -379,12 +365,8 @@ class Koji
                         $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
                         T_KOJI_FILEPATH.FILEPATH,
                         T_KOJI.JYUCYU_ID,
-                        T_KOJI.HOMON_SBT,
-                        T_KOJI.KOJI_ST,
-                        T_KOJI_FILEPATH.FILEPATH_ID
-                        FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
-                        AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04") 
+                        T_KOJI.HOMON_SBT
+                        WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"                      
                         AND T_KOJI.HOMON_SBT="01"
                         AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
@@ -412,12 +394,8 @@ class Koji
                         $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
                         T_KOJI_FILEPATH.FILEPATH,
                         T_KOJI.JYUCYU_ID,
-                        T_KOJI.HOMON_SBT,
-                        T_KOJI.KOJI_ST,
-                        T_KOJI_FILEPATH.FILEPATH_ID
-                        FROM T_KOJI LEFT JOIN T_KOJI_FILEPATH ON T_KOJI.JYUCYU_ID=T_KOJI_FILEPATH.ID 
-                        WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"
-                        AND (T_KOJI_FILEPATH.FILE_KBN_CD="03" OR T_KOJI_FILEPATH.FILE_KBN_CD="04") 
+                        T_KOJI.HOMON_SBT
+                        WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"                      
                         AND T_KOJI.HOMON_SBT="02"
                         AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
@@ -432,9 +410,7 @@ class Koji
                                 $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];
-                                $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
-                                $data['FILEPATH'] = $domain . $row['FILEPATH'];
+                                $data['KOJI_ST'] = $row['KOJI_ST'];                             
                                 $data['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $data;
                             }

@@ -41,7 +41,7 @@ class Schedule
             ) {
                 $YMD = $_GET['YMD'];
                 $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
-                $YM = date('Y-m' , strtotime($YMD));                
+                $YM = date('Y-m', strtotime($YMD));
                 $start_date = date("Y-m-d", strtotime('monday this week', strtotime($YMD)));
                 $end_date =  date("Y-m-d", strtotime('sunday this week', strtotime($YMD)));
 
@@ -80,7 +80,7 @@ class Schedule
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
                             AND T_EIGYO_ANKEN.DEL_FLG=0 
-                            AND M_KBN.KBN_CD="10"';                            
+                            AND M_KBN.KBN_CD="10"';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1005,13 +1005,13 @@ class Schedule
                         T_KOJI.MEMO, 
                         T_KOJI.HOMON_SBT, 
                         T_KOJI.COMMENT, 
-                        M_KBN.KBNMSAI_NAME                        
+                        M_KBN.KBNMSAI_NAME,
+                        M_KBN.KBNMSAI_CD,
+                        M_KBN.KBN_CD               
                         FROM T_KOJI 
-                        LEFT JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
-                        WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '"
-                        AND M_KBN.KBN_CD="05"                         
+                        LEFT JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                        WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '"        
                         AND T_KOJI.DEL_FLG=0';
-                        // echo $sql; die;
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1042,6 +1042,8 @@ class Schedule
                                 $data['COMMENT'] = $row['COMMENT'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
                                 $data['FILEPATH'] = $arr_list_file;
                                 $resultSet[] = $data;
                             }
@@ -1069,9 +1071,11 @@ class Schedule
                         T_KOJI.MEMO, 
                         T_KOJI.HOMON_SBT, 
                         T_KOJI.COMMENT, 
-                        M_KBN.KBNMSAI_NAME                  
+                        M_KBN.KBNMSAI_NAME,
+                        M_KBN.KBNMSAI_CD,
+                        M_KBN.KBN_CD                
                         FROM T_KOJI 
-                        LEFT JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"                       
+                        LEFT JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"                       
                         WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '"
                         AND M_KBN.KBN_CD="05"                         
                         AND T_KOJI.DEL_FLG=0';
@@ -1105,6 +1109,8 @@ class Schedule
                                 $data['COMMENT'] = $row['COMMENT'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
                                 $data['FILEPATH'] = $arr_list_file;
                                 $resultSet[] = $data;
                             }
@@ -1286,8 +1292,7 @@ class Schedule
                 'ALL_DAY_FLG' => 'nullable',
                 'HOMON_SBT' => 'required',
                 'JIKAN' => 'required',
-                'KBNMSAI_CD' => 'required',
-                'TAG_KBN' => 'required',
+                'KBNMSAI_CD' => 'required',                
                 'LOGIN_ID' => 'required'
             ]);
 
@@ -1298,7 +1303,7 @@ class Schedule
 
                 if ($validated['HOMON_SBT'] == "01") {
                     $sql = ' UPDATE T_KOJI
-                    SET TAG_KBN="' . $validated['TAG_KBN'] . '",
+                    SET TAG_KBN="' . $validated['KBNMSAI_CD'] . '",
                     SITAMIAPO_KBN="' . $validated['KBN'] . '",
                     SITAMIHOMONJIKAN="' . $validated['HOMONJIKAN'] . '",
                     SITAMIHOMONJIKAN_END="' . $validated['HOMONJIKAN_END'] . '",
@@ -1321,7 +1326,7 @@ class Schedule
 
                 if ($validated['HOMON_SBT'] == "02") {
                     $sql = 'UPDATE T_KOJI 
-                    SET TAG_KBN="' . $validated['TAG_KBN'] . '",
+                    SET TAG_KBN="' . $validated['KBNMSAI_CD'] . '",
                     KOJIAPO_KBN="' . $validated['KBN'] . '",
                     KOJIHOMONJIKAN="' . $validated['HOMONJIKAN'] . '",
                     KOJIHOMONJIKAN_END="' . $validated['HOMONJIKAN_END'] . '",
@@ -1444,7 +1449,7 @@ class Schedule
             $validated = $validate->validate($_POST, [
                 'JYOKEN_CD' => 'required',
                 'YMD' => 'required',
-                'TAG_KBN' => 'required',
+                'KBNMSAI_CD' => 'required',
                 'START_TIME' => 'required',
                 'END_TIME' => 'required',
                 'JININ' => 'required',
@@ -1468,7 +1473,7 @@ class Schedule
 
                 if (isset($validated['TAN_EIG_ID']) && !is_null($validated['TAN_EIG_ID'])) {
                     $sql = ' UPDATE T_EIGYO_ANKEN SET                     
-                        TAG_KBN="' . $validated['TAG_KBN'] . '",
+                        TAG_KBN="' . $validated['KBNMSAI_CD'] . '",
                         START_TIME="' .  $validated['START_TIME'] . '",
                         END_TIME="' .  $validated['END_TIME'] . '",
                         JININ="' .  $validated['JININ'] . '",
@@ -1531,7 +1536,7 @@ class Schedule
                         "' . $validated['JYOKEN_CD'] . '",
                         ' . $validated['JYOKEN_SYBET_FLG'] . ',
                         "' . $validated['YMD'] . '",
-                        "' . $validated['TAG_KBN'] . '",
+                        "' . $validated['KBNMSAI_CD'] . '",
                         "' . $validated['START_TIME'] . '",
                         "' . $validated['END_TIME'] . '",
                         "' . $validated['JININ'] . '",

@@ -1393,7 +1393,7 @@ class Order
             // $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
 
             if (empty($errors_validate)) {
-                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD
+                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD  
                                     FROM M_TANT
                                     WHERE TANT_CD="' . $data['LOGIN_ID'] . '"
                                     ';

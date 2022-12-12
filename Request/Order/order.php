@@ -1293,8 +1293,8 @@ class Order
                 isset($_GET['SYOZOKU_CD'])
             ) {
 
-                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, 
-                    M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO
+                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, 
+                    M_BUZAI.HINBAN, M_BUZAI.SYOHIN_NAME
                 FROM M_BUZAI 
                 LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
                 WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
@@ -1345,8 +1345,10 @@ class Order
                 $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, 
                     M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO
                 FROM M_BUZAI 
-                LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
-                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
+                LEFT JOIN T_SYUKKOJISEKI ON M_BUZAI.HINBAN=T_SYUKKOJISEKI.JISYA_CD 
+                LEFT JOIN T_BUZAIHACYU ON M_BUZAI.HINBAN=T_BUZAIHACYU.HINBAN 
+                LEFT JOIN T_BUZAIHACYUMSAI ON M_BUZAI.HINBAN=T_BUZAIHACYU.JISYA_CD 
+                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '" 
                     OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
                     OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
                     OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
@@ -1368,6 +1370,54 @@ class Order
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postInventoryListMaterialList()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $errors_validate = [];
+
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+
+            // $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
+
+            if (empty($errors_validate)) {
+                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD
+                                    FROM M_TANT
+                                    WHERE TANT_CD="' . $data['LOGIN_ID'] . '"
+                                    ';
+                $this->result = $this->dbConnect->query($sqlGetInfoLogin);
+                if ($this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $getInfoLogin['LOGIN_ID'] = $row['TANT_CD'];
+                        $getInfoLogin['SYOZOKU_CD'] = $row['SYOZOKU_CD'];
+                    }
+                }
+
+                foreach($data['MATERIAL_LIST_DETAIL'] as $item => $value) {
+                    $sql = 'INSERT INTO T_TANAMSAI_SAVE 
+                        (SAVE_TANT_CD,TANAMSAI_ID,BUZAI_KANRI_NO, JISYA_CD, HINBAN, SYOHIN_NAME, SENGETU_JITUZAIKO_SU, JITUZAIKO_SU)
+                        VALUES
+                        ("' . $getInfoLogin['LOGIN_ID'] . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
+                        "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "'. $value['SYOHIN_NAME'] . '" , 
+                        "' . $value['SENGETU_JITUZAIKO_SU'] . '", "' . $value['JITUZAIKO_SU'] . '")';
+                    $this->result = $this->dbConnect->query($sql);
+                }
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }

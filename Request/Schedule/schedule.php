@@ -918,7 +918,7 @@ class Schedule
             $errors = [];
             $resultSet = array();
 
-            $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME FROM M_GYOSYA';
+            $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME FROM M_GYOSYA WHERE (GYOSYA_KBN_CD="01" OR JISYA_LIKE_FLG=1) AND DEL_FLG=0';
             $this->result = $this->dbConnect->query($sql);
             if (!empty($this->dbConnect->error)) {
                 $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

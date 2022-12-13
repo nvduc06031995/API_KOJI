@@ -75,12 +75,11 @@ class Schedule
                         M_KBN.YOBIKOMOKU1, 
                         M_KBN.KBNMSAI_NAME
                         FROM T_EIGYO_ANKEN 
-                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"                   
+                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"                   
                         WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
-                            AND T_EIGYO_ANKEN.DEL_FLG=0 
-                            AND M_KBN.KBN_CD="10"';
+                            AND T_EIGYO_ANKEN.DEL_FLG=0 ';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -115,11 +114,10 @@ class Schedule
                 M_KBN.KBNMSAI_NAME, 
                 M_KBN.YOBIKOMOKU1          
                  FROM T_TBETUCALENDAR 
-                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.MEMO_CD=M_KBN.KBNMSAI_CD
+                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
                  WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                     
                      AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
-                     AND M_KBN.KBN_CD="06"
                      AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=1';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -180,12 +178,11 @@ class Schedule
                     T_KOJI.SITAMI_YMD,
                     M_TANT.SYOZOKU_CD
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="02"
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
                     LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
                     AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
                     AND T_KOJI.DEL_FLG=0 
-                    AND M_KBN.KBN_CD="05"
                     ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
@@ -235,14 +232,13 @@ class Schedule
                     M_TANT3.TANT_NAME AS TANT_NAME3,
                     T_KOJI.KOJI_YMD
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '" 
                         AND T_KOJI.DEL_FLG=0                         
-                        AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" )
-                        AND M_KBN.KBN_CD="05"';
+                        AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -337,7 +333,7 @@ class Schedule
                     M_TANT.TANT_NAME, 
                     M_TANT.TANT_CD
                     FROM T_EIGYO_ANKEN 
-                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
+                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                     AND T_EIGYO_ANKEN.DEL_FLG=0                    
@@ -363,6 +359,8 @@ class Schedule
                             $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
+                            $data['YMD'] = $row['YMD'];
+                            $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
                             $data['TYPE'] = 3;
                             $resultSet2[$TANT_CD][$EIGYO_ANKEN_YMD][] = $data;
                         }
@@ -378,19 +376,19 @@ class Schedule
                     T_TBETUCALENDAR.TAN_CAL_ID,
                     T_TBETUCALENDAR.JYOKEN_CD, 
                     T_TBETUCALENDAR.ALL_DAY_FLG,
-                    T_TBETUCALENDAR.MEMO_CD,                    
+                    T_TBETUCALENDAR.MEMO_CD,  
+                    T_TBETUCALENDAR.JYOKEN_SYBET_FLG,                  
                     M_KBN.KBNMSAI_CD, 
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.YOBIKOMOKU1,                   
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
-                    LEFT JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD AND T_TBETUCALENDAR.MEMO_CD=M_KBN.KBNMSAI_CD
+                    LEFT JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
                     LEFT JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
-                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
-                    AND M_KBN.KBN_CD="06"';
+                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -416,6 +414,7 @@ class Schedule
                             $data['MEMO_CD'] = $row['MEMO_CD'];
                             $data['YMD'] = $row['YMD'];
                             $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
                             $data['TYPE'] = 4;
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
                         }
@@ -443,15 +442,14 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
-                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
-                    AND M_KBN.KBN_CD="16"';
+                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -459,20 +457,70 @@ class Schedule
                     if ($this->result && $this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
-                            $TANT_CD = $row['TANT_CD'];
-                            $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
-                            $resultSet2[$TANT_CD]['TANT_CD'] = $row['TANT_CD'];
-                            $data = array();
-                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
-                            $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
-                            $data['KBN_CD'] = $row['KBN_CD'];
-                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
-                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                            $data['TANT_NAME'] = $row['TANT_NAME'];
-                            $data['TANT_CD'] = $row['TANT_CD'];
-                            $data['TYPE'] = 5;
-                            $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            $TANT_CD1 = $row['TANT_CD1'];
+                            $TANT_CD2 = $row['TANT_CD2'];
+                            $TANT_CD3 = $row['TANT_CD3'];
+                            $TANT_CD4 = $row['TANT_CD4'];
+
+                            if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['DAYLY_SALES'] = $row['DAYLY_SALES1'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME1'];
+                                $data['TANT_CD'] = $TANT_CD1;
+                                $data['TYPE'] = 5;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
+
+                            if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD2]['TANT_CD'] = $TANT_CD2;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['DAYLY_SALES'] = $row['DAYLY_SALES2'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME2'];
+                                $data['TANT_CD1'] = $row['TANT_CD2'];
+                                $data['TYPE'] = 5;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
+
+                            if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD3]['TANT_CD'] = $TANT_CD3;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['DAYLY_SALES'] = $row['DAYLY_SALES3'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME3'];
+                                $data['TANT_CD1'] = $row['TANT_CD3'];
+                                $data['TYPE'] = 5;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
+
+                            if (!empty($TANT_CD4) && $TANT_CD4 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD4]['TANT_CD'] = $TANT_CD4;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['DAYLY_SALES'] = $row['DAYLY_SALES4'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME4'];
+                                $data['TANT_CD1'] = $row['TANT_CD4'];
+                                $data['TYPE'] = 5;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
                         }
                     } else {
                         $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
@@ -498,36 +546,85 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01" 
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0
-                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )
-                    AND M_KBN.KBN_CD="16" ';
+                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                     }
                     if ($this->result && $this->result->num_rows > 0) {
                         // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $TANT_CD = $row['TANT_CD'];
-                            $KOJI_YMD = $row['KOJI_YMD'];
-                            $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
-                            $resultSet2[$TANT_CD]['TANT_CD'] = $row['TANT_CD'];
-                            $data = array();
-                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
-                            $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
-                            $data['KBN_CD'] = $row['KBN_CD'];
-                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
-                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                            $data['TANT_NAME'] = $row['TANT_NAME'];
-                            $data['TANT_CD'] = $row['TANT_CD'];
-                            $data['TYPE'] = 6;
-                            $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                        while ($row = $this->result->fetch_assoc()) {                        
+                            $TANT_CD1 = $row['TANT_CD1'];
+                            $TANT_CD2 = $row['TANT_CD2'];
+                            $TANT_CD3 = $row['TANT_CD3'];
+                            $TANT_CD4 = $row['TANT_CD4'];
+
+                            if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['MONTHLY_SALES'] = $row['MONTHLY_SALES1'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME1'];
+                                $data['TANT_CD'] = $TANT_CD1;
+                                $data['TYPE'] = 6;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
+
+                            if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD2]['TANT_CD'] = $TANT_CD2;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['MONTHLY_SALES'] = $row['MONTHLY_SALES2'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME2'];
+                                $data['TANT_CD1'] = $TANT_CD2;
+                                $data['TYPE'] = 6;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
+
+                            if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD3]['TANT_CD'] = $TANT_CD3;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['MONTHLY_SALES'] = $row['MONTHLY_SALES3'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME3'];
+                                $data['TANT_CD1'] = $TANT_CD3;
+                                $data['TYPE'] = 6;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
+
+                            if (!empty($TANT_CD4) && $TANT_CD4 == $v['TANT_CD']) {
+                                $KOJI_YMD = $row['KOJI_YMD'];
+                                $resultSet2[$TANT_CD4]['TANT_CD'] = $TANT_CD4;
+                                $data = array();
+                                $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                                $data['MONTHLY_SALES'] = $row['MONTHLY_SALES4'];
+                                $data['KBN_CD'] = $row['KBN_CD'];
+                                $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                                $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                                $data['TANT_NAME'] = $row['TANT_NAME4'];
+                                $data['TANT_CD1'] = $TANT_CD4;
+                                $data['TYPE'] = 6;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
+                            }
                         }
                     } else {
                         $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];

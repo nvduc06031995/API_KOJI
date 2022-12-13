@@ -1379,7 +1379,8 @@ class Schedule
                 GUEST_NAME,
                 ATTEND_NAME1,
                 ATTEND_NAME2,
-                ATTEND_NAME3 FROM T_EIGYO_ANKEN 
+                ATTEND_NAME3,
+                TAN_EIG_ID FROM T_EIGYO_ANKEN 
                 WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" 
                 AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
@@ -1445,6 +1446,7 @@ class Schedule
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $errors = [];
+            $resultSet = [];
             $validate = new Validate();
             $validated = $validate->validate($_POST, [
                 'JYOKEN_CD' => 'required',
@@ -1561,7 +1563,10 @@ class Schedule
             }
 
             if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode('sucess', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $validated['TAN_EIG_ID'] = $TAN_EIG_ID;
+                $validated['status'] = 'success';
+                $resultSet[] = $validated;
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }

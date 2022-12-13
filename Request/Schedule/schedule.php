@@ -1629,27 +1629,75 @@ class Schedule
 
                 //【ネット下見】
                 $sql = ' SELECT T_KOJI.JYUCYU_ID,
-                    T_KOJI.SITAMIHOMONJIKAN,
-                    T_KOJI.SITAMIHOMONJIKAN_END,
-                    T_KOJI.SETSAKI_ADDRESS,
-                    T_KOJI.KOJI_ITEM,
-                    T_KOJI.SETSAKI_NAME,
-                    T_KOJI.SITAMIAPO_KBN,
-                    T_KOJI.ALL_DAY_FLG,
-                    T_KOJI.HOMON_SBT,
-                    M_KBN.KBNMSAI_NAME,
-                    M_TANT.TANT_CD,
-                    M_TANT.TANT_NAME,
-                    T_KOJI.SITAMI_YMD,
-                    M_TANT.SYOZOKU_CD
-                    FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                    LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.SITAMI_YMD="' . $YM . '" 
-                    AND T_KOJI.DEL_FLG=0                   
-                    AND M_TANT.TANT_CD=' . $ID . '
-                    AND M_KBN.KBN_CD="05"  
-                    ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
+                T_KOJI.SITAMI_YMD,
+                T_KOJI.KOJI_YMD,
+                T_KOJI.HOMON_TANT_CD1,
+                T_KOJI.HOMON_TANT_CD2,
+                T_KOJI.HOMON_TANT_CD3,
+                T_KOJI.HOMON_TANT_CD4,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.SETSAKI_ADDRESS,
+                T_KOJI.KOJI_JININ,
+                T_KOJI.SITAMI_JININ,
+                T_KOJI.HOMON_SBT,
+                T_KOJI.KOJI_ST,
+                T_KOJI.KOJI_ITEM,
+                T_KOJI.SITAMI_KANSAN_POINT,
+                T_KOJI.KOJI_KANSAN_POINT,
+                T_KOJI.SITAMI_JIKAN,
+                T_KOJI.KOJI_JIKAN,
+                T_KOJI.KOJI_KEKKA,
+                T_KOJI.TENPO_CD,
+                T_KOJI.HOJIN_FLG,
+                T_KOJI.MALL_CD,
+                T_KOJI.KOJIGYOSYA_CD,
+                T_KOJI.TAG_KBN,
+                T_KOJI.SITAMIHOMONJIKAN,
+                T_KOJI.SITAMIHOMONJIKAN_END,
+                T_KOJI.KOJIHOMONJIKAN,
+                T_KOJI.KOJIHOMONJIKAN_END,
+                T_KOJI.KOJIIRAISYO_FILEPATH,
+                T_KOJI.SITAMIIRAISYO_FILEPATH,
+                T_KOJI.CANCEL_RIYU,
+                T_KOJI.SITAMIAPO_KBN,
+                T_KOJI.KOJIAPO_KBN,
+                T_KOJI.MTMORI_YMD,
+                T_KOJI.MEMO,
+                T_KOJI.COMMENT,
+                T_KOJI.READ_FLG,
+                T_KOJI.ATOBARAI,
+                T_KOJI.BIKO,
+                T_KOJI.SYUYAKU_JYUCYU_ID,
+                T_KOJI.REPORT_FLG,
+                T_KOJI.SITAMI_REPORT,
+                T_KOJI.ALL_DAY_FLG,
+                T_KOJI.CO_NAME,
+                T_KOJI.CO_POSTNO,
+                T_KOJI.CO_ADDRESS,
+                T_KOJI.KOJI_ITAKUHI,
+                T_KOJI.SKJ_RENKEI_YMD,
+                T_KOJI.KOJI_RENKEI_YMD,
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5,
+                M_TANT.TANT_CD,
+                M_TANT.TANT_NAME,
+                T_KOJI.SITAMI_YMD,
+                M_TANT.SYOZOKU_CD
+                FROM T_KOJI 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m")="' . $YM . '" 
+                AND T_KOJI.DEL_FLG=0                   
+                AND M_TANT.TANT_CD="' . $ID . '"';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1660,13 +1708,65 @@ class Schedule
                         $SITAMI_YMD = $row['SITAMI_YMD'];
                         $data = array();
                         $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                        $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                        $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                        $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                        $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                        $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                        $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['KOJI_ST'] = $row['KOJI_ST'];
+                        $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                        $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                        $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                        $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                        $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                        $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                        $data['TENPO_CD'] = $row['TENPO_CD'];
+                        $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                        $data['MALL_CD'] = $row['MALL_CD'];
+                        $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
                         $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
                         $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
-                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
-                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                        $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                        $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                        $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                        $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                         $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
-                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                        $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                        $data['MEMO'] = $row['MEMO'];
+                        $data['COMMENT'] = $row['COMMENT'];
+                        $data['READ_FLG'] = $row['READ_FLG'];
+                        $data['ATOBARAI'] = $row['ATOBARAI'];
+                        $data['BIKO'] = $row['BIKO'];
+                        $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                        $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                        $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['CO_NAME'] = $row['CO_NAME'];
+                        $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                        $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                        $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                        $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBN_NAME'] = $row['KBN_NAME'];
+                        $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                         $data['TYPE'] = 1;
                         $resultSet[$SITAMI_YMD][] = $data;
                     }
@@ -1674,31 +1774,80 @@ class Schedule
 
                 //【ネット工事】
                 $sql = ' SELECT T_KOJI.JYUCYU_ID,
-                    T_KOJI.KOJIHOMONJIKAN,
-                    T_KOJI.KOJIHOMONJIKAN_END,
-                    T_KOJI.SETSAKI_ADDRESS,
-                    T_KOJI.KOJI_ITEM,
-                    T_KOJI.SETSAKI_NAME,
-                    T_KOJI.KOJIAPO_KBN,   
-                    T_KOJI.ALL_DAY_FLG,
-                    T_KOJI.HOMON_SBT,
-                    M_KBN.KBNMSAI_NAME,
-                    M_TANT1.TANT_CD AS TANT_CD1,
-                    M_TANT1.TANT_NAME AS TANT_NAME1,
-                    M_TANT2.TANT_CD AS TANT_CD2,
-                    M_TANT2.TANT_NAME AS TANT_NAME2,
-                    M_TANT3.TANT_CD AS TANT_CD3,
-                    M_TANT3.TANT_NAME AS TANT_NAME3,
-                    T_KOJI.KOJI_YMD
-                    FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    WHERE T_KOJI.KOJI_YMD="' . $YM . '" 
-                        AND T_KOJI.DEL_FLG=0                          
-                        AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' )
-                        AND M_KBN.KBN_CD="05"';
+                T_KOJI.SITAMI_YMD,
+                T_KOJI.KOJI_YMD,
+                T_KOJI.HOMON_TANT_CD1,
+                T_KOJI.HOMON_TANT_CD2,
+                T_KOJI.HOMON_TANT_CD3,
+                T_KOJI.HOMON_TANT_CD4,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.SETSAKI_ADDRESS,
+                T_KOJI.KOJI_JININ,
+                T_KOJI.SITAMI_JININ,
+                T_KOJI.HOMON_SBT,
+                T_KOJI.KOJI_ST,
+                T_KOJI.KOJI_ITEM,
+                T_KOJI.SITAMI_KANSAN_POINT,
+                T_KOJI.KOJI_KANSAN_POINT,
+                T_KOJI.SITAMI_JIKAN,
+                T_KOJI.KOJI_JIKAN,
+                T_KOJI.KOJI_KEKKA,
+                T_KOJI.TENPO_CD,
+                T_KOJI.HOJIN_FLG,
+                T_KOJI.MALL_CD,
+                T_KOJI.KOJIGYOSYA_CD,
+                T_KOJI.TAG_KBN,
+                T_KOJI.SITAMIHOMONJIKAN,
+                T_KOJI.SITAMIHOMONJIKAN_END,
+                T_KOJI.KOJIHOMONJIKAN,
+                T_KOJI.KOJIHOMONJIKAN_END,
+                T_KOJI.KOJIIRAISYO_FILEPATH,
+                T_KOJI.SITAMIIRAISYO_FILEPATH,
+                T_KOJI.CANCEL_RIYU,
+                T_KOJI.SITAMIAPO_KBN,
+                T_KOJI.KOJIAPO_KBN,
+                T_KOJI.MTMORI_YMD,
+                T_KOJI.MEMO,
+                T_KOJI.COMMENT,
+                T_KOJI.READ_FLG,
+                T_KOJI.ATOBARAI,
+                T_KOJI.BIKO,
+                T_KOJI.SYUYAKU_JYUCYU_ID,
+                T_KOJI.REPORT_FLG,
+                T_KOJI.SITAMI_REPORT,
+                T_KOJI.ALL_DAY_FLG,
+                T_KOJI.CO_NAME,
+                T_KOJI.CO_POSTNO,
+                T_KOJI.CO_ADDRESS,
+                T_KOJI.KOJI_ITAKUHI,
+                T_KOJI.SKJ_RENKEI_YMD,
+                T_KOJI.KOJI_RENKEI_YMD,
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5,
+                M_TANT1.TANT_CD AS TANT_CD1,
+                M_TANT1.TANT_NAME AS TANT_NAME1,
+                M_TANT2.TANT_CD AS TANT_CD2,
+                M_TANT2.TANT_NAME AS TANT_NAME2,
+                M_TANT3.TANT_CD AS TANT_CD3,
+                M_TANT3.TANT_NAME AS TANT_NAME3,
+                T_KOJI.KOJI_YMD
+                FROM T_KOJI 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")="' . $YM . '" 
+                    AND T_KOJI.DEL_FLG=0                          
+                    AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1709,37 +1858,106 @@ class Schedule
                         $KOJI_YMD = $row['KOJI_YMD'];
                         $data = array();
                         $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                        $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                        $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                        $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                        $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                        $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                        $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['KOJI_ST'] = $row['KOJI_ST'];
+                        $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                        $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                        $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                        $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                        $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                        $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                        $data['TENPO_CD'] = $row['TENPO_CD'];
+                        $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                        $data['MALL_CD'] = $row['MALL_CD'];
+                        $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                         $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                         $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
-                        $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
-                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                        $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                        $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                        $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                         $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
-                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                        $data['MEMO'] = $row['MEMO'];
+                        $data['COMMENT'] = $row['COMMENT'];
+                        $data['READ_FLG'] = $row['READ_FLG'];
+                        $data['ATOBARAI'] = $row['ATOBARAI'];
+                        $data['BIKO'] = $row['BIKO'];
+                        $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                        $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                        $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['CO_NAME'] = $row['CO_NAME'];
+                        $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                        $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                        $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                        $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBN_NAME'] = $row['KBN_NAME'];
+                        $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                         $data['TYPE'] = 2;
                         $resultSet[$KOJI_YMD][] = $data;
                     }
                 }
 
                 //【営業工事・営業下見（担当者欄）】
-                $sql = 'SELECT T_EIGYO_ANKEN.START_TIME, 
-                    T_EIGYO_ANKEN.END_TIME, 
-                    T_EIGYO_ANKEN.GUEST_NAME, 
-                    T_EIGYO_ANKEN.YMD,
-                    T_EIGYO_ANKEN.JYOKEN_SYBET_FLG,
-                    M_KBN.KBNMSAI_NAME, 
-                    M_KBN.YOBIKOMOKU1, 
-                    M_TANT.TANT_NAME, 
-                    M_TANT.TANT_CD
-                    FROM T_EIGYO_ANKEN 
-                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBN_CD AND M_KBN.KBNMSAI_CD="01"
-                    CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD
-                    WHERE T_EIGYO_ANKEN.YMD = "' . $YM . '" 
-                    AND T_EIGYO_ANKEN.DEL_FLG=0                  
-                    AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG=0
-                    AND M_TANT.TANT_CD=' . $ID . '
-                    AND M_KBN.KBN_CD="10"';
+                $sql = 'SELECT  T_EIGYO_ANKEN.TAN_EIG_ID,
+                T_EIGYO_ANKEN.JYOKEN_CD,  
+                T_EIGYO_ANKEN.JYOKEN_SYBET_FLG, 
+                T_EIGYO_ANKEN.YMD,
+                T_EIGYO_ANKEN.START_TIME, 
+                T_EIGYO_ANKEN.END_TIME, 
+                T_EIGYO_ANKEN.TAG_KBN, 
+                T_EIGYO_ANKEN.JININ,
+                T_EIGYO_ANKEN.JIKAN, 
+                T_EIGYO_ANKEN.GUEST_NAME,
+                T_EIGYO_ANKEN.ATTEND_NAME1,
+                T_EIGYO_ANKEN.ATTEND_NAME2,
+                T_EIGYO_ANKEN.ATTEND_NAME3,
+                T_EIGYO_ANKEN.ALL_DAY_FLG,
+                T_EIGYO_ANKEN.RENKEI_YMD,
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5,
+                M_TANT.TANT_NAME, 
+                M_TANT.TANT_CD
+                FROM T_EIGYO_ANKEN 
+                CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD
+                WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m")= "' . $YM . '" 
+                AND T_EIGYO_ANKEN.DEL_FLG=0                  
+                AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG=0
+                AND M_TANT.TANT_CD="' . $ID . '"';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1749,34 +1967,69 @@ class Schedule
                     while ($row = $this->result->fetch_assoc()) {
                         $EIGYO_ANKEN_YMD = $row['YMD'];
                         $data = array();
+                        $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
+                        $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                        $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
+                        $data['YMD'] = $row['YMD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
                         $data['START_TIME'] = $row['START_TIME'];
                         $data['END_TIME'] = $row['END_TIME'];
+                        $data['JININ'] = $row['JININ'];
+                        $data['JIKAN'] = $row['JIKAN'];
                         $data['GUEST_NAME'] = $row['GUEST_NAME'];
+                        $data['ATTEND_NAME1'] = $row['ATTEND_NAME1'];
+                        $data['ATTEND_NAME2'] = $row['ATTEND_NAME2'];
+                        $data['ATTEND_NAME3'] = $row['ATTEND_NAME3'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBN_NAME'] = $row['KBN_NAME'];
+                        $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                         $data['TYPE'] = 3;
                         $resultSet[$EIGYO_ANKEN_YMD][] = $data;
                     }
                 }
 
                 //【メモ（営業所欄）】
-                $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
-                    T_TBETUCALENDAR.END_TIME, NAIYO, 
-                    T_TBETUCALENDAR.YMD,
-                    T_TBETUCALENDAR.TAN_CAL_ID,
-                    T_TBETUCALENDAR.JYOKEN_CD,
-                    M_KBN.KBNMSAI_NAME, 
-                    M_KBN.YOBIKOMOKU1,
-                    M_TANT.TANT_CD          
-                    FROM T_TBETUCALENDAR 
-                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBN_CD
-                    CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD
-                    WHERE T_TBETUCALENDAR.YMD = "' . $YM . '" 
-                    AND T_TBETUCALENDAR.DEL_FLG=0                                      
-                    AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
-                    AND M_TANT.TANT_CD=' . $ID . '
-                    AND M_KBN.KBN_CD="06"
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                $sql = 'SELECT  T_TBETUCALENDAR.TAN_CAL_ID,
+                T_TBETUCALENDAR.JYOKEN_CD, 
+                T_TBETUCALENDAR.JYOKEN_SYBET_FLG, 
+                T_TBETUCALENDAR.YMD, 
+                T_TBETUCALENDAR.TAG_KBN, 
+                T_TBETUCALENDAR.START_TIME, 
+                T_TBETUCALENDAR.END_TIME,
+                T_TBETUCALENDAR.MEMO_CD,
+                T_TBETUCALENDAR.NAIYO, 
+                T_TBETUCALENDAR.COMMENT, 
+                T_TBETUCALENDAR.ALL_DAY_FLG, 
+                T_TBETUCALENDAR.RENKEI_YMD, 
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5,
+                M_TANT.TANT_CD          
+                FROM T_TBETUCALENDAR 
+                CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD
+                WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m")= "' . $YM . '"
+                AND T_TBETUCALENDAR.DEL_FLG=0                                      
+                AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
+                AND M_TANT.TANT_CD="' . $ID . '"';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1786,48 +2039,117 @@ class Schedule
                     while ($row = $this->result->fetch_assoc()) {
                         $TBETUCALENDAR_YMD = $row['YMD'];
                         $data = array();
-                        $data['START_TIME'] = $row['START_TIME'];
-                        $data['END_TIME'] = $row['END_TIME'];
-                        $data['NAIYO'] = $row['NAIYO'];
-                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
                         $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                         $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                        $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
                         $data['YMD'] = $row['YMD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['START_TIME'] = $row['START_TIME'];
+                        $data['END_TIME'] = $row['END_TIME'];
+                        $data['MEMO_CD'] = $row['MEMO_CD'];
+                        $data['NAIYO'] = $row['NAIYO'];
+                        $data['COMMENT'] = $row['COMMENT'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBN_NAME'] = $row['KBN_NAME'];
+                        $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                         $data['TYPE'] = 4;
                         $resultSet[$TBETUCALENDAR_YMD][] = $data;
                     }
                 }
 
                 //【日予実】
-                $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, 
-                    T_KOJI.KOJI_YMD,
-                    T_KOJI.HOMON_SBT,
-                    M_TANT1.DAYLY_SALES AS DAYLY_SALES1, 
-                    M_TANT2.DAYLY_SALES AS DAYLY_SALES2,  
-                    M_TANT3.DAYLY_SALES AS DAYLY_SALES3,  
-                    M_TANT4.DAYLY_SALES AS DAYLY_SALES4,  
-                    M_KBN.KBN_CD, 
-                    M_KBN.KBNMSAI_CD,
-                    M_TANT1.TANT_CD AS TANT_CD1,
-                    M_TANT1.TANT_NAME AS TANT_NAME1,
-                    M_TANT2.TANT_CD AS TANT_CD2,
-                    M_TANT2.TANT_NAME AS TANT_NAME2,
-                    M_TANT3.TANT_CD AS TANT_CD3,
-                    M_TANT3.TANT_NAME AS TANT_NAME3, 
-                    M_TANT4.TANT_CD AS TANT_CD4,
-                    M_TANT4.TANT_NAME AS TANT_NAME4
-                    FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
-                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD="' . $YM . '" 
-                    AND T_KOJI.DEL_FLG=0                     
-                    AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' OR M_TANT4.TANT_CD=' . $ID . ' )
-                    AND M_KBN.KBN_CD="16" 
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                $sql = ' SELECT T_KOJI.JYUCYU_ID,
+                T_KOJI.SITAMI_YMD,
+                T_KOJI.KOJI_YMD,
+                T_KOJI.HOMON_TANT_CD1,
+                T_KOJI.HOMON_TANT_CD2,
+                T_KOJI.HOMON_TANT_CD3,
+                T_KOJI.HOMON_TANT_CD4,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.SETSAKI_ADDRESS,
+                T_KOJI.KOJI_JININ,
+                T_KOJI.SITAMI_JININ,
+                T_KOJI.HOMON_SBT,
+                T_KOJI.KOJI_ST,
+                T_KOJI.KOJI_ITEM,
+                T_KOJI.SITAMI_KANSAN_POINT,
+                T_KOJI.KOJI_KANSAN_POINT,
+                T_KOJI.SITAMI_JIKAN,
+                T_KOJI.KOJI_JIKAN,
+                T_KOJI.KOJI_KEKKA,
+                T_KOJI.TENPO_CD,
+                T_KOJI.HOJIN_FLG,
+                T_KOJI.MALL_CD,
+                T_KOJI.KOJIGYOSYA_CD,
+                T_KOJI.TAG_KBN,
+                T_KOJI.SITAMIHOMONJIKAN,
+                T_KOJI.SITAMIHOMONJIKAN_END,
+                T_KOJI.KOJIHOMONJIKAN,
+                T_KOJI.KOJIHOMONJIKAN_END,
+                T_KOJI.KOJIIRAISYO_FILEPATH,
+                T_KOJI.SITAMIIRAISYO_FILEPATH,
+                T_KOJI.CANCEL_RIYU,
+                T_KOJI.SITAMIAPO_KBN,
+                T_KOJI.KOJIAPO_KBN,
+                T_KOJI.MTMORI_YMD,
+                T_KOJI.MEMO,
+                T_KOJI.COMMENT,
+                T_KOJI.READ_FLG,
+                T_KOJI.ATOBARAI,
+                T_KOJI.BIKO,
+                T_KOJI.SYUYAKU_JYUCYU_ID,
+                T_KOJI.REPORT_FLG,
+                T_KOJI.SITAMI_REPORT,
+                T_KOJI.ALL_DAY_FLG,
+                T_KOJI.CO_NAME,
+                T_KOJI.CO_POSTNO,
+                T_KOJI.CO_ADDRESS,
+                T_KOJI.KOJI_ITAKUHI,
+                T_KOJI.SKJ_RENKEI_YMD,
+                T_KOJI.KOJI_RENKEI_YMD,
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5,
+                M_TANT1.DAYLY_SALES AS DAYLY_SALES1, 
+                M_TANT2.DAYLY_SALES AS DAYLY_SALES2,  
+                M_TANT3.DAYLY_SALES AS DAYLY_SALES3,  
+                M_TANT4.DAYLY_SALES AS DAYLY_SALES4,                      
+                M_TANT1.TANT_CD AS TANT_CD1,
+                M_TANT1.TANT_NAME AS TANT_NAME1,
+                M_TANT2.TANT_CD AS TANT_CD2,
+                M_TANT2.TANT_NAME AS TANT_NAME2,
+                M_TANT3.TANT_CD AS TANT_CD3,
+                M_TANT3.TANT_NAME AS TANT_NAME3, 
+                M_TANT4.TANT_CD AS TANT_CD4,
+                M_TANT4.TANT_NAME AS TANT_NAME4
+                FROM T_KOJI 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16"
+                LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '"
+                AND T_KOJI.DEL_FLG=0                     
+                AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1835,28 +2157,345 @@ class Schedule
                 if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $KOJI_YMD = $row['KOJI_YMD'];
-                        $data = array();
-                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
-                        $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
-                        $data['KBN_CD'] = $row['KBN_CD'];
-                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
-                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                        $data['TYPE'] = 5;
-                        $resultSet[$KOJI_YMD][] = $data;
+                        if (!empty($row['TANT_CD1']) && $row['TANT_CD1'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['DAYLY_SALES'] = $row['DAYLY_SALES1'];
+                            $data['TYPE'] = 5;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($row['TANT_CD2']) && $row['TANT_CD2'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['DAYLY_SALES'] = $row['DAYLY_SALES2'];
+                            $data['TYPE'] = 5;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($row['TANT_CD3']) && $row['TANT_CD3'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['DAYLY_SALES'] = $row['DAYLY_SALES3'];
+                            $data['TYPE'] = 5;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($row['TANT_CD4']) && $row['TANT_CD4'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['DAYLY_SALES'] = $row['DAYLY_SALES4'];
+                            $data['TYPE'] = 5;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
                     }
                 }
 
                 //【計予実】
-                $sql = ' SELECT T_KOJI.KOJI_ITAKUHI, 
-                    T_KOJI.KOJI_YMD,
-                    T_KOJI.HOMON_SBT,
+                $sql = ' SELECT T_KOJI.JYUCYU_ID,
+                T_KOJI.SITAMI_YMD,
+                T_KOJI.KOJI_YMD,
+                T_KOJI.HOMON_TANT_CD1,
+                T_KOJI.HOMON_TANT_CD2,
+                T_KOJI.HOMON_TANT_CD3,
+                T_KOJI.HOMON_TANT_CD4,
+                T_KOJI.SETSAKI_NAME,
+                T_KOJI.SETSAKI_ADDRESS,
+                T_KOJI.KOJI_JININ,
+                T_KOJI.SITAMI_JININ,
+                T_KOJI.HOMON_SBT,
+                T_KOJI.KOJI_ST,
+                T_KOJI.KOJI_ITEM,
+                T_KOJI.SITAMI_KANSAN_POINT,
+                T_KOJI.KOJI_KANSAN_POINT,
+                T_KOJI.SITAMI_JIKAN,
+                T_KOJI.KOJI_JIKAN,
+                T_KOJI.KOJI_KEKKA,
+                T_KOJI.TENPO_CD,
+                T_KOJI.HOJIN_FLG,
+                T_KOJI.MALL_CD,
+                T_KOJI.KOJIGYOSYA_CD,
+                T_KOJI.TAG_KBN,
+                T_KOJI.SITAMIHOMONJIKAN,
+                T_KOJI.SITAMIHOMONJIKAN_END,
+                T_KOJI.KOJIHOMONJIKAN,
+                T_KOJI.KOJIHOMONJIKAN_END,
+                T_KOJI.KOJIIRAISYO_FILEPATH,
+                T_KOJI.SITAMIIRAISYO_FILEPATH,
+                T_KOJI.CANCEL_RIYU,
+                T_KOJI.SITAMIAPO_KBN,
+                T_KOJI.KOJIAPO_KBN,
+                T_KOJI.MTMORI_YMD,
+                T_KOJI.MEMO,
+                T_KOJI.COMMENT,
+                T_KOJI.READ_FLG,
+                T_KOJI.ATOBARAI,
+                T_KOJI.BIKO,
+                T_KOJI.SYUYAKU_JYUCYU_ID,
+                T_KOJI.REPORT_FLG,
+                T_KOJI.SITAMI_REPORT,
+                T_KOJI.ALL_DAY_FLG,
+                T_KOJI.CO_NAME,
+                T_KOJI.CO_POSTNO,
+                T_KOJI.CO_ADDRESS,
+                T_KOJI.KOJI_ITAKUHI,
+                T_KOJI.SKJ_RENKEI_YMD,
+                T_KOJI.KOJI_RENKEI_YMD,
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
+                M_KBN.KBNMSAI_NAME, 
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5,
                     M_TANT1.MONTHLY_SALES AS MONTHLY_SALES1, 
                     M_TANT2.MONTHLY_SALES AS MONTHLY_SALES2,  
                     M_TANT3.MONTHLY_SALES AS MONTHLY_SALES3,  
-                    M_TANT4.MONTHLY_SALES AS MONTHLY_SALES4,  
-                    M_KBN.KBN_CD, 
-                    M_KBN.KBNMSAI_CD,
+                    M_TANT4.MONTHLY_SALES AS MONTHLY_SALES4,                      
                     M_TANT1.TANT_CD AS TANT_CD1,
                     M_TANT1.TANT_NAME AS TANT_NAME1,
                     M_TANT2.TANT_CD AS TANT_CD2,
@@ -1866,16 +2505,14 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBN_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE T_KOJI.KOJI_YMD="' . $YM . '" 
+                    WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '" 
                     AND T_KOJI.DEL_FLG=0                     
-                    AND (M_TANT1.TANT_CD=' . $ID . ' OR M_TANT2.TANT_CD=' . $ID . ' OR M_TANT3.TANT_CD=' . $ID . ' OR M_TANT4.TANT_CD=' . $ID . ' )
-                    AND M_KBN.KBN_CD="16" 
-                    AND M_KBN.KBNMSAI_CD="01" ';
+                    AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1883,15 +2520,277 @@ class Schedule
                 if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $KOJI_YMD = $row['KOJI_YMD'];
-                        $data = array();
-                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
-                        $data['DAYLY_SALES'] = $row['DAYLY_SALES'];
-                        $data['KBN_CD'] = $row['KBN_CD'];
-                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
-                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                        $data['TYPE'] = 6;
-                        $resultSet[$KOJI_YMD][] = $data;
+                        if (!empty($row['TANT_CD1']) && $row['TANT_CD1'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['MONTHLY_SALES'] = $row['MONTHLY_SALES1'];
+                            $data['TYPE'] = 6;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($row['TANT_CD2']) && $row['TANT_CD2'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['MONTHLY_SALES'] = $row['MONTHLY_SALES2'];
+                            $data['TYPE'] = 6;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($row['TANT_CD3']) && $row['TANT_CD3'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['MONTHLY_SALES'] = $row['MONTHLY_SALES3'];
+                            $data['TYPE'] = 6;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
+
+                        if (!empty($row['TANT_CD4']) && $row['TANT_CD4'] == $ID) {
+                            $KOJI_YMD = $row['KOJI_YMD'];
+                            $data = array();
+                            $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                            $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                            $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                            $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                            $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                            $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                            $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                            $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                            $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                            $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                            $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                            $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                            $data['KOJI_ST'] = $row['KOJI_ST'];
+                            $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                            $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                            $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                            $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                            $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                            $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                            $data['TENPO_CD'] = $row['TENPO_CD'];
+                            $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                            $data['MALL_CD'] = $row['MALL_CD'];
+                            $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                            $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                            $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                            $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                            $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                            $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                            $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                            $data['MEMO'] = $row['MEMO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['READ_FLG'] = $row['READ_FLG'];
+                            $data['ATOBARAI'] = $row['ATOBARAI'];
+                            $data['BIKO'] = $row['BIKO'];
+                            $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                            $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                            $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['CO_NAME'] = $row['CO_NAME'];
+                            $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                            $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                            $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                            $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                            $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['MONTHLY_SALES'] = $row['MONTHLY_SALES4'];
+                            $data['TYPE'] = 6;
+                            $resultSet[$KOJI_YMD][] = $data;
+                        }
                     }
                 }
             } else {

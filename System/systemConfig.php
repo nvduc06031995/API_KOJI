@@ -17,7 +17,7 @@ class systemConfig
     {
         // $this->dbConnect = new mysqli('localhost', 'mviawjlo_lifeone_kojibuapp', 'Eu*u1z,O&(+h', 'mviawjlo_lifeone_kojibuapp');
         // $this->dbConnect = new mysqli('45.252.249.30', 'mviawjlo_lifeone_kojibuapp', 'Eu*u1z,O&(+h', 'mviawjlo_lifeone_kojibuapp');
-        $this->dbConnect = new mysqli('o5044s2-36.kagoya.net', 'koujiapp', '7Us%Rich.8H#', 'lifeone_kojibuapp');
+        $this->dbConnect = new mysqli('153.127.238.30', 'koujiapp', '7Us%Rich.8H#', 'lifeone_kojibuapp');
         // $this->dbConnect = new mysqli('localhost', 'root', '', 'mviawjlo_lifeone_kojibuapp');
         $this->dbConnect->set_charset("utf8");
 

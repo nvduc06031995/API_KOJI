@@ -66,14 +66,32 @@ class Schedule
                     }
                 }
 
-                $sql = 'SELECT T_EIGYO_ANKEN.START_TIME, 
-                        T_EIGYO_ANKEN.TAN_EIG_ID, 
-                        T_EIGYO_ANKEN.END_TIME, 
-                        T_EIGYO_ANKEN.GUEST_NAME, 
-                        T_EIGYO_ANKEN.ALL_DAY_FLG,
+                $sql = 'SELECT T_EIGYO_ANKEN.TAN_EIG_ID,
+                        T_EIGYO_ANKEN.JYOKEN_CD,  
+                        T_EIGYO_ANKEN.JYOKEN_SYBET_FLG, 
                         T_EIGYO_ANKEN.YMD,
+                        T_EIGYO_ANKEN.START_TIME, 
+                        T_EIGYO_ANKEN.END_TIME, 
+                        T_EIGYO_ANKEN.TAG_KBN, 
+                        T_EIGYO_ANKEN.JININ,
+                        T_EIGYO_ANKEN.JIKAN, 
+                        T_EIGYO_ANKEN.GUEST_NAME,
+                        T_EIGYO_ANKEN.ATTEND_NAME1,
+                        T_EIGYO_ANKEN.ATTEND_NAME2,
+                        T_EIGYO_ANKEN.ATTEND_NAME3,
+                        T_EIGYO_ANKEN.ALL_DAY_FLG,
+                        T_EIGYO_ANKEN.RENKEI_YMD,
+                        M_KBN.KBN_CD,
+                        M_KBN.KBN_NAME,
+                        M_KBN.KBN_BIKO,
+                        M_KBN.KBNMSAI_CD,
+                        M_KBN.KBNMSAI_NAME, 
+                        M_KBN.KBNMSAI_BIKO,
                         M_KBN.YOBIKOMOKU1, 
-                        M_KBN.KBNMSAI_NAME
+                        M_KBN.YOBIKOMOKU2,
+                        M_KBN.YOBIKOMOKU3, 
+                        M_KBN.YOBIKOMOKU4,
+                        M_KBN.YOBIKOMOKU5
                         FROM T_EIGYO_ANKEN 
                         CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"                   
                         WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
@@ -89,30 +107,61 @@ class Schedule
                     while ($row = $this->result->fetch_assoc()) {
                         $EIGYO_ANKEN_YMD = $row['YMD'];
                         $data = array();
+                        $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
+                        $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                        $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
+                        $data['YMD'] = $row['YMD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
                         $data['START_TIME'] = $row['START_TIME'];
                         $data['END_TIME'] = $row['END_TIME'];
+                        $data['JININ'] = $row['JININ'];
+                        $data['JIKAN'] = $row['JIKAN'];
                         $data['GUEST_NAME'] = $row['GUEST_NAME'];
-                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                        $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
+                        $data['ATTEND_NAME1'] = $row['ATTEND_NAME1'];
+                        $data['ATTEND_NAME2'] = $row['ATTEND_NAME2'];
+                        $data['ATTEND_NAME3'] = $row['ATTEND_NAME3'];
                         $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
-                        $data['YMD'] = $row['YMD'];
+                        $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBN_NAME'] = $row['KBN_NAME'];
+                        $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                         $data['TYPE'] = 1;
                         $resultSet['OFFICE'][$EIGYO_ANKEN_YMD][] = $data;
                     }
                 }
 
                 //【メモ（営業所欄）】
-                $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
-                T_TBETUCALENDAR.TAN_CAL_ID,
-                T_TBETUCALENDAR.END_TIME, NAIYO, 
-                T_TBETUCALENDAR.YMD, 
+                $sql = 'SELECT T_TBETUCALENDAR.TAN_CAL_ID,
                 T_TBETUCALENDAR.JYOKEN_CD, 
+                T_TBETUCALENDAR.JYOKEN_SYBET_FLG, 
+                T_TBETUCALENDAR.YMD, 
+                T_TBETUCALENDAR.TAG_KBN, 
+                T_TBETUCALENDAR.START_TIME, 
+                T_TBETUCALENDAR.END_TIME,
+                T_TBETUCALENDAR.MEMO_CD,
+                T_TBETUCALENDAR.NAIYO, 
+                T_TBETUCALENDAR.COMMENT, 
                 T_TBETUCALENDAR.ALL_DAY_FLG, 
-                T_TBETUCALENDAR.MEMO_CD, 
-                M_KBN.KBNMSAI_CD, 
+                T_TBETUCALENDAR.RENKEI_YMD,                
+                M_KBN.KBN_CD,
+                M_KBN.KBN_NAME,
+                M_KBN.KBN_BIKO,
+                M_KBN.KBNMSAI_CD,
                 M_KBN.KBNMSAI_NAME, 
-                M_KBN.YOBIKOMOKU1          
+                M_KBN.KBNMSAI_BIKO,
+                M_KBN.YOBIKOMOKU1, 
+                M_KBN.YOBIKOMOKU2,
+                M_KBN.YOBIKOMOKU3, 
+                M_KBN.YOBIKOMOKU4,
+                M_KBN.YOBIKOMOKU5        
                  FROM T_TBETUCALENDAR 
                  CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
                  WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                     
@@ -128,17 +177,30 @@ class Schedule
                     while ($row = $this->result->fetch_assoc()) {
                         $TBETUCALENDAR_YMD = $row['YMD'];
                         $data = array();
-                        $data['START_TIME'] = $row['START_TIME'];
-                        $data['END_TIME'] = $row['END_TIME'];
-                        $data['NAIYO'] = $row['NAIYO'];
-                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
-                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                        $data['YMD'] = $row['YMD'];
                         $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                         $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
-                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
+                        $data['YMD'] = $row['YMD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['START_TIME'] = $row['START_TIME'];
+                        $data['END_TIME'] = $row['END_TIME'];
                         $data['MEMO_CD'] = $row['MEMO_CD'];
+                        $data['NAIYO'] = $row['NAIYO'];
+                        $data['COMMENT'] = $row['COMMENT'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                        $data['KBN_CD'] = $row['KBN_CD'];
+                        $data['KBN_NAME'] = $row['KBN_NAME'];
+                        $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                        $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                        $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                         $data['TYPE'] = 2;
                         $resultSet['OFFICE'][$TBETUCALENDAR_YMD][] = $data;
                     }
@@ -181,7 +243,7 @@ class Schedule
                     LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
                     LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
-                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"
+                    AND M_TANT.TANT_CD="' . $TANT_CD . '"
                     AND T_KOJI.DEL_FLG=0 
                     ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
                     $this->result = $this->dbConnect->query($sql);
@@ -204,12 +266,12 @@ class Schedule
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['HOMON_SBT'] = $row['HOMON_SBT'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
-                            $data['TANT_CD'] = $v['TANT_CD'];
+                            $data['TANT_CD'] = $TANT_CD;
                             $data['TYPE'] = 1;
                             $resultSet2[$TANT_CD][$SITAMI_YMD][] = $data;
                         }
                     } else {
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
+                        $resultSet2[$TANT_CD]['TANT_CD'] = $TANT_CD;
                         $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
@@ -238,7 +300,7 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '" 
                         AND T_KOJI.DEL_FLG=0                         
-                        AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" )';
+                        AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -249,7 +311,7 @@ class Schedule
                             $TANT_CD1 = $row['TANT_CD1'];
                             $TANT_CD2 = $row['TANT_CD2'];
                             $TANT_CD3 = $row['TANT_CD3'];
-                            if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD1) && $TANT_CD1 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
@@ -264,14 +326,10 @@ class Schedule
                                 $data['TANT_NAME'] = $row['TANT_NAME1'];
                                 $data['TANT_CD'] = $TANT_CD1;
                                 $data['TYPE'] = 2;
-                                if (empty($resultSet2[$TANT_CD1])) {
-                                    $resultSet2[$TANT_CD1]['TANT_NAME'] = $row['TANT_NAME1'];
-                                    $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;
-                                }
-                                $resultSet2[$TANT_CD1][$KOJI_YMD][] = $data;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD2) && $TANT_CD2 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
@@ -286,14 +344,10 @@ class Schedule
                                 $data['TANT_CD'] =  $TANT_CD2;
                                 $data['TANT_NAME'] = $row['TANT_NAME2'];
                                 $data['TYPE'] = 2;
-                                if (empty($resultSet2[$TANT_CD2])) {
-                                    $resultSet2[$TANT_CD2]['TANT_NAME'] = $row['TANT_NAME2'];
-                                    $resultSet2[$TANT_CD2]['TANT_CD'] = $TANT_CD2;
-                                }
-                                $resultSet2[$TANT_CD2][$KOJI_YMD][] = $data;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD3) && $TANT_CD3 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
                                 $data = array();
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
@@ -308,28 +362,38 @@ class Schedule
                                 $data['TANT_CD'] =  $TANT_CD3;
                                 $data['TANT_NAME'] = $row['TANT_NAME3'];
                                 $data['TYPE'] = 2;
-                                if (empty($resultSet2[$TANT_CD3])) {
-                                    $resultSet2[$TANT_CD3]['TANT_NAME'] = $row['TANT_NAME3'];
-                                    $resultSet2[$TANT_CD3]['TANT_CD'] = $TANT_CD3;
-                                }
-                                $resultSet2[$TANT_CD3][$KOJI_YMD][] = $data;
+                                $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
                         }
-                    } else {
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【営業工事・営業下見（担当者欄）】
-                    $sql = 'SELECT T_EIGYO_ANKEN.START_TIME, 
-                    T_EIGYO_ANKEN.END_TIME, 
-                    T_EIGYO_ANKEN.GUEST_NAME, 
+                    $sql = 'SELECT T_EIGYO_ANKEN.TAN_EIG_ID,
+                    T_EIGYO_ANKEN.JYOKEN_CD,  
+                    T_EIGYO_ANKEN.JYOKEN_SYBET_FLG, 
                     T_EIGYO_ANKEN.YMD,
-                    T_EIGYO_ANKEN.JYOKEN_SYBET_FLG,
-                    T_EIGYO_ANKEN.TAN_EIG_ID,
+                    T_EIGYO_ANKEN.START_TIME, 
+                    T_EIGYO_ANKEN.END_TIME, 
+                    T_EIGYO_ANKEN.TAG_KBN, 
+                    T_EIGYO_ANKEN.JININ,
+                    T_EIGYO_ANKEN.JIKAN, 
+                    T_EIGYO_ANKEN.GUEST_NAME,
+                    T_EIGYO_ANKEN.ATTEND_NAME1,
+                    T_EIGYO_ANKEN.ATTEND_NAME2,
+                    T_EIGYO_ANKEN.ATTEND_NAME3,
                     T_EIGYO_ANKEN.ALL_DAY_FLG,
+                    T_EIGYO_ANKEN.RENKEI_YMD,
+                    M_KBN.KBN_CD,
+                    M_KBN.KBN_NAME,
+                    M_KBN.KBN_BIKO,
+                    M_KBN.KBNMSAI_CD,
                     M_KBN.KBNMSAI_NAME, 
+                    M_KBN.KBNMSAI_BIKO,
                     M_KBN.YOBIKOMOKU1, 
+                    M_KBN.YOBIKOMOKU2,
+                    M_KBN.YOBIKOMOKU3, 
+                    M_KBN.YOBIKOMOKU4,
+                    M_KBN.YOBIKOMOKU5,
                     M_TANT.TANT_NAME, 
                     M_TANT.TANT_CD
                     FROM T_EIGYO_ANKEN 
@@ -337,7 +401,7 @@ class Schedule
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                     AND T_EIGYO_ANKEN.DEL_FLG=0                    
-                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"';
+                    AND M_TANT.TANT_CD="' . $TANT_CD . '"';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -347,40 +411,64 @@ class Schedule
                         while ($row = $this->result->fetch_assoc()) {
                             $TANT_CD = $row['TANT_CD'];
                             $EIGYO_ANKEN_YMD = $row['YMD'];
-                            $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
-                            $resultSet2[$TANT_CD]['TANT_CD'] = $row['TANT_CD'];
                             $data = array();
+                            $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
+                            $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
+                            $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
+                            $data['YMD'] = $row['YMD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
                             $data['START_TIME'] = $row['START_TIME'];
                             $data['END_TIME'] = $row['END_TIME'];
+                            $data['JININ'] = $row['JININ'];
+                            $data['JIKAN'] = $row['JIKAN'];
                             $data['GUEST_NAME'] = $row['GUEST_NAME'];
-                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                            $data['TAN_EIG_ID'] = $row['TAN_EIG_ID'];
+                            $data['ATTEND_NAME1'] = $row['ATTEND_NAME1'];
+                            $data['ATTEND_NAME2'] = $row['ATTEND_NAME2'];
+                            $data['ATTEND_NAME3'] = $row['ATTEND_NAME3'];
                             $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
-                            $data['YMD'] = $row['YMD'];
-                            $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
                             $data['TYPE'] = 3;
                             $resultSet2[$TANT_CD][$EIGYO_ANKEN_YMD][] = $data;
                         }
-                    } else {
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【メモ（営業所欄）】
-                    $sql = 'SELECT T_TBETUCALENDAR.START_TIME, 
-                    T_TBETUCALENDAR.END_TIME, NAIYO, 
-                    T_TBETUCALENDAR.YMD,
-                    T_TBETUCALENDAR.TAN_CAL_ID,
+                    $sql = 'SELECT T_TBETUCALENDAR.TAN_CAL_ID,
                     T_TBETUCALENDAR.JYOKEN_CD, 
-                    T_TBETUCALENDAR.ALL_DAY_FLG,
-                    T_TBETUCALENDAR.MEMO_CD,  
-                    T_TBETUCALENDAR.JYOKEN_SYBET_FLG,                  
-                    M_KBN.KBNMSAI_CD, 
+                    T_TBETUCALENDAR.JYOKEN_SYBET_FLG, 
+                    T_TBETUCALENDAR.YMD, 
+                    T_TBETUCALENDAR.TAG_KBN, 
+                    T_TBETUCALENDAR.START_TIME, 
+                    T_TBETUCALENDAR.END_TIME,
+                    T_TBETUCALENDAR.MEMO_CD,
+                    T_TBETUCALENDAR.NAIYO, 
+                    T_TBETUCALENDAR.COMMENT, 
+                    T_TBETUCALENDAR.ALL_DAY_FLG, 
+                    T_TBETUCALENDAR.RENKEI_YMD,
+                    M_KBN.KBN_CD,
+                    M_KBN.KBN_NAME,
+                    M_KBN.KBN_BIKO,
+                    M_KBN.KBNMSAI_CD,
                     M_KBN.KBNMSAI_NAME, 
-                    M_KBN.YOBIKOMOKU1,                   
+                    M_KBN.KBNMSAI_BIKO,
+                    M_KBN.YOBIKOMOKU1, 
+                    M_KBN.YOBIKOMOKU2,
+                    M_KBN.YOBIKOMOKU3, 
+                    M_KBN.YOBIKOMOKU4,
+                    M_KBN.YOBIKOMOKU5,                                      
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
@@ -388,7 +476,7 @@ class Schedule
                     LEFT JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
-                    AND M_TANT.TANT_CD="' . $v['TANT_CD'] . '"';
+                    AND M_TANT.TANT_CD="' . $TANT_CD . '"';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -398,29 +486,36 @@ class Schedule
                         while ($row = $this->result->fetch_assoc()) {
                             $TANT_CD = $row['TANT_CD'];
                             $TBETUCALENDAR_YMD = $row['YMD'];
-                            $resultSet2[$TANT_CD]['TANT_NAME'] = $row['TANT_NAME'];
-                            $resultSet2[$TANT_CD]['TANT_CD'] = $row['TANT_CD'];
                             $data = array();
-                            $data['START_TIME'] = $row['START_TIME'];
-                            $data['END_TIME'] = $row['END_TIME'];
-                            $data['NAIYO'] = $row['NAIYO'];
-                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
-                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
-                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                            $data['TANT_NAME'] = $row['TANT_NAME'];
-                            $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TAN_CAL_ID'] = $row['TAN_CAL_ID'];
                             $data['JYOKEN_CD'] = $row['JYOKEN_CD'];
-                            $data['MEMO_CD'] = $row['MEMO_CD'];
-                            $data['YMD'] = $row['YMD'];
-                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                             $data['JYOKEN_SYBET_FLG'] = $row['JYOKEN_SYBET_FLG'];
+                            $data['YMD'] = $row['YMD'];
+                            $data['TAG_KBN'] = $row['TAG_KBN'];
+                            $data['START_TIME'] = $row['START_TIME'];
+                            $data['END_TIME'] = $row['END_TIME'];
+                            $data['MEMO_CD'] = $row['MEMO_CD'];
+                            $data['NAIYO'] = $row['NAIYO'];
+                            $data['COMMENT'] = $row['COMMENT'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                            $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
+                            $data['KBN_CD'] = $row['KBN_CD'];
+                            $data['KBN_NAME'] = $row['KBN_NAME'];
+                            $data['KBN_BIKO'] = $row['KBN_BIKO'];
+                            $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
+                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
+                            $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
+                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
+                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
+                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
+                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 4;
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
                         }
-                    } else {
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【日予実】
@@ -449,7 +544,7 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
-                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )';
+                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -462,9 +557,8 @@ class Schedule
                             $TANT_CD3 = $row['TANT_CD3'];
                             $TANT_CD4 = $row['TANT_CD4'];
 
-                            if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD1) && $TANT_CD1 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES1'];
@@ -477,9 +571,8 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD2) && $TANT_CD2 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD2]['TANT_CD'] = $TANT_CD2;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES2'];
@@ -492,9 +585,8 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD3) && $TANT_CD3 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD3]['TANT_CD'] = $TANT_CD3;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES3'];
@@ -507,9 +599,8 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD4) && $TANT_CD4 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD4) && $TANT_CD4 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD4]['TANT_CD'] = $TANT_CD4;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES4'];
@@ -522,9 +613,6 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
                         }
-                    } else {
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
 
                     //【計予実】
@@ -553,22 +641,21 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0
-                    AND (M_TANT1.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT2.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT3.TANT_CD="' . $v['TANT_CD'] . '" OR M_TANT4.TANT_CD="' . $v['TANT_CD'] . '" )';
+                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                     }
                     if ($this->result && $this->result->num_rows > 0) {
                         // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {                        
+                        while ($row = $this->result->fetch_assoc()) {
                             $TANT_CD1 = $row['TANT_CD1'];
                             $TANT_CD2 = $row['TANT_CD2'];
                             $TANT_CD3 = $row['TANT_CD3'];
                             $TANT_CD4 = $row['TANT_CD4'];
 
-                            if (!empty($TANT_CD1) && $TANT_CD1 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD1) && $TANT_CD1 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD1]['TANT_CD'] = $TANT_CD1;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES1'];
@@ -581,9 +668,8 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD2) && $TANT_CD2 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD2) && $TANT_CD2 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD2]['TANT_CD'] = $TANT_CD2;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES2'];
@@ -596,9 +682,8 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD3) && $TANT_CD3 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD3) && $TANT_CD3 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD3]['TANT_CD'] = $TANT_CD3;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES3'];
@@ -611,9 +696,8 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
 
-                            if (!empty($TANT_CD4) && $TANT_CD4 == $v['TANT_CD']) {
+                            if (!empty($TANT_CD4) && $TANT_CD4 == $TANT_CD) {
                                 $KOJI_YMD = $row['KOJI_YMD'];
-                                $resultSet2[$TANT_CD4]['TANT_CD'] = $TANT_CD4;
                                 $data = array();
                                 $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES4'];
@@ -626,11 +710,10 @@ class Schedule
                                 $resultSet2[$TANT_CD][$KOJI_YMD][] = $data;
                             }
                         }
-                    } else {
-                        $resultSet2[$TANT_CD]['TANT_CD'] = $v['TANT_CD'];
-                        $resultSet2[$TANT_CD]['TANT_NAME'] = $v['TANT_NAME'];
                     }
                 }
+                var_dump($resultSet2);
+                die;
 
                 $data_person = array();
                 foreach ($resultSet2 as $key => $value) {
@@ -1467,17 +1550,22 @@ class Schedule
 
             if (isset($_GET['TAN_EIG_ID']) && $_GET['TAN_EIG_ID'] != "") {
                 $TAN_EIG_ID = $_GET['TAN_EIG_ID'];
-                $sql = ' SELECT TAG_KBN,
-                YMD, 
-                START_TIME,
-                END_TIME,
+                $sql = ' SELECT TAN_EIG_ID,
+                JYOKEN_CD,  
+                JYOKEN_SYBET_FLG, 
+                YMD,
+                START_TIME, 
+                END_TIME, 
+                TAG_KBN, 
                 JININ,
-                JIKAN,
+                JIKAN, 
                 GUEST_NAME,
                 ATTEND_NAME1,
                 ATTEND_NAME2,
                 ATTEND_NAME3,
-                TAN_EIG_ID FROM T_EIGYO_ANKEN 
+                ALL_DAY_FLG,
+                RENKEI_YMD
+                FROM T_EIGYO_ANKEN 
                 WHERE TAN_EIG_ID= "' . $TAN_EIG_ID . '" 
                 AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
@@ -1685,9 +1773,18 @@ class Schedule
             if (isset($_GET['TAN_CAL_ID']) && $_GET['TAN_CAL_ID'] != "") {
                 $TAN_CAL_ID = $_GET['TAN_CAL_ID'];
 
-                $sql = 'SELECT MEMO_CD, YMD, 
-                START_TIME, END_TIME, 
-                NAIYO, TAN_CAL_ID 
+                $sql = 'SELECT TAN_CAL_ID,
+                JYOKEN_CD, 
+                JYOKEN_SYBET_FLG, 
+                YMD, 
+                TAG_KBN, 
+                START_TIME, 
+                END_TIME,
+                MEMO_CD,
+                NAIYO, 
+                COMMENT, 
+                ALL_DAY_FLG, 
+                RENKEI_YMD 
                 FROM T_TBETUCALENDAR 
                 WHERE TAN_CAL_ID="' . $TAN_CAL_ID . '" 
                 AND DEL_FLG=0';

@@ -1340,8 +1340,13 @@ class Order
                 isset($_GET['SYOZOKU_CD'])
             ) {
 
-                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, 
-                    M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_KANRI_NO
+                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO
                 FROM M_BUZAI 
                 LEFT JOIN T_SYUKKOJISEKI ON M_BUZAI.HINBAN=T_SYUKKOJISEKI.JISYA_CD 
                 LEFT JOIN T_BUZAIHACYU ON M_BUZAI.HINBAN=T_BUZAIHACYU.HINBAN 

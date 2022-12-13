@@ -70,7 +70,7 @@ class Validate
 
     function required($name, $value = NULL)
     {
-        if (empty($value)) {
+        if ($value == "") {
             return "required " . $name;
         }
     }

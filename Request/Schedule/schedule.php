@@ -1292,7 +1292,7 @@ class Schedule
                 'ALL_DAY_FLG' => 'nullable',
                 'HOMON_SBT' => 'required',
                 'JIKAN' => 'required',
-                'KBNMSAI_CD' => 'required',                
+                'KBNMSAI_CD' => 'required',
                 'LOGIN_ID' => 'required'
             ]);
 
@@ -1577,38 +1577,65 @@ class Schedule
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $errors = [];
+            $resultSet = array();
+
             if (isset($_GET['TAN_CAL_ID']) && $_GET['TAN_CAL_ID'] != "") {
                 $TAN_CAL_ID = $_GET['TAN_CAL_ID'];
 
-                //Get data T_TBETUCALENDAR
-                $sql = 'SELECT MEMO_CD, YMD, START_TIME, END_TIME, NAIYO 
-                            FROM T_TBETUCALENDAR 
-                            WHERE TAN_CAL_ID="' . $TAN_CAL_ID . '" 
-                                AND DEL_FLG=0';
+                $sql = 'SELECT MEMO_CD, YMD, 
+                START_TIME, END_TIME, 
+                NAIYO, TAN_CAL_ID 
+                FROM T_TBETUCALENDAR 
+                WHERE TAN_CAL_ID="' . $TAN_CAL_ID . '" 
+                AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
-
-                //Get data M_KBN
-                $sqlPulldown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME 
-                                    FROM M_KBN 
-                                    WHERE KBN_CD="06" 
-                                        AND DEL_FLG=0';
-                $getPullDown = $this->dbConnect->query($sqlPulldown);
-
-                $resultSet = array();
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
                 if ($this->result && $this->result->num_rows > 0) {
                     while ($row = $this->result->fetch_assoc()) {
                         $resultSet['dataTBETUCALENDAR'][] = $row;
                     }
                 }
+
+                $sqlPulldown = 'SELECT KBN_CD, KBN_NAME, 
+                KBNMSAI_CD, KBNMSAI_NAME 
+                FROM M_KBN 
+                WHERE KBN_CD="06" 
+                AND DEL_FLG=0';
+                $getPullDown = $this->dbConnect->query($sqlPulldown);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
                 if ($getPullDown->num_rows > 0) {
                     while ($row = $getPullDown->fetch_assoc()) {
                         $resultSet['pullDown'][] = $row;
                     }
                 }
+            } else {
+                $sqlPulldown = 'SELECT KBN_CD, KBN_NAME, 
+                KBNMSAI_CD, KBNMSAI_NAME 
+                FROM M_KBN 
+                WHERE KBN_CD="06" 
+                AND DEL_FLG=0';
+                $getPullDown = $this->dbConnect->query($sqlPulldown);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
 
+                if ($getPullDown->num_rows > 0) {
+                    while ($row = $getPullDown->fetch_assoc()) {
+                        $resultSet['pullDown'][] = $row;
+                    }
+                }
+            }
+
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1620,55 +1647,45 @@ class Schedule
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_POST['JYOKEN_CD']) &&
-                isset($_POST['JYOKEN_SYBET_FLG']) &&
-                isset($_POST['YMD']) &&
-                isset($_POST['START_TIME'])
-            ) {
-                $jyokenCd = $_POST['JYOKEN_CD'];
-                $jyokenSybetFlg = $_POST['JYOKEN_SYBET_FLG'];
-                $ymd = $_POST['YMD'];
+            $errors = [];
+            $PRESENT_DATE = date('Y-m-d');
+            $PRESENT_DATETIME = date('Y-m-d H:i:s');
 
-                $MEMO_CD = isset($_POST['MEMO_CD']) ? '"' . $_POST['MEMO_CD'] . '"' : 'NULL';
-                $START_TIME = isset($_POST['START_TIME']) ? '"' . $_POST['START_TIME'] . '"' : 'NULL';
-                $END_TIME = isset($_POST['END_TIME']) ? '"' . $_POST['END_TIME'] . '"' : 'NULL';
-                $NAIYO = isset($_POST['NAIYO']) ? '"' . $_POST['NAIYO'] . '"' : 'NULL';
-                $ALL_DAY_FLG = isset($_POST['ALL_DAY_FLG']) ? '"' . $_POST['ALL_DAY_FLG'] . '"' : 'NULL';
+            $validate = new Validate();
+            $validated = $validate->validate($_POST, [
+                'JYOKEN_CD' => 'required',
+                'JYOKEN_SYBET_FLG' => 'required',
+                'YMD' => 'required',
+                'START_TIME' => 'required',
+                'END_TIME' => 'required',
+                'KBNMSAI_CD' => 'required',
+                'LOGIN_ID' => 'required',
+                'NAIYO' => 'nullable',
+                'ALL_DAY_FLG' => 'nullable',
+                'COMMENT' => 'nullable',
+                'TAN_CAL_ID' => 'nullable',
+            ]);
 
-                $TAG_KBN = isset($_POST['TAG_KBN']) ? '"' . $_POST['TAG_KBN'] . '"' : 'NULL';
-                $COMMENT = isset($_POST['COMMENT']) ? '"' . $_POST['COMMENT'] . '"' : 'NULL';
-
-                $sqlDataTBetucalendar = 'SELECT *
-                        FROM T_TBETUCALENDAR 
-                        WHERE JYOKEN_CD="' . $jyokenCd . '" 
-                            AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
-                            AND YMD="' . $ymd . '"
-                            AND DEL_FLG=0 
-                            AND START_TIME=' . $START_TIME . '
-                        ';
-                $getDataTBetucalendar = $this->dbConnect->query($sqlDataTBetucalendar);
-
-                if ($getDataTBetucalendar->num_rows > 0) {
-                    $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
-                        SET MEMO_CD=' . $MEMO_CD . ', 
-                            TAG_KBN=' . $TAG_KBN . ', 
-                            YMD="' . $ymd . '", 
-                            START_TIME=' . $START_TIME . ', 
-                            END_TIME=' . $END_TIME . ', 
-                            NAIYO=' . $NAIYO . ', 
-                            ALL_DAY_FLG=' . $ALL_DAY_FLG . ', 
-                            RENKEI_YMD="' . date('Y-m-d') . '", 
-                            UPD_PGID="KOJ1110F", 
-                            UPD_TANTCD="' . $jyokenCd . '", 
-                            UPD_YMD="' . date("Y-m-d H:i:s") . '" 
-                        WHERE JYOKEN_CD="' . $jyokenCd . '" 
-                            AND JYOKEN_SYBET_FLG="' . $jyokenSybetFlg . '" 
-                            AND YMD="' . $ymd . '" 
-                            AND DEL_FLG=0 
-                            AND START_TIME=' . $START_TIME . '
-                        ';
-                    $this->result = $this->dbConnect->query($sqlUpdate);
+            if ($validated) {
+                if (isset($validated['TANT_CAL_ID']) && !is_null($validated['TANT_CAL_ID'])) {
+                    $sql = 'UPDATE T_TBETUCALENDAR 
+                    SET MEMO_CD="' . $validated['MEMO_CD'] . '", 
+                    TAG_KBN="' . $validated['KBNMSAI_CD'] . '", 
+                    YMD="' . $validated['YMD'] . '", 
+                    START_TIME="' . $validated['START_TIME'] . '", 
+                    END_TIME="' . $validated['END_TIME'] . '", 
+                    NAIYO="' . $validated['NAIYO'] . '", 
+                    ALL_DAY_FLG=' . $validated['ALL_DAY_FLG'] . ', 
+                    RENKEI_YMD="' . $PRESENT_DATE . '", 
+                    UPD_PGID="KOJ1110F", 
+                    UPD_TANTCD="' . $validated['LOGIN_ID'] . '", 
+                    UPD_YMD="' . $PRESENT_DATETIME . '" 
+                    WHERE TAN_CAL_ID="' . $validated['TAN_CAL_ID'] . '"                            
+                    AND DEL_FLG=0';
+                    $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 } else {
                     $sqlDataTBetucalendar = 'SELECT max(TAN_CAL_ID) as TANCALID_MAX
                         FROM T_TBETUCALENDAR';
@@ -1682,25 +1699,32 @@ class Schedule
                     }
 
                     $TAN_CAL_ID = sprintf('%010d', $num);
-                    $sqlInsert = 'INSERT INTO T_TBETUCALENDAR 
-                                    (
-                                        TAN_CAL_ID, JYOKEN_CD, JYOKEN_SYBET_FLG, YMD, TAG_KBN, START_TIME, END_TIME, 
-                                        MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, DEL_FLG, ADD_PGID, ADD_TANTCD, ADD_YMD, 
-                                        UPD_PGID, UPD_TANTCD, UPD_YMD
-                                    )
-                                VALUES 
-                                    (
-                                        "' . $TAN_CAL_ID . '", "' . $_POST['JYOKEN_CD'] . '", "' . $_POST['JYOKEN_SYBET_FLG'] . '", 
-                                        "' . $_POST['YMD'] . '", ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
-                                        ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', ' . $ALL_DAY_FLG . ', "' . date('Y-m-d') . '", 0, 
-                                        "KOJ1110F", "' . $jyokenCd . '", "' . date("Y-m-d H:i:s") . '", "KOJ1110F", "' . $jyokenCd . '", "' . date("Y-m-d H:i:s") . '"
-                                    );';
-                    $this->result = $this->dbConnect->query($sqlInsert);
+                    $sql = 'INSERT INTO T_TBETUCALENDAR 
+                    (
+                        TAN_CAL_ID, JYOKEN_CD, JYOKEN_SYBET_FLG, YMD, 
+                        TAG_KBN, START_TIME, END_TIME, 
+                        MEMO_CD, NAIYO, COMMENT, ALL_DAY_FLG, RENKEI_YMD, 
+                        DEL_FLG, ADD_PGID, ADD_TANTCD, ADD_YMD, 
+                        UPD_PGID, UPD_TANTCD, UPD_YMD
+                    )
+                    VALUES 
+                    (
+                        "' . $TAN_CAL_ID . '", "' . $validated['JYOKEN_CD'] . '", "' . $validated['JYOKEN_SYBET_FLG'] . '", "' . $validated['YMD'] . '",
+                        "' . $validated['KBNMSAI_CD'] . '", "' . $validated['START_TIME'] . '", "' . $validated['END_TIME'] . '", 
+                        "' . $validated['MEMO_CD'] . '", "' . $validated['NAIYO'] . '", "' . $validated['COMMENT'] . '", ' . $validated['ALL_DAY_FLG'] . ', "' . $PRESENT_DATE . '", 
+                        0, "KOJ1110F", "' . $validated['LOGIN_ID'] . '", "' . $PRESENT_DATETIME . '", "KOJ1110F", "' . $validated['LOGIN_ID'] . '", "' . $PRESENT_DATETIME . '"
+                    )';
+                    $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
                 }
+            }
 
-                $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": "ERROR"}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
@@ -1712,22 +1736,27 @@ class Schedule
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_POST['JYOKEN_CD']) &&
-                isset($_POST['JYOKEN_SYBET_FLG']) &&
-                isset($_POST['YMD'])
-            ) {
-                $sqlUpdate = 'UPDATE T_TBETUCALENDAR 
+            $errors = [];
+            $PRESENT_DATE = date('Y-m-d');
+            $validate = new Validate();
+            $validated = $validate->validate($_POST, [
+                'TAN_CAL_ID' => 'required',
+            ]);
+            if ($validated) {
+                $sql = 'UPDATE T_TBETUCALENDAR 
                         SET DEL_FLG=1, 
-                            RENKEI_YMD="' . date('Y-m-d') . '" 
-                        WHERE JYOKEN_CD="' . $_POST['JYOKEN_CD'] . '" 
-                            AND JYOKEN_SYBET_FLG="' . $_POST['JYOKEN_SYBET_FLG'] . '" 
-                            AND YMD="' . $_POST['YMD'] . '"';
-                $this->result = $this->dbConnect->query($sqlUpdate);
+                        RENKEI_YMD="' . $PRESENT_DATE . '" 
+                        WHERE TAN_CAL_ID="' . $validated['TAN_CAL_ID'] . '"';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+            }
 
-                $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": "ERROR"}');
+                $this->dbReference->sendResponse(200, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

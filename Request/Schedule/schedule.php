@@ -711,9 +711,7 @@ class Schedule
                             }
                         }
                     }
-                }
-                var_dump($resultSet2);
-                die;
+                }                
 
                 $data_person = array();
                 foreach ($resultSet2 as $key => $value) {

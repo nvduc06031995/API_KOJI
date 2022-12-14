@@ -32,26 +32,62 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
+            $domain = $this->domain;
             $resultSet = array();
             $errors = [];
 
             if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "")) {
                 $YMD = $_GET['YMD'];
                 $LOGIN_ID = $_GET['LOGIN_ID'];
-                $sql = 'SELECT SITAMIHOMONJIKAN,
+                $sql = 'SELECT JYUCYU_ID,
+                SITAMI_YMD,
+                KOJI_YMD,
+                HOMON_TANT_CD1,
+                HOMON_TANT_CD2,
+                HOMON_TANT_CD3,
+                HOMON_TANT_CD4,
+                SETSAKI_NAME,
+                SETSAKI_ADDRESS,
+                KOJI_JININ,
+                SITAMI_JININ,
                 HOMON_SBT,
                 KOJI_ST,
-                JYUCYU_ID,
-                SITAMI_JININ,
-                SITAMI_JIKAN,
                 KOJI_ITEM,
-                SETSAKI_ADDRESS,
-                SITAMI_YMD,   
-                HOMON_TANT_CD4,         
-                SETSAKI_NAME,
-                KOJIHOMONJIKAN, 
-                KOJI_JININ,
-                KOJI_JIKAN FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
+                SITAMI_KANSAN_POINT,
+                KOJI_KANSAN_POINT,
+                SITAMI_JIKAN,
+                KOJI_JIKAN,
+                KOJI_KEKKA,
+                TENPO_CD,
+                HOJIN_FLG,
+                MALL_CD,
+                KOJIGYOSYA_CD,
+                TAG_KBN,
+                SITAMIHOMONJIKAN,
+                SITAMIHOMONJIKAN_END,
+                KOJIHOMONJIKAN,
+                KOJIHOMONJIKAN_END,
+                KOJIIRAISYO_FILEPATH,
+                SITAMIIRAISYO_FILEPATH,
+                CANCEL_RIYU,
+                SITAMIAPO_KBN,
+                KOJIAPO_KBN,
+                MTMORI_YMD,
+                MEMO,
+                COMMENT,
+                READ_FLG,
+                ATOBARAI,
+                BIKO,
+                SYUYAKU_JYUCYU_ID,
+                REPORT_FLG,
+                SITAMI_REPORT,
+                ALL_DAY_FLG,
+                CO_NAME,
+                CO_POSTNO,
+                CO_ADDRESS,
+                KOJI_ITAKUHI,
+                SKJ_RENKEI_YMD,
+                KOJI_RENKEI_YMD FROM T_KOJI WHERE SITAMI_YMD="' . $YMD . '" 
                 AND HOMON_TANT_CD4="' . $LOGIN_ID . '"
                 AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
@@ -62,41 +98,109 @@ class Koji
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
-                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
+                        $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
+                        $data['KOJI_YMD'] = $row['KOJI_YMD'];
+                        $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
+                        $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
+                        $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
+                        $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
                         $data['HOMON_SBT'] = $row['HOMON_SBT'];
                         $data['KOJI_ST'] = $row['KOJI_ST'];
-                        $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
-                        $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
-                        $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
                         $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
-                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
-                        $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
-                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
-                        $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
-                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
-                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
+                        $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                        $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
+                        $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
                         $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                        $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                        $data['TENPO_CD'] = $row['TENPO_CD'];
+                        $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                        $data['MALL_CD'] = $row['MALL_CD'];
+                        $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                        $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                        $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                        $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
+                        $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                        $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                        $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                        $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                        $data['MEMO'] = $row['MEMO'];
+                        $data['COMMENT'] = $row['COMMENT'];
+                        $data['READ_FLG'] = $row['READ_FLG'];
+                        $data['ATOBARAI'] = $row['ATOBARAI'];
+                        $data['BIKO'] = $row['BIKO'];
+                        $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                        $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                        $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['CO_NAME'] = $row['CO_NAME'];
+                        $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                        $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                        $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                        $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
                 }
 
-                $sql = 'SELECT KOJIHOMONJIKAN,
-                HOMON_SBT,
-                KOJI_ST,
-                JYUCYU_ID,
-                KOJI_JININ,
-                KOJI_JIKAN,
-                KOJI_ITEM,
-                SETSAKI_ADDRESS,
+                $sql = 'SELECT JYUCYU_ID,
+                SITAMI_YMD,
                 KOJI_YMD,
                 HOMON_TANT_CD1,
                 HOMON_TANT_CD2,
                 HOMON_TANT_CD3,
+                HOMON_TANT_CD4,
                 SETSAKI_NAME,
-                SITAMIHOMONJIKAN,
+                SETSAKI_ADDRESS,
+                KOJI_JININ,
                 SITAMI_JININ,
-                SITAMI_JIKAN FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
+                HOMON_SBT,
+                KOJI_ST,
+                KOJI_ITEM,
+                SITAMI_KANSAN_POINT,
+                KOJI_KANSAN_POINT,
+                SITAMI_JIKAN,
+                KOJI_JIKAN,
+                KOJI_KEKKA,
+                TENPO_CD,
+                HOJIN_FLG,
+                MALL_CD,
+                KOJIGYOSYA_CD,
+                TAG_KBN,
+                SITAMIHOMONJIKAN,
+                SITAMIHOMONJIKAN_END,
+                KOJIHOMONJIKAN,
+                KOJIHOMONJIKAN_END,
+                KOJIIRAISYO_FILEPATH,
+                SITAMIIRAISYO_FILEPATH,
+                CANCEL_RIYU,
+                SITAMIAPO_KBN,
+                KOJIAPO_KBN,
+                MTMORI_YMD,
+                MEMO,
+                COMMENT,
+                READ_FLG,
+                ATOBARAI,
+                BIKO,
+                SYUYAKU_JYUCYU_ID,
+                REPORT_FLG,
+                SITAMI_REPORT,
+                ALL_DAY_FLG,
+                CO_NAME,
+                CO_POSTNO,
+                CO_ADDRESS,
+                KOJI_ITAKUHI,
+                SKJ_RENKEI_YMD,
+                KOJI_RENKEI_YMD FROM T_KOJI WHERE KOJI_YMD="' . $YMD . '"
                 AND (HOMON_TANT_CD1="' . $LOGIN_ID . '" OR HOMON_TANT_CD2="' . $LOGIN_ID . '" OR HOMON_TANT_CD3="' . $LOGIN_ID . '")
                 AND SYUYAKU_JYUCYU_ID IS NULL AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
@@ -107,22 +211,55 @@ class Koji
                     // output data of each row                    
                     while ($row = $this->result->fetch_assoc()) {
                         $data = array();
-                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
-                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                        $data['KOJI_ST'] = $row['KOJI_ST'];
                         $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
-                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
-                        $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
-                        $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
-                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['SITAMI_YMD'] = $row['SITAMI_YMD'];
                         $data['KOJI_YMD'] = $row['KOJI_YMD'];
-                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
                         $data['HOMON_TANT_CD1'] = $row['HOMON_TANT_CD1'];
                         $data['HOMON_TANT_CD2'] = $row['HOMON_TANT_CD2'];
                         $data['HOMON_TANT_CD3'] = $row['HOMON_TANT_CD3'];
-                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['HOMON_TANT_CD4'] = $row['HOMON_TANT_CD4'];
+                        $data['SETSAKI_NAME'] = $row['SETSAKI_NAME'];
+                        $data['SETSAKI_ADDRESS'] = $row['SETSAKI_ADDRESS'];
+                        $data['KOJI_JININ'] = $row['KOJI_JININ'];
                         $data['SITAMI_JININ'] = $row['SITAMI_JININ'];
+                        $data['HOMON_SBT'] = $row['HOMON_SBT'];
+                        $data['KOJI_ST'] = $row['KOJI_ST'];
+                        $data['KOJI_ITEM'] = $row['KOJI_ITEM'];
+                        $data['SITAMI_KANSAN_POINT'] = $row['SITAMI_KANSAN_POINT'];
+                        $data['KOJI_KANSAN_POINT'] = $row['KOJI_KANSAN_POINT'];
                         $data['SITAMI_JIKAN'] = $row['SITAMI_JIKAN'];
+                        $data['KOJI_JIKAN'] = $row['KOJI_JIKAN'];
+                        $data['KOJI_KEKKA'] = $row['KOJI_KEKKA'];
+                        $data['TENPO_CD'] = $row['TENPO_CD'];
+                        $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                        $data['MALL_CD'] = $row['MALL_CD'];
+                        $data['KOJIGYOSYA_CD'] = $row['KOJIGYOSYA_CD'];
+                        $data['TAG_KBN'] = $row['TAG_KBN'];
+                        $data['SITAMIHOMONJIKAN'] = $row['SITAMIHOMONJIKAN'];
+                        $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
+                        $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
+                        $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
+                        $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                        $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
+                        $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
+                        $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
+                        $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
+                        $data['MTMORI_YMD'] = $row['MTMORI_YMD'];
+                        $data['MEMO'] = $row['MEMO'];
+                        $data['COMMENT'] = $row['COMMENT'];
+                        $data['READ_FLG'] = $row['READ_FLG'];
+                        $data['ATOBARAI'] = $row['ATOBARAI'];
+                        $data['BIKO'] = $row['BIKO'];
+                        $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                        $data['REPORT_FLG'] = $row['REPORT_FLG'];
+                        $data['SITAMI_REPORT'] = $row['SITAMI_REPORT'];
+                        $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
+                        $data['CO_NAME'] = $row['CO_NAME'];
+                        $data['CO_POSTNO'] = $row['CO_POSTNO'];
+                        $data['CO_ADDRESS'] = $row['CO_ADDRESS'];
+                        $data['KOJI_ITAKUHI'] = $row['KOJI_ITAKUHI'];
+                        $data['SKJ_RENKEI_YMD'] = $row['SKJ_RENKEI_YMD'];
+                        $data['KOJI_RENKEI_YMD'] = $row['KOJI_RENKEI_YMD'];
                         $data['LOGIN_ID'] = $LOGIN_ID;
                         $resultSet[] = $data;
                     }
@@ -139,7 +276,8 @@ class Koji
         }
     }
 
-    function getTirasi() {
+    function getTirasi()
+    {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
@@ -148,7 +286,7 @@ class Koji
             $resultSet = array();
             $errors = [];
 
-            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "")) {   
+            if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "")) {
                 $YMD = $_GET['YMD'];
                 $LOGIN_ID = $_GET['LOGIN_ID'];
 
@@ -269,11 +407,11 @@ class Koji
 
             if ($validated) {
                 $UPD_PGID = "KOJ1120F";
-                $UPD_YMD = date('Y-m-d H:i:s');
+                $PRESENT_DATETIME = date('Y-m-d H:i:s');
                 $sql = 'UPDATE T_KOJI SET  SYUYAKU_JYUCYU_ID="' . $validated['JYUCYU_ID'] . '",                    
                     UPD_PGID="' . $UPD_PGID . '", 
                     UPD_TANTCD= "' . $validated['LOGIN_ID'] . '", 
-                    UPD_YMD="' . $UPD_YMD . '"
+                    UPD_YMD="' . $PRESENT_DATETIME . '"
                     WHERE SETSAKI_ADDRESS="' . $validated['SETSAKI_ADDRESS'] . '"
                     AND KOJI_YMD="' . $validated['YMD'] . '"
                     AND DEL_FLG= 0 ';
@@ -307,19 +445,39 @@ class Koji
             ]);
 
             if ($validated) {
-                $RENKEI_YMD = date('Y-m-d');
+                $PRESENT_DATE = date('Y-m-d');
+                $ADD_PGID = "KOJ0990B";
                 $UPD_PGID = "KOJ1110F";
-                $UPD_YMD = date('Y-m-d H:i:s');
+                $PRESENT_DATETIME = date('Y-m-d H:i:s');
 
-                $sql = 'UPDATE T_TIRASI SET  YMD="' . $validated['YMD'] . '", 
-                    RENKEI_YMD="' . $RENKEI_YMD . '", 
-                    KOJI_TIRASISU=' . $validated['KOJI_TIRASISU'] . ', 
-                    UPD_PGID="' . $UPD_PGID . '", 
-                    UPD_TANTCD= "' . $validated['LOGIN_ID'] . '", 
-                    UPD_YMD="' . $UPD_YMD . '"
-                    WHERE TANT_CD="' . $validated['LOGIN_ID'] . '" 
-                    AND YMD="' . $validated['YMD'] . '"';
-
+                $sql = 'INSERT INTO T_TIRASI 
+                (TANT_CD, 
+                YMD, 
+                KOJI_TIRASISU,
+                RENKEI_YMD, 
+                DEL_FLG,
+                ADD_PGID,
+                ADD_TANTCD,
+                ADD_YMD,
+                UPD_PGID,
+                UPD_TANTCD,
+                UPD_YMD) 
+                VALUES
+                ("' . $validated['LOGIN_ID'] . '",
+                "' . $validated['YMD'] . '", 
+                ' . $validated['KOJI_TIRASISU'] . ',                
+                "' . $PRESENT_DATE . '",
+                 0 ,
+                "' . $ADD_PGID . '",
+                "' . $validated['LOGIN_ID'] . '",
+                "' . $PRESENT_DATETIME . '",
+                "' . $UPD_PGID . '",
+                "' . $validated['LOGIN_ID'] . '",
+                "' . $PRESENT_DATETIME . '") 
+                ON DUPLICATE KEY UPDATE    
+                TANT_CD=VALUES(TANT_CD) , YMD=VALUES(YMD), 
+                KOJI_TIRASISU=VALUES(KOJI_TIRASISU) , RENKEI_YMD=VALUES(RENKEI_YMD), 
+                UPD_PGID=VALUES(UPD_PGID) , UPD_TANTCD=VALUES(UPD_TANTCD), UPD_YMD=VALUES(UPD_YMD)';              
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -327,7 +485,10 @@ class Koji
             }
 
             if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $resultSet = [];
+                $validated['status'] = 'success';
+                $resultSet[] = $validated;
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -371,8 +532,8 @@ class Koji
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
-                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
-                              
+                                $files = explode("/", $row['SITAMIIRAISYO_FILEPATH']);
+
                                 $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
@@ -400,8 +561,8 @@ class Koji
                             // output data of each row                    
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
-                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
-                              
+                                $files = explode("/", $row['SITAMIIRAISYO_FILEPATH']);
+
                                 $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $KOJIIRAISYO_FILEPATH = $domain . $row['KOJIIRAISYO_FILEPATH'];
                                 $data['KOJIIRAISYO_FILEPATH'] = $KOJIIRAISYO_FILEPATH;
@@ -431,8 +592,8 @@ class Koji
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['DOMAIN'] = $domain;
-                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
-                              
+                                $files = explode("/", $row['SITAMIIRAISYO_FILEPATH']);
+
                                 $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
@@ -463,8 +624,8 @@ class Koji
                             while ($row = $this->result->fetch_assoc()) {
                                 $data = array();
                                 $data['DOMAIN'] = $domain;
-                                $files = explode("/" , $row['SITAMIIRAISYO_FILEPATH']);
-                              
+                                $files = explode("/", $row['SITAMIIRAISYO_FILEPATH']);
+
                                 $data['FILE_NAME'] = isset($files[1]) ? $files[1] : NULL;
                                 $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];

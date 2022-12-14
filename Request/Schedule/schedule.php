@@ -97,7 +97,7 @@ class Schedule
                         WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
-                            AND T_EIGYO_ANKEN.DEL_FLG=0 ';
+                            AND T_EIGYO_ANKEN.DEL_FLG=0 ORDER BY START_TIME ASC';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -167,7 +167,8 @@ class Schedule
                  WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                     
                      AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
-                     AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=1';
+                     AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=1 
+                     ORDER BY START_TIME ASC';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -294,7 +295,7 @@ class Schedule
                     WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
                     AND T_KOJI.DEL_FLG=0 
-                    ORDER BY M_TANT.TANT_CD ASC,T_KOJI.SITAMI_YMD ASC';
+                    ORDER BY SITAMIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -452,7 +453,8 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '" 
                         AND T_KOJI.DEL_FLG=0                         
-                        AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" )';
+                        AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" )
+                        ORDER BY KOJIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -706,7 +708,8 @@ class Schedule
                     CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                     AND T_EIGYO_ANKEN.DEL_FLG=0                    
-                    AND M_TANT.TANT_CD="' . $TANT_CD . '"';
+                    AND M_TANT.TANT_CD="' . $TANT_CD . '"
+                    ORDER BY START_TIME ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -781,7 +784,8 @@ class Schedule
                     LEFT JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
-                    AND M_TANT.TANT_CD="' . $TANT_CD . '"';
+                    AND M_TANT.TANT_CD="' . $TANT_CD . '"
+                    ORDER BY START_TIME ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -904,7 +908,8 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
-                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )';
+                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )
+                    ORDER BY KOJIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1280,7 +1285,8 @@ class Schedule
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0
-                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )';
+                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )
+                    ORDER BY KOJIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -3828,6 +3834,42 @@ class Schedule
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postSalesConstructionSalesPreviewDelete()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $PRESENT_DATE = date('Y-m-d');
+            $validate = new Validate();
+            $validated = $validate->validate($_POST, [
+                'TAN_EIG_ID' => 'required',
+            ]);
+            if ($validated) {
+                $sql = 'UPDATE T_EIGYO_ANKEN 
+                        SET DEL_FLG=1, 
+                        RENKEI_YMD="' . $PRESENT_DATE . '" 
+                        WHERE TAN_EIG_ID="' . $validated['TAN_EIG_ID'] . '"';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+            }
+
+            if (empty($errors['msg'])) {
+                $resultSet = [];
+                $validated['status'] = 'success';
+                $resultSet[] = $validated;
+
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(200, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }

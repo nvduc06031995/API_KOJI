@@ -781,8 +781,8 @@ class Order
             if (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "") {
                 $LOGIN_ID = $_GET['LOGIN_ID'];
                 $sql = ' SELECT * FROM T_TANAMSAI_SAVE
-                WHERE SAVE_TANT_CD="'.$LOGIN_ID.'" 
-                AND DEL_FLG=0';              
+                WHERE SAVE_TANT_CD="' . $LOGIN_ID . '" 
+                AND DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -807,67 +807,77 @@ class Order
         }
     }
 
-    function getInventoryListForCreate()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            $errors = [];
-            $resultSet = array();
+    // function getInventoryListForCreate()
+    // {
+    //     $this->dbReference = new systemConfig();
+    //     $this->dbConnect = $this->dbReference->connectDB();
+    //     if ($this->dbConnect == NULL) {
+    //         $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+    //     } else {
+    //         $errors = [];
+    //         $resultSet = array();
 
-            if (isset($_GET['SYOZOKU_CD'])) {
-                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
-                $getSubMonthYear = date('Y', strtotime("-1 months")) . date('m', strtotime("-1 months"));
-                $getCurrentMonthYear = date('Y') . date('m');
-                $getCurrentDate = date('Y-m-d');
+    //         if (isset($_GET['SYOZOKU_CD'])) {
+    //             $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+    //             $getSubMonthYear = date('Y', strtotime("-1 months")) . date('m', strtotime("-1 months"));
+    //             $getCurrentMonthYear = date('Y') . date('m');                
+    //             $getCurrentDate = date('Y-m-d');
 
-                $sql = ' SELECT T_TANAMSAI.BUZAI_KANRI_NO, 
-                T_TANAMSAI.HINBAN, 
-                T_TANAMSAI.SYOHIN_NAME, 
-                T_TANAMSAI.JITUZAIKO_SU AS SENGETU_JITUZAIKO_SU, 
-                M_BUZAI.BUZAI_BUNRUI, 
-                M_BUZAI.MAKER_NAME, 
-                M_BUZAI.SIIRE_TANKA, 
-                T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO, 
-                T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO
-                FROM T_TANA 
-                LEFT JOIN T_TANAMSAI ON T_TANA.TANA_ID=T_TANAMSAI.TANA_ID
-                LEFT JOIN M_BUZAI ON T_TANAMSAI.BUZAI_KANRI_NO = M_BUZAI.BUZAI_KANRI_NO
-                LEFT JOIN T_SYUKKOJISEKI ON T_TANAMSAI.HINBAN = T_SYUKKOJISEKI.JISYA_CD
-                LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
-                LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID = T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
-                WHERE T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '"
-                AND T_TANA.TANA_YM >= "' . $getSubMonthYear . '"
-                AND T_TANA.TANA_YM <= "' . $getCurrentMonthYear . '"
-                AND T_TANA.DEL_FLG=0
-                AND T_TANA.TANA_YMD >= "' . $getCurrentDate . '"
-                AND T_SYUKKOJISEKI.SOKO_CD = "' . $SYOZOKU_CD . '"
-                AND T_SYUKKOJISEKI.SYUKKO_DATE = T_TANA.TANA_YMD
-                AND T_BUZAIHACYU.HACYU_YMD = T_TANA.TANA_YMD';
-                $this->result = $this->dbConnect->query($sql);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
+    //             $sql = ' SELECT T_TANA.TANA_ID,
+    //             T_TANA.TANA_YM,
+    //             T_TANA.TANA_YMD,
+    //             T_TANA.MONTHLY_KEIJO_YM,
+    //             T_TANA.BASYO_GYOSYA_SYBET_CD,
+    //             T_TANA.SOKO_CD,
+    //             T_TANA.SYOZOKU_CD,
+    //             T_TANAMSAI.TANAMSAI_ID,
+    //             T_TANAMSAI.BUZAI_KANRI_NO,            
+    //             T_TANAMSAI.HINBAN,
+    //             T_TANAMSAI.SYOHIN_NAME,              
+    //             T_TANAMSAI.JITUZAIKO_SU AS SENGETU_JITUZAIKO_SU, 
+    //             M_BUZAI.BUZAI_BUNRUI,                 
+    //             M_BUZAI.MAKER_NAME AS BUZAI_MAKER_NAME,
+    //             M_BUZAI.SIIRE_NAME AS BUZAI_SIIRE_NAME,
+    //             M_BUZAI.SIIRE_TANKA AS BUZAI_SIIRE_TANKA,             
+    //             M_BUZAI.SORYO AS BUZAI_SORYO,                
+    //             T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO,               
+    //             T_BUZAIHACYU.BUZAI_HACYU_ID,                     
+    //             T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO            
+    //             FROM T_TANA 
+    //             LEFT JOIN T_TANAMSAI ON T_TANA.TANA_ID=T_TANAMSAI.TANA_ID
+    //             LEFT JOIN M_BUZAI ON T_TANAMSAI.BUZAI_KANRI_NO = M_BUZAI.BUZAI_KANRI_NO
+    //             LEFT JOIN T_SYUKKOJISEKI ON T_TANA.SOKO_CD = T_SYUKKOJISEKI.SOKO_CD
+    //             LEFT JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD
+    //             LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID = T_BUZAIHACYUMSAI.BUZAI_HACYU_ID
+    //             WHERE T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '"
+    //             AND T_TANA.TANA_YM >= "' . $getSubMonthYear . '"
+    //             AND T_TANA.TANA_YM <= "' . $getCurrentMonthYear . '"
+    //             AND T_TANA.TANA_YMD >= "' . $getCurrentDate . '"                
+    //             AND T_TANA.DEL_FLG=0
+    //             AND WHERE T_SYUKKOJISEKI.SYUKKO_DATE IN (SELECT TANA_YMD FROM T_TANA WHERE SYOZOKU_CD="'.$SYOZOKU_CD.'")
+    //             AND WHERE T_BUZAIHACYU.HACYU_YMD IN (SELECT TANA_YMD FROM T_TANA WHERE SYOZOKU_CD="'.$SYOZOKU_CD.'")';                      
+    //             $this->result = $this->dbConnect->query($sql);
+    //             if (!empty($this->dbConnect->error)) {
+    //                 $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+    //             }
 
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-            } else {
-                $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
-            }
+    //             if ($this->result && $this->result->num_rows > 0) {
+    //                 // output data of each row
+    //                 while ($row = $this->result->fetch_assoc()) {
+    //                     $resultSet[] = $row;
+    //                 }
+    //             }
+    //         } else {
+    //             $errors['msg'][] = 'Missing parameter SYOZOKU_CD';
+    //         }
 
-            if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-        }
-    }
+    //         if (empty($errors['msg'])) {
+    //             $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    //         } else {
+    //             $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    //         }
+    //     }
+    // }
 
     function getQRInventoryList()
     {
@@ -917,7 +927,7 @@ class Order
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
-    }    
+    }
 
     function getInventoryListForEdit()
     {
@@ -978,7 +988,7 @@ class Order
         }
     }
 
-    function deleteTanamsaiSave()
+    function postTanamsaiSaveDelete()
     {
         $this->dbReference = new systemConfig();
         $this->dbConnect = $this->dbReference->connectDB();
@@ -993,9 +1003,8 @@ class Order
             ]);
 
             if ($validated) {
-                $sql = 'UPDATE T_TANAMSAI_SAVE SET DEL_FLG="1" 
-                    WHERE SAVE_TANT_CD="' . $_POST['LOGIN_ID'] . '"
-                ';
+                $sql = 'UPDATE T_TANAMSAI_SAVE SET DEL_FLG=1 
+                    WHERE SAVE_TANT_CD="' . $_POST['LOGIN_ID'] . '"';
                 $this->result = $this->dbConnect->query($sql);
 
                 if (!empty($this->dbConnect->error)) {
@@ -1004,7 +1013,10 @@ class Order
             }
 
             if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode('Success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $resultSet = [];
+                $validated['status'] = 'success';
+                $resultSet[] = $validated;
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -1105,6 +1117,162 @@ class Order
                         ("' . $T_TANA_ID_MAX . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
                         "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "' . $value['SYOHIN_NAME'] . '" , 
                         "' . $value['JITUZAIKO_SU'] . '")';
+                    $this->result = $this->dbConnect->query($sql);
+                }
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    /* =========================== 部材リスト-2 */
+    function getInventoryListMaterialListSearch()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (
+                isset($_GET['BUZAI_BUNRUI']) &&
+                isset($_GET['MAKER_NAME']) &&
+                isset($_GET['HINBAN']) &&
+                isset($_GET['SYOHIN_NAME']) &&
+                isset($_GET['SYOZOKU_CD'])
+            ) {
+
+                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, 
+                    M_BUZAI.HINBAN, M_BUZAI.SYOHIN_NAME
+                FROM M_BUZAI 
+                LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
+                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
+                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
+                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
+                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
+                ';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function getInventoryListMaterialListSelect()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (
+                isset($_GET['BUZAI_BUNRUI']) &&
+                isset($_GET['MAKER_NAME']) &&
+                isset($_GET['HINBAN']) &&
+                isset($_GET['SYOHIN_NAME']) &&
+                isset($_GET['SYOZOKU_CD'])
+            ) {
+
+                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO, 
+                M_BUZAI.BUZAI_KANRI_NO
+                FROM M_BUZAI 
+                LEFT JOIN T_SYUKKOJISEKI ON M_BUZAI.HINBAN=T_SYUKKOJISEKI.JISYA_CD 
+                LEFT JOIN T_BUZAIHACYU ON M_BUZAI.HINBAN=T_BUZAIHACYU.HINBAN 
+                LEFT JOIN T_BUZAIHACYUMSAI ON M_BUZAI.HINBAN=T_BUZAIHACYU.JISYA_CD 
+                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '" 
+                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
+                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
+                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
+                ';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet[] = $row;
+                    }
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+            }
+
+            if (empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postInventoryListMaterialList()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $errors_validate = [];
+
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+
+            // $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
+
+            if (empty($errors_validate)) {
+                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD  
+                                    FROM M_TANT
+                                    WHERE TANT_CD="' . $data['LOGIN_ID'] . '"
+                                    ';
+                $this->result = $this->dbConnect->query($sqlGetInfoLogin);
+                if ($this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $getInfoLogin['LOGIN_ID'] = $row['TANT_CD'];
+                        $getInfoLogin['SYOZOKU_CD'] = $row['SYOZOKU_CD'];
+                    }
+                }
+
+                foreach ($data['MATERIAL_LIST_DETAIL'] as $item => $value) {
+                    $sql = 'INSERT INTO T_TANAMSAI_SAVE 
+                        (SAVE_TANT_CD,TANAMSAI_ID,BUZAI_KANRI_NO, JISYA_CD, HINBAN, SYOHIN_NAME, SENGETU_JITUZAIKO_SU, JITUZAIKO_SU)
+                        VALUES
+                        ("' . $getInfoLogin['LOGIN_ID'] . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
+                        "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "' . $value['SYOHIN_NAME'] . '" , 
+                        "' . $value['SENGETU_JITUZAIKO_SU'] . '", "' . $value['JITUZAIKO_SU'] . '")';
                     $this->result = $this->dbConnect->query($sql);
                 }
             }
@@ -1304,162 +1472,6 @@ class Order
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
                     }
-                }
-            }
-
-            if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-        }
-    }
-
-    /* =========================== 部材リスト_2 */
-    function getInventoryListMaterialListSearch()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            $errors = [];
-            $resultSet = array();
-
-            if (
-                isset($_GET['BUZAI_BUNRUI']) &&
-                isset($_GET['MAKER_NAME']) &&
-                isset($_GET['HINBAN']) &&
-                isset($_GET['SYOHIN_NAME']) &&
-                isset($_GET['SYOZOKU_CD'])
-            ) {
-
-                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, 
-                    M_BUZAI.HINBAN, M_BUZAI.SYOHIN_NAME
-                FROM M_BUZAI 
-                LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
-                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
-                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
-                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
-                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
-                ';
-                $this->result = $this->dbConnect->query($sql);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
-
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-            } else {
-                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
-            }
-
-            if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-        }
-    }
-
-    function getInventoryListMaterialListSelect()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            $errors = [];
-            $resultSet = array();
-
-            if (
-                isset($_GET['BUZAI_BUNRUI']) &&
-                isset($_GET['MAKER_NAME']) &&
-                isset($_GET['HINBAN']) &&
-                isset($_GET['SYOHIN_NAME']) &&
-                isset($_GET['SYOZOKU_CD'])
-            ) {
-
-                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO
-                FROM M_BUZAI 
-                LEFT JOIN T_SYUKKOJISEKI ON M_BUZAI.HINBAN=T_SYUKKOJISEKI.JISYA_CD 
-                LEFT JOIN T_BUZAIHACYU ON M_BUZAI.HINBAN=T_BUZAIHACYU.HINBAN 
-                LEFT JOIN T_BUZAIHACYUMSAI ON M_BUZAI.HINBAN=T_BUZAIHACYU.JISYA_CD 
-                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '" 
-                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
-                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
-                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
-                ';
-                $this->result = $this->dbConnect->query($sql);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
-
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-            } else {
-                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
-            }
-
-            if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-        }
-    }
-
-    function postInventoryListMaterialList()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            $errors = [];
-            $errors_validate = [];
-
-            $json_string  = file_get_contents('php://input');
-            $json_request = json_decode($json_string, true);
-            $data = (array)$json_request;
-
-            // $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
-
-            if (empty($errors_validate)) {
-                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD  
-                                    FROM M_TANT
-                                    WHERE TANT_CD="' . $data['LOGIN_ID'] . '"
-                                    ';
-                $this->result = $this->dbConnect->query($sqlGetInfoLogin);
-                if ($this->result->num_rows > 0) {
-                    while ($row = $this->result->fetch_assoc()) {
-                        $getInfoLogin['LOGIN_ID'] = $row['TANT_CD'];
-                        $getInfoLogin['SYOZOKU_CD'] = $row['SYOZOKU_CD'];
-                    }
-                }
-
-                foreach ($data['MATERIAL_LIST_DETAIL'] as $item => $value) {
-                    $sql = 'INSERT INTO T_TANAMSAI_SAVE 
-                        (SAVE_TANT_CD,TANAMSAI_ID,BUZAI_KANRI_NO, JISYA_CD, HINBAN, SYOHIN_NAME, SENGETU_JITUZAIKO_SU, JITUZAIKO_SU)
-                        VALUES
-                        ("' . $getInfoLogin['LOGIN_ID'] . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
-                        "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "' . $value['SYOHIN_NAME'] . '" , 
-                        "' . $value['SENGETU_JITUZAIKO_SU'] . '", "' . $value['JITUZAIKO_SU'] . '")';
-                    $this->result = $this->dbConnect->query($sql);
                 }
             }
 

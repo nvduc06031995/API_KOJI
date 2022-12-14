@@ -576,13 +576,14 @@ class Koji
                     }
                 } else if ($SINGLE_SUMMARIZE == "02") {
                     if ($HOMON_SBT == "01") {
-                        $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,
-                        T_KOJI_FILEPATH.FILEPATH,
+                        $sql = 'SELECT T_KOJI.SITAMIIRAISYO_FILEPATH,                       
                         T_KOJI.JYUCYU_ID,
-                        T_KOJI.HOMON_SBT
+                        T_KOJI.HOMON_SBT,
+                        T_KOJI.KOJI_ST
+                        FROM T_KOJI
                         WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"                      
                         AND T_KOJI.HOMON_SBT="01"
-                        AND T_KOJI.DEL_FLG=0';
+                        AND T_KOJI.DEL_FLG=0';                       
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -598,9 +599,7 @@ class Koji
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];
-                                $data['FILEPATH_ID'] = $row['FILEPATH_ID'];
-                                $data['FILEPATH'] = $domain . $row['FILEPATH'];
+                                $data['KOJI_ST'] = $row['KOJI_ST'];                                
                                 $data['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $data;
                             }
@@ -608,10 +607,11 @@ class Koji
                     }
 
                     if ($HOMON_SBT == "02") {
-                        $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,
-                        T_KOJI_FILEPATH.FILEPATH,
+                        $sql = 'SELECT T_KOJI.KOJIIRAISYO_FILEPATH,                        
                         T_KOJI.JYUCYU_ID,
-                        T_KOJI.HOMON_SBT
+                        T_KOJI.HOMON_SBT,
+                        T_KOJI.KOJI_ST
+                        FROM T_KOJI
                         WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"                      
                         AND T_KOJI.HOMON_SBT="02"
                         AND T_KOJI.DEL_FLG=0';

@@ -489,6 +489,8 @@ class Order
                         }
                     }
                 }
+            } else {
+                $errors['msg'][] = $errors_validate;
             }
 
             if (empty($errors['msg'])) {
@@ -1021,7 +1023,7 @@ class Order
     function validatePostInventoryListForCreateNotExist($array)
     {
         $errors = [];
-        if (isset($array['INVENTORY_DETAIL']) && !empty($array['USER_INFO'])) {
+        if (isset($array['INVENTORY_DETAIL']) && !empty($array['INVENTORY_DETAIL'])) {
             foreach ($array['INVENTORY_DETAIL'] as $key => $values) {
                 if (!isset($values['BUZAI_KANRI_NO']) || $values['BUZAI_KANRI_NO'] == "") {
                     $errors[] = 'BUZAI_KANRI_NO' . ' ' . '[' . $key . ']' . ' is required ';
@@ -1123,9 +1125,14 @@ class Order
                     "' . $value['HINBAN'] . '" , "' . $value['SYOHIN_NAME'] . '" , 
                     "' . $value['JITUZAIKO_SU'] . '",0,
                     "' . $ADD_PGID . '","' . $LOGIN_ID . '","' . $PRESENT_DATETIME . '",
-                    "' . $UPD_PGID . '","' . $LOGIN_ID . '","' . $PRESENT_DATETIME . '")';                    
+                    "' . $UPD_PGID . '","' . $LOGIN_ID . '","' . $PRESENT_DATETIME . '")';
                     $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                    }
                 }
+            } else {
+                $errors['msg'][] = $errors_validate;
             }
 
             if (empty($errors['msg'])) {
@@ -1207,6 +1214,8 @@ class Order
                     "' . $UPD_PGID . '","' . $LOGIN_ID . '","' . $PRESENT_DATETIME . '")';
                     $this->result = $this->dbConnect->query($sql);
                 }
+            } else {
+                $errors['msg'][] = $errors_validate;
             }
 
             if (empty($errors['msg'])) {
@@ -1229,35 +1238,96 @@ class Order
             $resultSet = array();
 
             if (
-                isset($_GET['BUZAI_BUNRUI']) &&
-                isset($_GET['MAKER_NAME']) &&
-                isset($_GET['HINBAN']) &&
-                isset($_GET['SYOHIN_NAME']) &&
-                isset($_GET['SYOZOKU_CD'])
-            ) {
+                isset($_GET['BUZAI_BUNRUI']) && isset($_GET['MAKER_NAME']) && isset($_GET['HINBAN']) &&
+                isset($_GET['SYOHIN_NAME']) && isset($_GET['SYOZOKU_CD'])
+            ) {               
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+                $YM = date('Ym' , strtotime("-1 months"));
+                $FIRST_DATE_OF_MONTH = date('Y-m-01');
+                $LAST_DATE_OF_MONTH = date('Y-m-t');
 
-                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, M_BUZAI.BUZAI_BUNRUI, M_BUZAI.MAKER_NAME, 
-                    M_BUZAI.HINBAN, M_BUZAI.SYOHIN_NAME
-                FROM M_BUZAI 
-                LEFT JOIN T_ZAIKO ON M_BUZAI.HINBAN=T_ZAIKO.HINBAN               
-                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '"         
-                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
-                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
-                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
-                ';
-                $this->result = $this->dbConnect->query($sql);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
-
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
+                $data = $_GET;
+                $query = [];
+                foreach($data as $key => $value) {
+                    if($key == "BUZAI_BUNRUI" && $value != ""){
+                        $query[] = 'M_BUZAI.BUZAI_BUNRUI LIKE "%' . $value . '%"';
+                    } 
+                    if ($key == "MAKER_NAME" && $value != "") {
+                        $query[] = 'M_BUZAI.MAKER_NAME LIKE "%' . $value . '%"';
+                    } 
+                    if ($key == "HINBAN" && $value != "") {
+                        $query[] = 'M_BUZAI.HINBAN LIKE "%' . $value . '%"';
+                    } 
+                    if ($key == "SYOHIN_NAME" && $value != "") {
+                        $query[] = 'M_BUZAI.SYOHIN_NAME LIKE "%' . $value . '%"';
+                    }                     
+                }; 
+                $search_query = "";             
+                $search_query = implode(' OR ', $query);                
+                if ($SYOZOKU_CD != "") {
+                    $sql = ' SELECT  M_BUZAI.BUZAI_BUNRUI, 
+                    M_BUZAI.HINBAN AS BUZAI_HINBAN, 
+                    M_BUZAI.SYOHIN_NAME AS BUZAI_SYOHIN_NAME,
+                    M_BUZAI.BUZAI_KANRI_NO, 
+                    M_BUZAI.MAKER_CD AS BUZAI_MAKER_CD, 
+                    M_BUZAI.MAKER_NAME AS BUZAI_MAKER_NAME, 
+                    M_BUZAI.SIIRE_NAME, 
+                    M_BUZAI.SIIRE_TANKA, 
+                    M_BUZAI.LOT,
+                    M_BUZAI.TANI, 
+                    M_BUZAI.SORYO, 
+                    M_BUZAI.BIKO,
+                    T_ZAIKO.ZAIKO_ID,
+                    T_ZAIKO.BASYO_GYOSYA_SYBET_CD,
+                    T_ZAIKO.ZAIKO_SYBET_CD,
+                    T_ZAIKO.SOKO_CD,
+                    T_ZAIKO.CTGORY_CD,
+                    T_ZAIKO.CTGORY_NAME,
+                    T_ZAIKO.MAKER_CD AS ZAIKO_MAKER_CD,
+                    T_ZAIKO.MAKER_NAME AS ZAIKO_MAKER_NAME,
+                    T_ZAIKO.JISYA_CD,
+                    T_ZAIKO.HINBAN AS ZAIKO_HINBAN,
+                    T_ZAIKO.JAN_CD,
+                    T_ZAIKO.SYOHIN_NAME AS ZAIKO_SYOHIN_NAME,
+                    T_ZAIKO.GENKA,
+                    T_ZAIKO.JISSU,
+                    T_ZAIKO.HIKI_ZUMI_FLG
+                    FROM M_BUZAI 
+                    LEFT JOIN T_ZAIKO ON M_BUZAI.BUZAI_BUNRUI=T_ZAIKO.BASYO_GYOSYA_SYBET_CD AND T_ZAIKO.SOKO_CD="' . $SYOZOKU_CD . '"
+                    LEFT JOIN T_SYUKKOJISEKI ON T_SYUKKOJISEKI.SOKO_CD=T_ZAIKO.SOKO_CD 
+                        AND (T_SYUKKOJISEKI.SYUKKO_DATE BETWEEN "'.$FIRST_DATE_OF_MONTH.'" AND "'.$LAST_DATE_OF_MONTH.'")
+                    LEFT JOIN T_BUZAIHACYU ON T_SYUKKOJISEKI.SOKO_CD=T_ZAIKO.SOKO_CD 
+                        AND (T_BUZAIHACYU.HACYU_YMD BETWEEN "'.$FIRST_DATE_OF_MONTH.'" AND "'.$LAST_DATE_OF_MONTH.'")
+                    LEFT JOIN T_BUZAIHACYUMSAI ON T_BUZAIHACYU.BUZAI_HACYU_ID=T_BUZAIHACYUMSAI.BUZAI_HACYU_ID 
+                    WHERE ';
+                    if($search_query != ""){
+                        $sql .= $search_query . ' AND ';
                     }
+                    $sql .= ' M_BUZAI.DEL_FLG=0';
+                    // $sql .= ' M_BUZAI.DEL_FLG=0 AND NOT EXISTS (SELECT T_TANA.TANA_ID 
+                    // FROM T_TANAMSAI
+                    // INNER JOIN T_TANA ON T_TANA.TANA_ID = T_TANAMSAI.TANA_ID
+                    // WHERE T_TANA.SOKO_CD = "'.$SYOZOKU_CD.'"
+                    // AND T_TANA.TANA_YM = "'.$YM.'" GROUP BY T_TANA.TANA_ID) 
+                    // AND NOT EXISTS (SELECT T_TANA.TANA_ID 
+                    // FROM T_TANAMSAI_SAVE
+                    // WHERE T_TANA.SOKO_CD="'.$SYOZOKU_CD.'")';                    
+                    $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+
+                    if ($this->result && $this->result->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $this->result->fetch_assoc()) {
+                            $resultSet[] = $row;
+                        }
+                    }
+                } else {
+                    $errors['msg'][] = 'SYOZOKU_CD is required';
                 }
             } else {
-                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+                $errors['msg'][] = 'Missing parameter BUZAI_BUNRUI or MAKER_NAME or HINBAN or SYOHIN_NAME';
             }
 
             if (empty($errors['msg'])) {
@@ -1268,62 +1338,62 @@ class Order
         }
     }
 
-    function getInventoryListMaterialListSelect()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            $errors = [];
-            $resultSet = array();
+    // function getInventoryListMaterialListSelect()
+    // {
+    //     $this->dbReference = new systemConfig();
+    //     $this->dbConnect = $this->dbReference->connectDB();
+    //     if ($this->dbConnect == NULL) {
+    //         $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+    //     } else {
+    //         $errors = [];
+    //         $resultSet = array();
 
-            if (
-                isset($_GET['BUZAI_BUNRUI']) &&
-                isset($_GET['MAKER_NAME']) &&
-                isset($_GET['HINBAN']) &&
-                isset($_GET['SYOHIN_NAME']) &&
-                isset($_GET['SYOZOKU_CD'])
-            ) {
+    //         if (
+    //             isset($_GET['BUZAI_BUNRUI']) &&
+    //             isset($_GET['MAKER_NAME']) &&
+    //             isset($_GET['HINBAN']) &&
+    //             isset($_GET['SYOHIN_NAME']) &&
+    //             isset($_GET['SYOZOKU_CD'])
+    //         ) {
 
-                $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO, 
-                M_BUZAI.BUZAI_KANRI_NO
-                FROM M_BUZAI 
-                LEFT JOIN T_SYUKKOJISEKI ON M_BUZAI.HINBAN=T_SYUKKOJISEKI.JISYA_CD 
-                LEFT JOIN T_BUZAIHACYU ON M_BUZAI.HINBAN=T_BUZAIHACYU.HINBAN 
-                LEFT JOIN T_BUZAIHACYUMSAI ON M_BUZAI.HINBAN=T_BUZAIHACYU.JISYA_CD 
-                WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '" 
-                    OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
-                    OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
-                    OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
-                ';
-                $this->result = $this->dbConnect->query($sql);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
+    //             $sql = ' SELECT M_BUZAI.BUZAI_KANRI_NO, 
+    //             M_BUZAI.BUZAI_KANRI_NO, 
+    //             M_BUZAI.BUZAI_KANRI_NO, 
+    //             M_BUZAI.BUZAI_KANRI_NO, 
+    //             M_BUZAI.BUZAI_KANRI_NO, 
+    //             M_BUZAI.BUZAI_KANRI_NO, 
+    //             M_BUZAI.BUZAI_KANRI_NO
+    //             FROM M_BUZAI 
+    //             LEFT JOIN T_SYUKKOJISEKI ON M_BUZAI.HINBAN=T_SYUKKOJISEKI.JISYA_CD 
+    //             LEFT JOIN T_BUZAIHACYU ON M_BUZAI.HINBAN=T_BUZAIHACYU.HINBAN 
+    //             LEFT JOIN T_BUZAIHACYUMSAI ON M_BUZAI.HINBAN=T_BUZAIHACYU.JISYA_CD 
+    //             WHERE M_BUZAI.BUZAI_HACYU_ID="' . $_GET['BUZAI_BUNRUI'] . '" 
+    //                 OR M_BUZAI.MAKER_NAME="' . $_GET['MAKER_NAME'] . '" 
+    //                 OR M_BUZAI.HINBAN="' . $_GET['HINBAN'] . '" 
+    //                 OR M_BUZAI.SYOHIN_NAME="' . $_GET['SYOHIN_NAME'] . '" 
+    //             ';
+    //             $this->result = $this->dbConnect->query($sql);
+    //             if (!empty($this->dbConnect->error)) {
+    //                 $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+    //             }
 
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                    }
-                }
-            } else {
-                $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
-            }
+    //             if ($this->result && $this->result->num_rows > 0) {
+    //                 // output data of each row
+    //                 while ($row = $this->result->fetch_assoc()) {
+    //                     $resultSet[] = $row;
+    //                 }
+    //             }
+    //         } else {
+    //             $errors['msg'][] = 'Missing parameter BUZAI_HACYU_ID';
+    //         }
 
-            if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            } else {
-                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-        }
-    }
+    //         if (empty($errors['msg'])) {
+    //             $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    //         } else {
+    //             $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    //         }
+    //     }
+    // }
 
     function postInventoryListMaterialList()
     {
@@ -1331,38 +1401,43 @@ class Order
         $this->dbConnect = $this->dbReference->connectDB();
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
+        } else {            
             $errors = [];
-            $errors_validate = [];
-
+            $errors_validate = [];            
             $json_string  = file_get_contents('php://input');
             $json_request = json_decode($json_string, true);
             $data = (array)$json_request;
-
-            // $errors_validate = $this->validatePostInventoryListForCreateNotExist($data);
-
-            if (empty($errors_validate)) {
-                $sqlGetInfoLogin = 'SELECT TANT_CD, SYOZOKU_CD  
-                                    FROM M_TANT
-                                    WHERE TANT_CD="' . $data['LOGIN_ID'] . '"
-                                    ';
-                $this->result = $this->dbConnect->query($sqlGetInfoLogin);
-                if ($this->result->num_rows > 0) {
-                    while ($row = $this->result->fetch_assoc()) {
-                        $getInfoLogin['LOGIN_ID'] = $row['TANT_CD'];
-                        $getInfoLogin['SYOZOKU_CD'] = $row['SYOZOKU_CD'];
-                    }
-                }
-
+            
+            $errors_validate = $this->validatePostInventoryListMaterialList($data);
+            if (empty($errors_validate)) {                 
+                $LOGIN_ID = $data['LOGIN_ID']; 
+                $ADD_PGID = "KOJ1040B";
+                $UPD_PGID = "KOJ1040B";
+                $PRESENT_DATE = date('Y-m-d');
+                $PRESENT_DATETIME = date('Y-m-d H:i:s');
+                
                 foreach ($data['MATERIAL_LIST_DETAIL'] as $item => $value) {
                     $sql = 'INSERT INTO T_TANAMSAI_SAVE 
-                        (SAVE_TANT_CD,TANAMSAI_ID,BUZAI_KANRI_NO, JISYA_CD, HINBAN, SYOHIN_NAME, SENGETU_JITUZAIKO_SU, JITUZAIKO_SU)
+                    (SAVE_TANT_CD,TANAMSAI_ID,
+                    BUZAI_KANRI_NO, JISYA_CD, 
+                    HINBAN, SYOHIN_NAME, 
+                    SENGETU_JITUZAIKO_SU, JITUZAIKO_SU,DEL_FLG,
+                    ADD_PGID,ADD_TANTCD,ADD_YMD,
+                    UPD_PGID,UPD_TANTCD,UPD_YMD)
                         VALUES
-                        ("' . $getInfoLogin['LOGIN_ID'] . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
-                        "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "' . $value['SYOHIN_NAME'] . '" , 
-                        "' . $value['SENGETU_JITUZAIKO_SU'] . '", "' . $value['JITUZAIKO_SU'] . '")';
+                    ("' . $LOGIN_ID . '" , "' . ($item + 1) . '" , "' . $value['BUZAI_KANRI_NO'] . '" , 
+                    "' . $value['JISYA_CD'] . '" , "' . $value['HINBAN'] . '" , "' . $value['SYOHIN_NAME'] . '" , 
+                    "0", "' . $value['JITUZAIKO_SU'] . '",0,
+                    "' . $ADD_PGID . '","' . $LOGIN_ID . '","' . $PRESENT_DATETIME . '",
+                    "' . $UPD_PGID . '","' . $LOGIN_ID . '","' . $PRESENT_DATETIME . '")';
+                    
                     $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                    }
                 }
+            } else {
+                $errors['msg'][] = $errors_validate;
             }
 
             if (empty($errors['msg'])) {
@@ -1371,6 +1446,35 @@ class Order
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
+    }
+
+    function validatePostInventoryListMaterialList($array) {
+        $errors = [];
+        if (isset($array['MATERIAL_LIST_DETAIL']) && !empty($array['MATERIAL_LIST_DETAIL'])) {
+            foreach ($array['MATERIAL_LIST_DETAIL'] as $key => $values) {
+                if (!isset($values['BUZAI_KANRI_NO']) || $values['BUZAI_KANRI_NO'] == "") {
+                    $errors[] = 'BUZAI_KANRI_NO' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['JISYA_CD']) || $values['JISYA_CD'] == "") {
+                    $errors[] = 'JISYA_CD' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['HINBAN']) || $values['HINBAN'] == "") {
+                    $errors[] = 'HINBAN' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['SYOHIN_NAME']) || $values['SYOHIN_NAME'] == "") {
+                    $errors[] = 'SYOHIN_NAME' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+                if (!isset($values['JITUZAIKO_SU']) || $values['JITUZAIKO_SU'] == "") {
+                    $errors[] = 'JITUZAIKO_SU' . ' ' . '[' . $key . ']' . ' is required ';
+                }
+            }
+        }
+        
+        if ((isset($array['LOGIN_ID']) && $array['LOGIN_ID'] == "") || !isset($array['LOGIN_ID'])) {
+            $errors[] = 'LOGIN_ID is required ';
+        }
+
+        return $errors;
     }
 
     /* =========================== 部材発注一覧(発注承認) */
@@ -1507,22 +1611,20 @@ class Order
 
             $list_buzai_hacyu_id = $data['BUZAI_HACYU_ID'];
 
-            if (!empty($list_buzai_hacyu_id)); {
+            if (!empty($list_buzai_hacyu_id)) {
                 foreach ($list_buzai_hacyu_id as $key => $value) {
                     $sql = 'UPDATE T_BUZAIHACYU SET
                         RENKEI_YMD="' . $PRESENT_DATE . '",
                         HACYU_OKFLG="03"
                         WHERE BUZAI_HACYU_ID="' . $value . '"
                         AND DEL_FLG=0';
-                    // echo $sql; die;
                     $this->result = $this->dbConnect->query($sql);
 
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
                     }
                 }
-            }
-
+            } 
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -1548,7 +1650,7 @@ class Order
 
             $list_buzai_hacyu_id = $data['BUZAI_HACYU_ID'];
 
-            if (!empty($list_buzai_hacyu_id)); {
+            if (!empty($list_buzai_hacyu_id)){
                 foreach ($list_buzai_hacyu_id as $key => $value) {
                     $sql = 'UPDATE T_BUZAIHACYU SET
                         RENKEI_YMD="' . $PRESENT_DATE . '",
@@ -1561,7 +1663,7 @@ class Order
                         $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
                     }
                 }
-            }
+            } 
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

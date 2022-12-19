@@ -62,10 +62,10 @@ class Login
                             $resultSet = $row;
                         }
                     } else {
-                        $errors['msg'][] = 'PASSWORD is wrong!';
+                        $errors['msg'][] = 'パスワードが正しくありません';
                     }
                 } else {
-                    $errors['msg'][] = 'LOGIN_ID is not exists!';
+                    $errors['msg'][] = '担当者コードが存在しません。正しいコードを入力してください。';
                 }
             }
 

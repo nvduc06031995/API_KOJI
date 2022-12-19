@@ -3545,35 +3545,47 @@ class Schedule
                 'JININ' => 'required',
                 'KANSAN_POINT' => 'required',
                 'MEMO' => 'required',
-                'ALL_DAY_FLG' => 'nullable',
                 'HOMON_SBT' => 'required',
                 'JIKAN' => 'required',
                 'KBNMSAI_CD' => 'required',
-                'LOGIN_ID' => 'required'
+                'LOGIN_ID' => 'required',
+                'ALL_DAY_FLG' => 'nullable',
             ]);
 
-            if ($validated) {
-                $SKJ_RENKEI_YMD = date("Y-m-d");
-                $UPD_PGID = 'KOJ1110F';
-                $UPD_YMD = date("Y-m-d H:i:s");
+            if ($validated) {             
+                $JYUCYU_ID = '"' . $validated['JYUCYU_ID'] . '"';
+                $KBN = '"'.$validated['KBN'].'"' ;
+                $HOMONJIKAN = '"' . $validated['HOMONJIKAN'] . '"';
+                $HOMONJIKAN_END = '"' . $validated['HOMONJIKAN_END'] . '"';
+                $JININ = '"' . $validated['JININ'] . '"';
+                $KANSAN_POINT = '"' . $validated['KANSAN_POINT'] . '"';
+                $MEMO = '"' . $validated['MEMO'] . '"';
+                $HOMON_SBT = '"' . $validated['HOMON_SBT'] . '"';
+                $JIKAN = '' . $validated['JIKAN'] . '';
+                $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';               
+                $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';
+                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0;                
+                $UPD_PGID = '"KOJ1110F"';
+                $PRESENT_DATE = '"' . date('Y-m-d') . '"';
+                $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';                                            
 
                 if ($validated['HOMON_SBT'] == "01") {
                     $sql = ' UPDATE T_KOJI
-                    SET TAG_KBN="' . $validated['KBNMSAI_CD'] . '",
-                    SITAMIAPO_KBN="' . $validated['KBN'] . '",
-                    SITAMIHOMONJIKAN="' . $validated['HOMONJIKAN'] . '",
-                    SITAMIHOMONJIKAN_END="' . $validated['HOMONJIKAN_END'] . '",
-                    SITAMI_JININ=' . $validated['JININ'] . ',
-                    SITAMI_KANSAN_POINT=' . $validated['KANSAN_POINT'] . ',
-                    ALL_DAY_FLG=' . $validated['ALL_DAY_FLG'] . ',
-                    SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
-                    UPD_PGID= "' . $UPD_PGID . '",
-                    UPD_TANTCD="' . $validated['LOGIN_ID'] . '",
-                    UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $validated['MEMO'] . '",
-                    SITAMI_JIKAN=' . $validated['JIKAN'] . '                 
-                    WHERE JYUCYU_ID="' . $validated['JYUCYU_ID'] . '"
-                    AND DEL_FLG=0';
+                    SET TAG_KBN=' . $TAG_KBN. ',
+                    SITAMIAPO_KBN=' . $KBN. ',
+                    SITAMIHOMONJIKAN=' . $HOMONJIKAN. ',
+                    SITAMIHOMONJIKAN_END=' . $HOMONJIKAN_END. ',
+                    SITAMI_JININ=' . $JININ. ',
+                    SITAMI_KANSAN_POINT=' . $KANSAN_POINT. ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG. ',
+                    SKJ_RENKEI_YMD=' . $PRESENT_DATE . ',
+                    SITAMI_JIKAN=' . $JIKAN. ',                 
+                    MEMO=' . $MEMO. ',
+                    UPD_PGID= ' . $UPD_PGID . ',
+                    UPD_TANTCD=' . $LOGIN_ID. ',
+                    UPD_YMD=' . $PRESENT_DATETIME . '
+                    WHERE JYUCYU_ID=' . $JYUCYU_ID. '
+                    AND DEL_FLG=0';                    
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -3582,21 +3594,21 @@ class Schedule
 
                 if ($validated['HOMON_SBT'] == "02") {
                     $sql = 'UPDATE T_KOJI 
-                    SET TAG_KBN="' . $validated['KBNMSAI_CD'] . '",
-                    KOJIAPO_KBN="' . $validated['KBN'] . '",
-                    KOJIHOMONJIKAN="' . $validated['HOMONJIKAN'] . '",
-                    KOJIHOMONJIKAN_END="' . $validated['HOMONJIKAN_END'] . '",
-                    KOJI_JININ=' . $validated['JININ'] . ',
-                    KOJI_KANSAN_POINT=' . $validated['KANSAN_POINT'] . ',
-                    ALL_DAY_FLG=' . $validated['ALL_DAY_FLG'] . ',
-                    SKJ_RENKEI_YMD="' . $SKJ_RENKEI_YMD . '",
-                    UPD_PGID= "' . $UPD_PGID . '",
-                    UPD_TANTCD="' . $validated['LOGIN_ID'] . '",            
-                    UPD_YMD="' . $UPD_YMD . '",
-                    MEMO="' . $validated['MEMO'] . '" ,
-                    KOJI_JIKAN=' . $validated['JIKAN'] . '       
-                    WHERE JYUCYU_ID="' . $validated['JYUCYU_ID'] . '"
-                    AND DEL_FLG=0';
+                    SET TAG_KBN=' . $TAG_KBN. ',
+                    KOJIAPO_KBN=' . $KBN. ',
+                    KOJIHOMONJIKAN=' . $HOMONJIKAN. ',
+                    KOJIHOMONJIKAN_END=' . $HOMONJIKAN_END. ',
+                    KOJI_JININ=' . $JININ. ',
+                    KOJI_KANSAN_POINT=' . $KANSAN_POINT. ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG. ',
+                    SKJ_RENKEI_YMD=' . $PRESENT_DATE . ',
+                    MEMO=' . $MEMO. ' ,
+                    KOJI_JIKAN=' . $JIKAN. ' ,      
+                    UPD_PGID= ' . $UPD_PGID . ',
+                    UPD_TANTCD=' . $LOGIN_ID. ',            
+                    UPD_YMD=' . $PRESENT_DATETIME . '
+                    WHERE JYUCYU_ID=' . $JYUCYU_ID. '
+                    AND DEL_FLG=0';                   
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -3731,7 +3743,8 @@ class Schedule
             ]);
 
             if ($validated) {
-                $TAN_EIG_ID = $validated['KBNMSAI_CD'];
+                $TAN_EIG_ID_TEMP = "";
+                $TAN_EIG_ID = "";
                 $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';
                 $JYOKEN_CD = '"' . $validated['JYOKEN_CD'] . '"';
                 $YMD = '"' . $validated['YMD'] . '"';
@@ -3745,14 +3758,15 @@ class Schedule
                 $ATTEND_NAME1 = !is_null($validated['ATTEND_NAME1']) ? '"' . $validated['ATTEND_NAME1'] . '"' : 'NULL';
                 $ATTEND_NAME2 = !is_null($validated['ATTEND_NAME2']) ? '"' . $validated['ATTEND_NAME2'] . '"' : 'NULL';
                 $ATTEND_NAME3 = !is_null($validated['ATTEND_NAME3']) ? '"' . $validated['ATTEND_NAME3'] . '"' : 'NULL';
-                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0 ;
+                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0;
                 $ADD_PGID = '"KOJ1110F"';
                 $UPD_PGID = '"KOJ1110F"';
                 $PRESENT_DATE = '"' . date('Y-m-d') . '"';
                 $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';
 
                 if (isset($validated['TAN_EIG_ID']) && !is_null($validated['TAN_EIG_ID'])) {
-                    $TAN_EIG_ID = $validated['TAN_EIG_ID'];
+                    $TAN_EIG_ID_TEMP = $validated['TAN_EIG_ID'];
+                    $TAN_EIG_ID = '"' . $validated['TAN_EIG_ID'] . '"';
                     $sql = ' UPDATE T_EIGYO_ANKEN SET                     
                         TAG_KBN=' . $TAG_KBN . ',
                         START_TIME=' .  $START_TIME . ',
@@ -3768,7 +3782,7 @@ class Schedule
                         UPD_PGID=' . $UPD_PGID . ',
                         UPD_TANTCD=' . $LOGIN_ID . ',
                         UPD_YMD=' . $PRESENT_DATETIME . ' 
-                        WHERE TAN_EIG_ID="' . $TAN_EIG_ID . '"                
+                        WHERE TAN_EIG_ID=' . $TAN_EIG_ID . '                
                         AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
@@ -3787,7 +3801,8 @@ class Schedule
                         }
                     }
 
-                    $TAN_EIG_ID = sprintf('%010d', $num);
+                    $TAN_EIG_ID_TEMP = sprintf('%010d', $num);
+                    $TAN_EIG_ID = '"' . sprintf('%010d', $num) . '"';
                     $sql = 'INSERT INTO T_EIGYO_ANKEN 
                         (
                         TAN_EIG_ID,
@@ -3813,7 +3828,7 @@ class Schedule
                         UPD_YMD                      
                         )
                         VALUES (
-                        "' . $TAN_EIG_ID . '",
+                        ' . $TAN_EIG_ID . ',
                         ' . $JYOKEN_CD . ',
                         ' . $JYOKEN_SYBET_FLG . ',
                         ' . $YMD . ',
@@ -3833,7 +3848,7 @@ class Schedule
                         ' . $PRESENT_DATETIME . ',
                         ' . $UPD_PGID . ',
                         ' . $LOGIN_ID . ',
-                        ' . $PRESENT_DATETIME . ' )';                      
+                        ' . $PRESENT_DATETIME . ' )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -3842,7 +3857,7 @@ class Schedule
             }
 
             if (empty($errors['msg'])) {
-                $validated['TAN_EIG_ID'] = $TAN_EIG_ID;
+                $validated['TAN_EIG_ID'] = $TAN_EIG_ID_TEMP;
                 $validated['status'] = 'success';
                 $resultSet[] = $validated;
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -3977,9 +3992,6 @@ class Schedule
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $errors = [];
-            $PRESENT_DATE = date('Y-m-d');
-            $PRESENT_DATETIME = date('Y-m-d H:i:s');            
-
             $validate = new Validate();
             $validated = $validate->validate($_POST, [
                 'JYOKEN_CD' => 'required',
@@ -3987,6 +3999,7 @@ class Schedule
                 'YMD' => 'required',
                 'START_TIME' => 'required',
                 'END_TIME' => 'required',
+                'MEMO_CD' => 'required',
                 'KBNMSAI_CD' => 'required',
                 'LOGIN_ID' => 'required',
                 'NAIYO' => 'nullable',
@@ -3996,40 +4009,42 @@ class Schedule
             ]);
 
             if ($validated) {
-                // $TANT_CAL_ID = $validated['KBNMSAI_CD'];
-                // $JYOKEN_CD = '"' . $validated['JYOKEN_CD'] . '"';
-                // $JYOKEN_SYBET_FLG = $validated['JYOKEN_SYBET_FLG'];
-                // $YMD = '"' . $validated['YMD'] . '"';
-                // $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';
-                // $START_TIME = '"' . $validated['START_TIME'] . '"';
-                // $END_TIME = '"' . $validated['END_TIME'] . '"';
-                // $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';           
-                // $NAIYO = !is_null($validated['NAIYO']) ? '"' . $validated['NAIYO'] . '"' : 'NULL';
-                // $ATTEND_NAME1 = !is_null($validated['ATTEND_NAME1']) ? '"' . $validated['ATTEND_NAME1'] . '"' : 'NULL';
-                // $ATTEND_NAME2 = !is_null($validated['ATTEND_NAME2']) ? '"' . $validated['ATTEND_NAME2'] . '"' : 'NULL';
-                // $ATTEND_NAME3 = !is_null($validated['ATTEND_NAME3']) ? '"' . $validated['ATTEND_NAME3'] . '"' : 'NULL';
-                // $ALL_DAY_FLG = $validated['ALL_DAY_FLG'];
-                // $ADD_PGID = '"KOJ1110F"';
-                // $UPD_PGID = '"KOJ1110F"';
-                // $PRESENT_DATE = '"' . date('Y-m-d') . '"';
-                // $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';
+                $TANT_CAL_ID_TEMP = "";
+                $TANT_CAL_ID = "";
+                $JYOKEN_CD = '"' . $validated['JYOKEN_CD'] . '"';
+                $JYOKEN_SYBET_FLG = $validated['JYOKEN_SYBET_FLG'];
+                $YMD = '"' . $validated['YMD'] . '"';
+                $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';
+                $START_TIME = '"' . $validated['START_TIME'] . '"';
+                $END_TIME = '"' . $validated['END_TIME'] . '"';
+                $MEMO_CD = '"' . $validated['MEMO_CD'] . '"';
+                $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';
+                $NAIYO = !is_null($validated['NAIYO']) ? '"' . $validated['NAIYO'] . '"' : 'NULL';
+                $COMMENT = !is_null($validated['COMMENT']) ? '"' . $validated['COMMENT'] . '"' : 'NULL';
+                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0;
+                $ADD_PGID = '"KOJ1110F"';
+                $UPD_PGID = '"KOJ1110F"';
+                $PRESENT_DATE = '"' . date('Y-m-d') . '"';
+                $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';
 
                 if (isset($validated['TANT_CAL_ID']) && !is_null($validated['TANT_CAL_ID'])) {
-                    $TANT_CAL_ID = $validated['TANT_CAL_ID'];
+                    $TANT_CAL_ID_TEMP = $validated['TANT_CAL_ID'];
+                    $TANT_CAL_ID = '"' . $validated['TANT_CAL_ID'] . '"';
                     $sql = 'UPDATE T_TBETUCALENDAR 
-                    SET MEMO_CD="' . $validated['MEMO_CD'] . '", 
-                    TAG_KBN="' . $validated['KBNMSAI_CD'] . '", 
-                    YMD="' . $validated['YMD'] . '", 
-                    START_TIME="' . $validated['START_TIME'] . '", 
-                    END_TIME="' . $validated['END_TIME'] . '", 
-                    NAIYO="' . $validated['NAIYO'] . '", 
-                    ALL_DAY_FLG=' . $validated['ALL_DAY_FLG'] . ', 
-                    RENKEI_YMD="' . $PRESENT_DATE . '", 
-                    UPD_PGID="KOJ1110F", 
-                    UPD_TANTCD="' . $validated['LOGIN_ID'] . '", 
-                    UPD_YMD="' . $PRESENT_DATETIME . '" 
-                    WHERE TAN_CAL_ID="' . $validated['TAN_CAL_ID'] . '"                            
-                    AND DEL_FLG=0';
+                    SET MEMO_CD=' . $MEMO_CD . ', 
+                    TAG_KBN=' . $TAG_KBN . ', 
+                    YMD=' . $YMD . ', 
+                    START_TIME=' . $START_TIME . ', 
+                    END_TIME=' . $END_TIME . ', 
+                    NAIYO=' . $NAIYO . ',
+                    COMMENT=' . $COMMENT . ', 
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ', 
+                    RENKEI_YMD=' . $PRESENT_DATE . ', 
+                    UPD_PGID=' . $UPD_PGID . ', 
+                    UPD_TANTCD=' . $LOGIN_ID . ', 
+                    UPD_YMD=' . $PRESENT_DATETIME . ' 
+                    WHERE TAN_CAL_ID=' . $TANT_CAL_ID . '                           
+                    AND DEL_FLG=0';                    
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -4046,7 +4061,8 @@ class Schedule
                         }
                     }
 
-                    $TAN_CAL_ID = sprintf('%010d', $num);
+                    $TANT_CAL_ID_TEMP = sprintf('%010d', $num);
+                    $TAN_CAL_ID = '"' . sprintf('%010d', $num) . '"';
                     $sql = 'INSERT INTO T_TBETUCALENDAR 
                     (
                         TAN_CAL_ID, JYOKEN_CD, 
@@ -4059,13 +4075,13 @@ class Schedule
                     )
                     VALUES 
                     (
-                        "' . $TAN_CAL_ID . '", "' . $validated['JYOKEN_CD'] . '", 
-                        "' . $validated['JYOKEN_SYBET_FLG'] . '", "' . $validated['YMD'] . '",
-                        "' . $validated['KBNMSAI_CD'] . '", "' . $validated['START_TIME'] . '", "' . $validated['END_TIME'] . '", 
-                        "' . $validated['MEMO_CD'] . '", "' . $validated['NAIYO'] . '", "' . $validated['COMMENT'] . '", 
-                        ' . $validated['ALL_DAY_FLG'] . ', "' . $PRESENT_DATE . '", 
-                        0, "KOJ1110F", "' . $validated['LOGIN_ID'] . '", "' . $PRESENT_DATETIME . '", "KOJ1110F", "' . $validated['LOGIN_ID'] . '", "' . $PRESENT_DATETIME . '"
-                    )';
+                        ' . $TAN_CAL_ID . ', ' . $JYOKEN_CD . ', 
+                        ' . $JYOKEN_SYBET_FLG . ', ' . $YMD . ',
+                        ' . $TAG_KBN . ', ' . $START_TIME . ', ' . $END_TIME . ', 
+                        ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', 
+                        ' . $ALL_DAY_FLG . ', ' . $PRESENT_DATE . ', 
+                        0, ' . $ADD_PGID . ', ' . $LOGIN_ID . ', ' . $PRESENT_DATETIME . ', ' . $UPD_PGID . ', ' . $LOGIN_ID . ', ' . $PRESENT_DATETIME . '
+                    )';                  
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -4076,7 +4092,7 @@ class Schedule
             if (empty($errors['msg'])) {
                 $resultSet = [];
                 $validated['status'] = 'success';
-                $validated['TAN_CAL_ID'] = $TAN_CAL_ID;
+                $validated['TAN_CAL_ID'] = $TANT_CAL_ID_TEMP;
                 $resultSet[] = $validated;
 
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

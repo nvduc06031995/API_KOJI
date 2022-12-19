@@ -38,29 +38,42 @@ class Login
             ]);
 
             if ($validated) {
-                $sql = 'SELECT * FROM M_TANT WHERE TANT_CD="' . $validated['LOGIN_ID'] . '" AND PASSWORD="' . $validated['PASSWORD'] . '" AND DEL_FLG= 0';
+                $LOGIN_ID = "";
+                $sql = 'SELECT TANT_CD FROM M_TANT WHERE TANT_CD="' . $validated['LOGIN_ID'] . '" AND DEL_FLG= 0';
                 $this->result = $this->dbConnect->query($sql);
-
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                if ($this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $LOGIN_ID = $row['TANT_CD'];
+                    }
                 }
 
-                if ($this->result->num_rows > 0) {
-                    // output data of each row                    
-                    while ($row = $this->result->fetch_assoc()) {
-                        $row['STATUS'] = 'success';
-                        $resultSet = $row;
+                if ($LOGIN_ID != "") {
+                    $sql = 'SELECT * FROM M_TANT WHERE TANT_CD="' . $validated['LOGIN_ID'] . '" AND PASSWORD="' . $validated['PASSWORD'] . '" AND DEL_FLG= 0';
+                    $this->result = $this->dbConnect->query($sql);
+
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                    }
+
+                    if ($this->result->num_rows > 0) {
+                        // output data of each row                    
+                        while ($row = $this->result->fetch_assoc()) {
+                            $row['STATUS'] = 'success';
+                            $resultSet = $row;
+                        }
+                    } else {
+                        $errors['msg'][] = 'PASSWORD is wrong!';
                     }
                 } else {
-                    $errors['msg'][] = 'LOGIN_ID or PASSWORD is wrong!';
+                    $errors['msg'][] = 'LOGIN_ID is not exists!';
                 }
             }
 
-            if(empty($errors['msg'])){
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }            
+            }
         }
     }
 }

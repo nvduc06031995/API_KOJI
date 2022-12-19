@@ -3745,7 +3745,7 @@ class Schedule
                 $ATTEND_NAME1 = !is_null($validated['ATTEND_NAME1']) ? '"' . $validated['ATTEND_NAME1'] . '"' : 'NULL';
                 $ATTEND_NAME2 = !is_null($validated['ATTEND_NAME2']) ? '"' . $validated['ATTEND_NAME2'] . '"' : 'NULL';
                 $ATTEND_NAME3 = !is_null($validated['ATTEND_NAME3']) ? '"' . $validated['ATTEND_NAME3'] . '"' : 'NULL';
-                $ALL_DAY_FLG = $validated['ALL_DAY_FLG'];
+                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0 ;
                 $ADD_PGID = '"KOJ1110F"';
                 $UPD_PGID = '"KOJ1110F"';
                 $PRESENT_DATE = '"' . date('Y-m-d') . '"';
@@ -3833,7 +3833,7 @@ class Schedule
                         ' . $PRESENT_DATETIME . ',
                         ' . $UPD_PGID . ',
                         ' . $LOGIN_ID . ',
-                        ' . $PRESENT_DATETIME . ' )';
+                        ' . $PRESENT_DATETIME . ' )';                      
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -3978,8 +3978,7 @@ class Schedule
         } else {
             $errors = [];
             $PRESENT_DATE = date('Y-m-d');
-            $PRESENT_DATETIME = date('Y-m-d H:i:s');
-            $TANT_CAL_ID = "";
+            $PRESENT_DATETIME = date('Y-m-d H:i:s');            
 
             $validate = new Validate();
             $validated = $validate->validate($_POST, [
@@ -3997,6 +3996,24 @@ class Schedule
             ]);
 
             if ($validated) {
+                // $TANT_CAL_ID = $validated['KBNMSAI_CD'];
+                // $JYOKEN_CD = '"' . $validated['JYOKEN_CD'] . '"';
+                // $JYOKEN_SYBET_FLG = $validated['JYOKEN_SYBET_FLG'];
+                // $YMD = '"' . $validated['YMD'] . '"';
+                // $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';
+                // $START_TIME = '"' . $validated['START_TIME'] . '"';
+                // $END_TIME = '"' . $validated['END_TIME'] . '"';
+                // $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';           
+                // $NAIYO = !is_null($validated['NAIYO']) ? '"' . $validated['NAIYO'] . '"' : 'NULL';
+                // $ATTEND_NAME1 = !is_null($validated['ATTEND_NAME1']) ? '"' . $validated['ATTEND_NAME1'] . '"' : 'NULL';
+                // $ATTEND_NAME2 = !is_null($validated['ATTEND_NAME2']) ? '"' . $validated['ATTEND_NAME2'] . '"' : 'NULL';
+                // $ATTEND_NAME3 = !is_null($validated['ATTEND_NAME3']) ? '"' . $validated['ATTEND_NAME3'] . '"' : 'NULL';
+                // $ALL_DAY_FLG = $validated['ALL_DAY_FLG'];
+                // $ADD_PGID = '"KOJ1110F"';
+                // $UPD_PGID = '"KOJ1110F"';
+                // $PRESENT_DATE = '"' . date('Y-m-d') . '"';
+                // $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';
+
                 if (isset($validated['TANT_CAL_ID']) && !is_null($validated['TANT_CAL_ID'])) {
                     $TANT_CAL_ID = $validated['TANT_CAL_ID'];
                     $sql = 'UPDATE T_TBETUCALENDAR 

@@ -3732,41 +3732,42 @@ class Schedule
 
             if ($validated) {
                 $TAN_EIG_ID = $validated['KBNMSAI_CD'];
-                $JYOKEN_CD = '"'.$validated['JYOKEN_CD'].'"';
-                $YMD = '"'.$validated['YMD'].'"';
+                $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';
+                $JYOKEN_CD = '"' . $validated['JYOKEN_CD'] . '"';
+                $YMD = '"' . $validated['YMD'] . '"';
                 $JYOKEN_SYBET_FLG = $validated['JYOKEN_SYBET_FLG'];
-                $TAG_KBN = '"'.$validated['KBNMSAI_CD'].'"';
-                $START_TIME = $validated['KBNMSAI_CD'];
-                $END_TIME = $validated['KBNMSAI_CD'];
-                $JININ = $validated['KBNMSAI_CD'];
-                $JIKAN = $validated['KBNMSAI_CD'];
+                $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';
+                $START_TIME = '"' . $validated['START_TIME'] . '"';
+                $END_TIME = '"' . $validated['END_TIME'] . '"';
+                $JININ = '"' . $validated['JININ'] . '"';
+                $JIKAN = '' . $validated['JIKAN'] . '';
                 $GUEST_NAME = !is_null($validated['GUEST_NAME']) ? '"' . $validated['GUEST_NAME'] . '"' : 'NULL';
                 $ATTEND_NAME1 = !is_null($validated['ATTEND_NAME1']) ? '"' . $validated['ATTEND_NAME1'] . '"' : 'NULL';
                 $ATTEND_NAME2 = !is_null($validated['ATTEND_NAME2']) ? '"' . $validated['ATTEND_NAME2'] . '"' : 'NULL';
                 $ATTEND_NAME3 = !is_null($validated['ATTEND_NAME3']) ? '"' . $validated['ATTEND_NAME3'] . '"' : 'NULL';
-                $ALL_DAY_FLG = $validated['KBNMSAI_CD'];                           
-                $ADD_PGID = "KOJ1110F";
-                $UPD_PGID = "KOJ1110F";
-                $PRESENT_DATE = date('Y-m-d');
-                $PRESENT_DATETIME = date('Y-m-d H:i:s');
+                $ALL_DAY_FLG = $validated['ALL_DAY_FLG'];
+                $ADD_PGID = '"KOJ1110F"';
+                $UPD_PGID = '"KOJ1110F"';
+                $PRESENT_DATE = '"' . date('Y-m-d') . '"';
+                $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';
 
                 if (isset($validated['TAN_EIG_ID']) && !is_null($validated['TAN_EIG_ID'])) {
                     $TAN_EIG_ID = $validated['TAN_EIG_ID'];
                     $sql = ' UPDATE T_EIGYO_ANKEN SET                     
-                        TAG_KBN="' . $validated['KBNMSAI_CD'] . '",
-                        START_TIME="' .  $validated['START_TIME'] . '",
-                        END_TIME="' .  $validated['END_TIME'] . '",
-                        JININ="' .  $validated['JININ'] . '",
-                        JIKAN=' .  $validated['JIKAN'] . ',
-                        GUEST_NAME="' .  $validated['GUEST_NAME'] . '",
-                        ATTEND_NAME1="' .  $validated['ATTEND_NAME1'] . '",
-                        ATTEND_NAME2="' .  $validated['ATTEND_NAME2'] . '",
-                        ATTEND_NAME3="' .  $validated['ATTEND_NAME3'] . '",
-                        ALL_DAY_FLG=' .  $validated['ALL_DAY_FLG'] . ',
-                        RENKEI_YMD="' . $PRESENT_DATE . '",
-                        UPD_PGID="' . $UPD_PGID . '",
-                        UPD_TANTCD="' . $validated['LOGIN_ID'] . '",
-                        UPD_YMD="' . $PRESENT_DATETIME . '" 
+                        TAG_KBN=' . $TAG_KBN . ',
+                        START_TIME=' .  $START_TIME . ',
+                        END_TIME=' .  $END_TIME . ',
+                        JININ=' .  $JININ . ',
+                        JIKAN=' .  $JIKAN . ',
+                        GUEST_NAME=' .  $GUEST_NAME . ',
+                        ATTEND_NAME1=' .  $ATTEND_NAME1 . ',
+                        ATTEND_NAME2=' .  $ATTEND_NAME2 . ',
+                        ATTEND_NAME3=' .  $ATTEND_NAME3 . ',
+                        ALL_DAY_FLG=' .  $ALL_DAY_FLG . ',
+                        RENKEI_YMD=' . $PRESENT_DATE . ',
+                        UPD_PGID=' . $UPD_PGID . ',
+                        UPD_TANTCD=' . $LOGIN_ID . ',
+                        UPD_YMD=' . $PRESENT_DATETIME . ' 
                         WHERE TAN_EIG_ID="' . $TAN_EIG_ID . '"                
                         AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
@@ -3813,27 +3814,26 @@ class Schedule
                         )
                         VALUES (
                         "' . $TAN_EIG_ID . '",
-                        ' . $JYOKEN_CD. ',
+                        ' . $JYOKEN_CD . ',
                         ' . $JYOKEN_SYBET_FLG . ',
                         ' . $YMD . ',
                         ' . $TAG_KBN . ',
                         ' . $START_TIME . ',
-                        "' . $validated['END_TIME'] . '",
-                        "' . $validated['JININ'] . '",
-                        ' . $validated['JIKAN'] . ',
+                        ' . $END_TIME . ',
+                        ' . $JININ . ',
+                        ' . $JIKAN . ',
                         ' . $GUEST_NAME . ',
                         ' . $ATTEND_NAME1 . ',
                         ' . $ATTEND_NAME2 . ',
-                        ' . $ATTEND_NAME3. ',
-                        ' . $validated['ALL_DAY_FLG'] . ',  
+                        ' . $ATTEND_NAME3 . ',
+                        ' . $ALL_DAY_FLG . ',  
                         0,                 
-                        "' . $ADD_PGID . '",
-                        "' . $validated['LOGIN_ID'] . '",
-                        "' . $PRESENT_DATETIME . '",
-                        "' . $UPD_PGID . '",
-                        "' . $validated['LOGIN_ID'] . '",
-                        "' . $PRESENT_DATETIME . '" )';
-                        echo $sql; die;
+                        ' . $ADD_PGID . ',
+                        ' . $LOGIN_ID . ',
+                        ' . $PRESENT_DATETIME . ',
+                        ' . $UPD_PGID . ',
+                        ' . $LOGIN_ID . ',
+                        ' . $PRESENT_DATETIME . ' )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

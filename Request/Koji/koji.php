@@ -649,6 +649,253 @@ class Koji
         }
     }
 
+    /* ==================================================================== 工事報告 */
+    function getConstructionReport()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $resultSet = array();
+
+            if (
+                isset($_GET['JYUCYU_ID']) &&
+                isset($_GET['KOJI_ST']) &&
+                isset($_GET['SINGLE_SUMMARIZE'])
+            ) {
+                $jyucyuId = $_GET['JYUCYU_ID'];
+                $kojiSt = $_GET['KOJI_ST'];                
+
+                if (in_array($kojiSt , [1,2])) {
+                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
+                        //Get HOJIN_FLG
+                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
+                            FROM T_KOJI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                        ';
+                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
+                        if ($this->result && $this->result->num_rows > 0) {
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
+                            }
+                        }
+
+                        $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
+                        FROM T_KOJIMSAI 
+                        WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                            AND KOJIJITUIKA_FLG<>"0" 
+                            AND DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sqlNotReported);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
+                        if ($this->result && $this->result->num_rows > 0) {
+                            // output data of each row
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['constructionNotReportSINGLE'][] = $row;
+                            }
+                        }
+                    }
+
+                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
+                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
+                            FROM T_KOJI 
+                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
+                                AND DEL_FLG=0';
+                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
+                            if (!empty($this->dbConnect->error)) {
+                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                            }
+
+                            $listJyucyuIdKoji = array();
+                            if ($this->result && $this->result->num_rows > 0) {
+                                // output data of each row
+                                while ($row = $this->result->fetch_assoc()) {
+                                    $listJyucyuIdKoji[] = $row;
+                                }
+                            }
+
+                            foreach ($listJyucyuIdKoji as $value) {
+                                //Get HOJIN_FLG
+                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
+                                    FROM T_KOJI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                ';
+                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
+                                if ($this->result && $this->result->num_rows > 0) {
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
+                                    }
+                                }
+
+                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
+                                    FROM T_KOJIMSAI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                        AND KOJIJITUIKA_FLG<>"0" 
+                                        AND DEL_FLG=0';
+                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
+                                if ($this->result && $this->result->num_rows > 0) {
+                                    // output data of each row
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['constructionNotReportSUMMARIZE'][] = $row;
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
+                            die;
+                        }
+                    }
+                } elseif ($kojiSt == 3) {
+                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
+                        //Get HOJIN_FLG
+                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
+                            FROM T_KOJI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                        ';
+                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
+                        if ($this->result && $this->result->num_rows > 0) {
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
+                            }
+                        }
+
+                        $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
+                            FROM T_KOJIMSAI 
+                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
+                            AND KOJIJITUIKA_FLG<>"0" 
+                            AND DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sqlReported);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
+                        if ($this->result && $this->result->num_rows > 0) {
+                            // output data of each row
+                            while ($row = $this->result->fetch_assoc()) {
+                                $resultSet['constructionReportSINGLE'][] = $row;
+                            }
+                        }
+                    }
+                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
+                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
+                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
+                            FROM T_KOJI 
+                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
+                                AND DEL_FLG=0';
+                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
+                            if (!empty($this->dbConnect->error)) {
+                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                            }
+
+                            $listJyucyuIdKoji = array();
+                            if ($this->result && $this->result->num_rows > 0) {
+                                // output data of each row
+                                while ($row = $this->result->fetch_assoc()) {
+                                    $listJyucyuIdKoji[] = $row;
+                                }
+                            }
+
+                            foreach ($listJyucyuIdKoji as $value) {
+                                //Get HOJIN_FLG
+                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
+                                    FROM T_KOJI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                ';
+                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
+                                if ($this->result && $this->result->num_rows > 0) {
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
+                                    }
+                                }
+
+                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
+                                    FROM T_KOJIMSAI 
+                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
+                                        AND KOJIJITUIKA_FLG<>"0" 
+                                        AND DEL_FLG=0';
+                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
+                                if (!empty($this->dbConnect->error)) {
+                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                                }
+
+                                if ($this->result && $this->result->num_rows > 0) {
+                                    // output data of each row
+                                    while ($row = $this->result->fetch_assoc()) {
+                                        $resultSet['constructionReportSUMMARIZE'][] = $row;
+                                    }
+                                }
+                            }
+                        } else {
+                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
+                            die;
+                        }
+                    }
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode(['Error_message' => "KOJI_ST_value: 1 || 2 || 3"], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                    die;
+                }
+
+                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME, KBN_BIKO 
+                    FROM M_KBN 
+                    WHERE KBN_CD="07"';
+                $this->result = $this->dbConnect->query($sqlGetPullDown);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+
+                if ($this->result && $this->result->num_rows > 0) {
+                    // output data of each row
+                    while ($row = $this->result->fetch_assoc()) {
+                        $resultSet['PULLDOWN'][] = $row;
+                    }
+                }
+
+                if (empty($errors['msg'])) {
+                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                } else {
+                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
+            } else {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or SINGLE_SUMMARIZE';
+            } 
+            
+            if(empty($errors['msg'])) {
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
     /* ==================================================================== 写真確認 */
     function getPhotoConfirm()
     {
@@ -1174,246 +1421,9 @@ class Koji
             }
         }
     }
-
-    // 工事報告
+    
     // Construction Report
     //----未報告の場合
-    function getConstructionReport()
-    {
-        $this->dbReference = new systemConfig();
-        $this->dbConnect = $this->dbReference->connectDB();
-        if ($this->dbConnect == NULL) {
-            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
-        } else {
-            if (
-                isset($_GET['JYUCYU_ID']) &&
-                isset($_GET['KOJI_ST']) &&
-                isset($_GET['SINGLE_SUMMARIZE'])
-            ) {
-                $jyucyuId = $_GET['JYUCYU_ID'];
-                $kojiSt = $_GET['KOJI_ST'];
-
-                $resultSet = array();
-                if ($kojiSt == 1 || $kojiSt == 2) {
-                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
-                        //Get HOJIN_FLG
-                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                            FROM T_KOJI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                        ';
-                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                            }
-                        }
-
-                        $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
-                        FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                            AND KOJIJITUIKA_FLG<>"0" 
-                            AND DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sqlNotReported);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            // output data of each row
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['constructionNotReportSINGLE'][] = $row;
-                            }
-                        }
-                    }
-                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
-                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
-                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
-                            FROM T_KOJI 
-                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
-                                AND DEL_FLG=0';
-                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
-                            if (!empty($this->dbConnect->error)) {
-                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                            }
-
-                            $listJyucyuIdKoji = array();
-                            if ($this->result && $this->result->num_rows > 0) {
-                                // output data of each row
-                                while ($row = $this->result->fetch_assoc()) {
-                                    $listJyucyuIdKoji[] = $row;
-                                }
-                            }
-
-                            foreach ($listJyucyuIdKoji as $value) {
-                                //Get HOJIN_FLG
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                                    FROM T_KOJI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                ';
-                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                                    }
-                                }
-
-                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
-                                    FROM T_KOJIMSAI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                        AND KOJIJITUIKA_FLG<>"0" 
-                                        AND DEL_FLG=0';
-                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    // output data of each row
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['constructionNotReportSUMMARIZE'][] = $row;
-                                    }
-                                }
-                            }
-                        } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
-                            die;
-                        }
-                    }
-                } elseif ($kojiSt == 3) {
-                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
-                        //Get HOJIN_FLG
-                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                            FROM T_KOJI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                        ';
-                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                            }
-                        }
-
-                        $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                            FROM T_KOJIMSAI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                            AND KOJIJITUIKA_FLG<>"0" 
-                            AND DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sqlReported);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            // output data of each row
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['constructionReportSINGLE'][] = $row;
-                            }
-                        }
-                    }
-                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
-                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
-                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
-                            FROM T_KOJI 
-                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
-                                AND DEL_FLG=0';
-                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
-                            if (!empty($this->dbConnect->error)) {
-                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                            }
-
-                            $listJyucyuIdKoji = array();
-                            if ($this->result && $this->result->num_rows > 0) {
-                                // output data of each row
-                                while ($row = $this->result->fetch_assoc()) {
-                                    $listJyucyuIdKoji[] = $row;
-                                }
-                            }
-
-                            foreach ($listJyucyuIdKoji as $value) {
-                                //Get HOJIN_FLG
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                                    FROM T_KOJI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                ';
-                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                                    }
-                                }
-
-                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                                    FROM T_KOJIMSAI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                        AND KOJIJITUIKA_FLG<>"0" 
-                                        AND DEL_FLG=0';
-                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    // output data of each row
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['constructionReportSUMMARIZE'][] = $row;
-                                    }
-                                }
-                            }
-                        } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
-                            die;
-                        }
-                    }
-                } else {
-                    $this->dbReference->sendResponse(400, json_encode(['Error_message' => "KOJI_ST_value: 1 || 2 || 3"], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                    die;
-                }
-
-                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME, KBN_BIKO 
-                    FROM M_KBN 
-                    WHERE KBN_CD="07"';
-                $this->result = $this->dbConnect->query($sqlGetPullDown);
-                if (!empty($this->dbConnect->error)) {
-                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                }
-
-                if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
-                    while ($row = $this->result->fetch_assoc()) {
-                        $resultSet['PULLDOWN'][] = $row;
-                    }
-                }
-
-                if (empty($errors['msg'])) {
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                }
-            } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
-            }
-        }
-    }
 
     // 承諾書-サイン登録
     function postLetterConsent()
@@ -2051,8 +2061,7 @@ class Koji
                         UPD_PGID = "KOJ1120F",
                         UPD_TANTCD = "' . $_POST['JYUCYU_ID'] . '",
                         UPD_YMD = "' . date('Y-m-d H:i:s') . '"
-                    WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"
-                    ';
+                    WHERE JYUCYU_ID = "' . $_POST['JYUCYU_ID'] . '"';
                 $this->result = $this->dbConnect->query($sqlUpdateKOJI);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

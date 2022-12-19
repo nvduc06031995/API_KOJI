@@ -38,10 +38,10 @@ class Menu
             if (isset($_GET['LOGIN_ID']) && $_GET['LOGIN_ID'] != "") {
                 // 新着コメント
                 $LOGIN_ID = $_GET['LOGIN_ID'];
-                $sql = 'SELECT COMMENT , JYUCYU_ID
+                $sql = 'SELECT MEMO , JYUCYU_ID
                 FROM T_KOJI 
                 WHERE ADD_TANTCD="' . $LOGIN_ID . '" 
-                AND COMMENT IS NOT NULL 
+                AND MEMO IS NOT NULL 
                 AND READ_FLG IS NULL';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {

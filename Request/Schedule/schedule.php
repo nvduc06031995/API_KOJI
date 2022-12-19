@@ -39,6 +39,7 @@ class Schedule
             if ((isset($_GET['YMD']) && $_GET['YMD'] != "") &&
                 (isset($_GET['KOJIGYOSYA_CD']) && $_GET['KOJIGYOSYA_CD'] != "")
             ) {
+                $domain = $this->domain;
                 $YMD = $_GET['YMD'];
                 $KOJIGYOSYA_CD = $_GET['KOJIGYOSYA_CD'];
                 $YM = date('Y-m', strtotime($YMD));
@@ -334,8 +335,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -495,8 +496,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -564,8 +565,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -899,16 +900,14 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
-                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )
-                    AND M_KBN.KBN_CD="16"
-                    AND M_KBN.KBNMSAI_CD="01"
+                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )                                      
                     ORDER BY KOJIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
@@ -953,8 +952,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1278,17 +1277,16 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD 
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16" 
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0
-                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )
-                    AND M_KBN.KBN_CD="16"
-                    AND M_KBN.KBNMSAI_CD="01" 
+                    AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )                                       
                     ORDER BY KOJIHOMONJIKAN ASC';
+                    // echo $sql; die;
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1332,8 +1330,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1402,8 +1400,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1472,8 +1470,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1542,8 +1540,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1743,8 +1741,8 @@ class Schedule
                         $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                         $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                         $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                        $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                        $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                        $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                        $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                         $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                         $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                         $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1893,8 +1891,8 @@ class Schedule
                         $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                         $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                         $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                        $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                        $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                        $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                        $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                         $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                         $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                         $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2150,14 +2148,13 @@ class Schedule
                 M_TANT4.TANT_CD AS TANT_CD4,
                 M_TANT4.TANT_NAME AS TANT_NAME4
                 FROM T_KOJI 
-                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD 
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
                 LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                 LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                 LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                 LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '"
-                AND T_KOJI.DEL_FLG=0                     
-                AND M_KBN.KBN_CD="16"
+                AND T_KOJI.DEL_FLG=0                                     
                 AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';                
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -2197,8 +2194,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2265,8 +2262,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2333,8 +2330,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2401,8 +2398,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2514,14 +2511,13 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"  
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '" 
-                    AND T_KOJI.DEL_FLG=0
-                    AND M_KBN.KBN_CD="16"                    
+                    AND T_KOJI.DEL_FLG=0                                      
                     AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -2561,8 +2557,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2629,8 +2625,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2697,8 +2693,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -2765,8 +2761,8 @@ class Schedule
                             $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                             $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                             $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                            $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                            $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                            $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                            $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                             $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                             $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                             $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];

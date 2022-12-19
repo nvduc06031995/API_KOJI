@@ -51,7 +51,7 @@ class Validate
                         break;
                     case 'nullable':
                         if (isset($this->data[$name])) {                          
-                            $this->data[$name] = !empty($this->data[$name]) ? $this->data[$name] : 'NULL';
+                            $this->data[$name] = !empty($this->data[$name]) ? $this->data[$name] : NULL ;
                         } 
                         break;
                     default:

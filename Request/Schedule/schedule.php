@@ -188,7 +188,6 @@ class Schedule
                         $data['MEMO_CD'] = $row['MEMO_CD'];
                         $data['NAIYO'] = $row['NAIYO'];
                         $data['COMMENT'] = $row['COMMENT'];
-                        $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                         $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
                         $data['KBN_CD'] = $row['KBN_CD'];
@@ -806,7 +805,6 @@ class Schedule
                             $data['MEMO_CD'] = $row['MEMO_CD'];
                             $data['NAIYO'] = $row['NAIYO'];
                             $data['COMMENT'] = $row['COMMENT'];
-                            $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['ALL_DAY_FLG'] = $row['ALL_DAY_FLG'];
                             $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
                             $data['KBN_CD'] = $row['KBN_CD'];
@@ -901,7 +899,7 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -909,6 +907,8 @@ class Schedule
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
                     AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )
+                    AND M_KBN.KBN_CD="16"
+                    AND M_KBN.KBNMSAI_CD="01"
                     ORDER BY KOJIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
@@ -1278,7 +1278,7 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD 
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -1286,6 +1286,8 @@ class Schedule
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0
                     AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )
+                    AND M_KBN.KBN_CD="16"
+                    AND M_KBN.KBNMSAI_CD="01" 
                     ORDER BY KOJIHOMONJIKAN ASC';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
@@ -2148,14 +2150,15 @@ class Schedule
                 M_TANT4.TANT_CD AS TANT_CD4,
                 M_TANT4.TANT_NAME AS TANT_NAME4
                 FROM T_KOJI 
-                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16"
+                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD 
                 LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                 LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                 LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                 LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '"
                 AND T_KOJI.DEL_FLG=0                     
-                AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
+                AND M_KBN.KBN_CD="16"
+                AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';                
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -2511,13 +2514,14 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16"
+                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD
                     LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '" 
-                    AND T_KOJI.DEL_FLG=0                     
+                    AND T_KOJI.DEL_FLG=0
+                    AND M_KBN.KBN_CD="16"                    
                     AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {

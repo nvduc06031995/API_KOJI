@@ -309,7 +309,7 @@ class Koji
                         $data['YMD'] = $row['YMD'];
                         $data['KOJI_TIRASISU'] = $row['KOJI_TIRASISU'];
                         $data['RENKEI_YMD'] = $row['RENKEI_YMD'];
-                        $resultSet['TIRASI'][] = $data;
+                        $resultSet[] = $data;
                     }
                 }
             } else {

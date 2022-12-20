@@ -94,7 +94,7 @@ class Schedule
                         M_KBN.YOBIKOMOKU4,
                         M_KBN.YOBIKOMOKU5
                         FROM T_EIGYO_ANKEN 
-                        CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"                   
+                        INNER JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"                   
                         WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
@@ -164,7 +164,7 @@ class Schedule
                 M_KBN.YOBIKOMOKU4,
                 M_KBN.YOBIKOMOKU5        
                  FROM T_TBETUCALENDAR 
-                 CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
+                 INNER JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
                  WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                     
                      AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
@@ -290,8 +290,8 @@ class Schedule
                     M_TANT.TANT_NAME,                    
                     M_TANT.SYOZOKU_CD
                     FROM T_KOJI 
-                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                    CROSS JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                    INNER JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
                     AND T_KOJI.DEL_FLG=0 
@@ -447,10 +447,10 @@ class Schedule
                     M_TANT3.TANT_NAME AS TANT_NAME3,
                     T_KOJI.KOJI_YMD
                     FROM T_KOJI 
-                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                    CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                    INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '" 
                         AND T_KOJI.DEL_FLG=0                         
                         AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" )
@@ -704,8 +704,8 @@ class Schedule
                     M_TANT.TANT_NAME, 
                     M_TANT.TANT_CD
                     FROM T_EIGYO_ANKEN 
-                    CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
-                    CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
+                    INNER JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                    INNER JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                     AND T_EIGYO_ANKEN.DEL_FLG=0                    
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
@@ -780,8 +780,8 @@ class Schedule
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
-                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
-                    CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
+                    INNER JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
+                    INNER JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
@@ -900,11 +900,11 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"  
-                    CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"  
+                    INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    INNER JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
                     AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )                                      
@@ -1277,11 +1277,11 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"
-                    CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"
+                    INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    INNER JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
                     AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )                                       
@@ -1699,8 +1699,8 @@ class Schedule
                 T_KOJI.SITAMI_YMD,
                 M_TANT.SYOZOKU_CD
                 FROM T_KOJI 
-                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                CROSS JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                INNER JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m")="' . $YM . '" 
                 AND T_KOJI.DEL_FLG=0                   
                 AND M_TANT.TANT_CD="' . $ID . '"';
@@ -1847,10 +1847,10 @@ class Schedule
                 M_TANT3.TANT_NAME AS TANT_NAME3,
                 T_KOJI.KOJI_YMD
                 FROM T_KOJI 
-                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")="' . $YM . '" 
                     AND T_KOJI.DEL_FLG=0                          
                     AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" )';
@@ -1958,8 +1958,8 @@ class Schedule
                 M_TANT.TANT_NAME, 
                 M_TANT.TANT_CD
                 FROM T_EIGYO_ANKEN 
-                CROSS JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
-                CROSS JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD
+                INNER JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                INNER JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD
                 WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m")= "' . $YM . '" 
                 AND T_EIGYO_ANKEN.DEL_FLG=0                  
                 AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG=0
@@ -2030,8 +2030,8 @@ class Schedule
                 M_KBN.YOBIKOMOKU5,
                 M_TANT.TANT_CD          
                 FROM T_TBETUCALENDAR 
-                CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
-                CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD
+                INNER JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                INNER JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD
                 WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m")= "' . $YM . '"
                 AND T_TBETUCALENDAR.DEL_FLG=0                                      
                 AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
@@ -2148,11 +2148,11 @@ class Schedule
                 M_TANT4.TANT_CD AS TANT_CD4,
                 M_TANT4.TANT_NAME AS TANT_NAME4
                 FROM T_KOJI 
-                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
-                CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
+                INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                INNER JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '"
                 AND T_KOJI.DEL_FLG=0                                               
                 AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
@@ -2511,11 +2511,11 @@ class Schedule
                 M_TANT4.TANT_CD AS TANT_CD4,
                 M_TANT4.TANT_NAME AS TANT_NAME4
                 FROM T_KOJI 
-                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"  
-                CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"  
+                INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                INNER JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '" 
                 AND T_KOJI.DEL_FLG=0                                                   
                 AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
@@ -3021,7 +3021,7 @@ class Schedule
                         M_KBN.YOBIKOMOKU4,
                         M_KBN.YOBIKOMOKU5              
                         FROM T_KOJI 
-                        LEFT JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                        INNER JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
                         WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '"        
                         AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
@@ -3170,7 +3170,7 @@ class Schedule
                         M_KBN.YOBIKOMOKU4,
                         M_KBN.YOBIKOMOKU5              
                         FROM T_KOJI 
-                        LEFT JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"                       
+                        INNER JOIN M_KBN ON T_KOJI.TAG_KBN = M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"                       
                         WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '"
                         AND M_KBN.KBN_CD="05"                         
                         AND T_KOJI.DEL_FLG=0';

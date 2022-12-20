@@ -58,7 +58,7 @@ class Menu
                 $sql = 'SELECT M_TANT.TANT_CD,
                 M_GYOSYA.KOJIGYOSYA_CD 
                 FROM M_TANT 
-                LEFT JOIN M_GYOSYA ON M_TANT.SYOZOKUBUSYO_CD = M_GYOSYA.KOJIGYOSYA_CD
+                INNER JOIN M_GYOSYA ON M_TANT.SYOZOKUBUSYO_CD = M_GYOSYA.KOJIGYOSYA_CD
                 WHERE M_TANT.TANT_CD="' . $LOGIN_ID . '" 
                 AND M_TANT.DEL_FLG= 0';
                 $temp_data = '';
@@ -75,7 +75,7 @@ class Menu
 
                 $sql = 'SELECT COUNT(*)
                 FROM T_NYUKOYOTEI 
-                LEFT JOIN M_GYOSYA ON T_NYUKOYOTEI.SOKO_CD = M_GYOSYA.KOJIGYOSYA_CD
+                INNER JOIN M_GYOSYA ON T_NYUKOYOTEI.SOKO_CD = M_GYOSYA.KOJIGYOSYA_CD
                 WHERE T_NYUKOYOTEI.SOKO_CD="' . $temp_data . '" 
                 AND T_NYUKOYOTEI.DEL_FLG= 0';
 
@@ -133,7 +133,7 @@ class Menu
                 // お知らせ(部材発注申請)    
                 $sql = 'SELECT COUNT(*)
                 FROM T_BUZAIHACYU 
-                LEFT JOIN M_TANT ON T_BUZAIHACYU.SYOZOKU_CD = M_TANT.SYOZOKU_CD
+                INNER JOIN M_TANT ON T_BUZAIHACYU.SYOZOKU_CD = M_TANT.SYOZOKU_CD
                 WHERE T_BUZAIHACYU.SYOZOKU_CD="' . $temp_data . '" 
                 AND T_BUZAIHACYU.HACYU_OKFLG= "01"
                 AND M_TANT.BUZAI_HACOK_FLG= 1';

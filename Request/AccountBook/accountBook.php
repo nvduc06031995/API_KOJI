@@ -55,7 +55,7 @@ class AccountBook
                 // 本日時点の回収累計
                 $sql = 'SELECT T_NYUKINMSAI.NYUKIN_GAK
                     FROM T_NYUKIN 
-                    LEFT JOIN T_NYUKINMSAI ON T_NYUKIN.NYUKIN_ID=T_NYUKINMSAI.NYUKIN_ID 
+                    INNER JOIN T_NYUKINMSAI ON T_NYUKIN.NYUKIN_ID=T_NYUKINMSAI.NYUKIN_ID 
                     WHERE T_NYUKIN.TANT_CD="' . $TANT_CD . '" 
                 ';
                 $this->result = $this->dbConnect->query($sql);

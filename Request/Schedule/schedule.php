@@ -290,8 +290,8 @@ class Schedule
                     M_TANT.TANT_NAME,                    
                     M_TANT.SYOZOKU_CD
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                    LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                    CROSS JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
                     AND T_KOJI.DEL_FLG=0 
@@ -447,10 +447,10 @@ class Schedule
                     M_TANT3.TANT_NAME AS TANT_NAME3,
                     T_KOJI.KOJI_YMD
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                    CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '" 
                         AND T_KOJI.DEL_FLG=0                         
                         AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" )
@@ -634,8 +634,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -780,8 +780,8 @@ class Schedule
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
-                    LEFT JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
-                    LEFT JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
+                    CROSS JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
+                    CROSS JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
@@ -900,11 +900,11 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
-                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"  
+                    CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
                     AND T_KOJI.DEL_FLG=0                    
                     AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )                                      
@@ -1022,8 +1022,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1092,8 +1092,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1162,8 +1162,8 @@ class Schedule
                                 $data['SITAMIHOMONJIKAN_END'] = $row['SITAMIHOMONJIKAN_END'];
                                 $data['KOJIHOMONJIKAN'] = $row['KOJIHOMONJIKAN'];
                                 $data['KOJIHOMONJIKAN_END'] = $row['KOJIHOMONJIKAN_END'];
-                                $data['KOJIIRAISYO_FILEPATH'] = $row['KOJIIRAISYO_FILEPATH'];
-                                $data['SITAMIIRAISYO_FILEPATH'] = $row['SITAMIIRAISYO_FILEPATH'];
+                                $data['KOJIIRAISYO_FILEPATH'] = $domain . $row['KOJIIRAISYO_FILEPATH'];
+                                $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['CANCEL_RIYU'] = $row['CANCEL_RIYU'];
                                 $data['SITAMIAPO_KBN'] = $row['SITAMIAPO_KBN'];
                                 $data['KOJIAPO_KBN'] = $row['KOJIAPO_KBN'];
@@ -1277,13 +1277,13 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16" 
-                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"
+                    CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                    CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                    CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                    CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                     WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m") = "' . $YM . '"
-                    AND T_KOJI.DEL_FLG=0
+                    AND T_KOJI.DEL_FLG=0                    
                     AND (M_TANT1.TANT_CD="' . $TANT_CD . '" OR M_TANT2.TANT_CD="' . $TANT_CD . '" OR M_TANT3.TANT_CD="' . $TANT_CD . '" OR M_TANT4.TANT_CD="' . $TANT_CD . '" )                                       
                     ORDER BY KOJIHOMONJIKAN ASC';
                     // echo $sql; die;
@@ -1609,7 +1609,7 @@ class Schedule
         } else {
             $errors = [];
             $resultSet = array();
-
+            $domain = $this->domain;
             if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['ID']) && $_GET['ID'] != "")) {
                 $YMD = $_GET['YMD'];
                 $ID = $_GET['ID'];
@@ -1699,8 +1699,8 @@ class Schedule
                 T_KOJI.SITAMI_YMD,
                 M_TANT.SYOZOKU_CD
                 FROM T_KOJI 
-                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                LEFT JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                CROSS JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m")="' . $YM . '" 
                 AND T_KOJI.DEL_FLG=0                   
                 AND M_TANT.TANT_CD="' . $ID . '"';
@@ -1847,10 +1847,10 @@ class Schedule
                 M_TANT3.TANT_NAME AS TANT_NAME3,
                 T_KOJI.KOJI_YMD
                 FROM T_KOJI 
-                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
-                LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")="' . $YM . '" 
                     AND T_KOJI.DEL_FLG=0                          
                     AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" )';
@@ -2148,13 +2148,13 @@ class Schedule
                 M_TANT4.TANT_CD AS TANT_CD4,
                 M_TANT4.TANT_NAME AS TANT_NAME4
                 FROM T_KOJI 
-                LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
-                LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"
+                CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
                 WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '"
-                AND T_KOJI.DEL_FLG=0                                     
+                AND T_KOJI.DEL_FLG=0                                               
                 AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
@@ -2498,27 +2498,27 @@ class Schedule
                 M_KBN.YOBIKOMOKU3, 
                 M_KBN.YOBIKOMOKU4,
                 M_KBN.YOBIKOMOKU5,
-                    M_TANT1.MONTHLY_SALES AS MONTHLY_SALES1, 
-                    M_TANT2.MONTHLY_SALES AS MONTHLY_SALES2,  
-                    M_TANT3.MONTHLY_SALES AS MONTHLY_SALES3,  
-                    M_TANT4.MONTHLY_SALES AS MONTHLY_SALES4,                      
-                    M_TANT1.TANT_CD AS TANT_CD1,
-                    M_TANT1.TANT_NAME AS TANT_NAME1,
-                    M_TANT2.TANT_CD AS TANT_CD2,
-                    M_TANT2.TANT_NAME AS TANT_NAME2,
-                    M_TANT3.TANT_CD AS TANT_CD3,
-                    M_TANT3.TANT_NAME AS TANT_NAME3, 
-                    M_TANT4.TANT_CD AS TANT_CD4,
-                    M_TANT4.TANT_NAME AS TANT_NAME4
-                    FROM T_KOJI 
-                    LEFT JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"  
-                    LEFT JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
-                    LEFT JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
-                    LEFT JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
-                    LEFT JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
-                    WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '" 
-                    AND T_KOJI.DEL_FLG=0                                      
-                    AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
+                M_TANT1.MONTHLY_SALES AS MONTHLY_SALES1, 
+                M_TANT2.MONTHLY_SALES AS MONTHLY_SALES2,  
+                M_TANT3.MONTHLY_SALES AS MONTHLY_SALES3,  
+                M_TANT4.MONTHLY_SALES AS MONTHLY_SALES4,                      
+                M_TANT1.TANT_CD AS TANT_CD1,
+                M_TANT1.TANT_NAME AS TANT_NAME1,
+                M_TANT2.TANT_CD AS TANT_CD2,
+                M_TANT2.TANT_NAME AS TANT_NAME2,
+                M_TANT3.TANT_CD AS TANT_CD3,
+                M_TANT3.TANT_NAME AS TANT_NAME3, 
+                M_TANT4.TANT_CD AS TANT_CD4,
+                M_TANT4.TANT_NAME AS TANT_NAME4
+                FROM T_KOJI 
+                CROSS JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBNMSAI_CD="01" AND M_KBN.KBN_CD="16"  
+                CROSS JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
+                CROSS JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
+                CROSS JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
+                CROSS JOIN M_TANT as M_TANT4 ON M_TANT4.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                WHERE DATE_FORMAT(T_KOJI.KOJI_YMD , "%Y-%m")= "' . $YM . '" 
+                AND T_KOJI.DEL_FLG=0                                                   
+                AND (M_TANT1.TANT_CD="' . $ID . '" OR M_TANT2.TANT_CD="' . $ID . '" OR M_TANT3.TANT_CD="' . $ID . '" OR M_TANT4.TANT_CD="' . $ID . '" )';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -2861,35 +2861,18 @@ class Schedule
 
             if ((isset($_GET['TANT_KBN_CD']) && $_GET['TANT_KBN_CD'] != "") &&
                 (isset($_GET['SYOZOKU_CD']) && $_GET['SYOZOKU_CD'] != "")
-            ) {                
+            ) {
                 $TANT_KBN_CD = $_GET['TANT_KBN_CD'];
                 $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
 
-                if(in_array($TANT_KBN_CD , ["01" , "03"])){
+                if (in_array($TANT_KBN_CD, ["01", "03"])) {
                     $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME 
-                    FROM M_GYOSYA WHERE DEL_FLG=0';                 
+                    FROM M_GYOSYA WHERE DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                     }
-        
-                    if ($this->result && $this->result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $resultSet[] = $row;
-                        }
-                    }
-                } 
-                
-                if (in_array($TANT_KBN_CD , ["02" , "04"])){
-                    $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME                    
-                    FROM M_GYOSYA 
-                    WHERE KOJIGYOSYA_CD="'.$SYOZOKU_CD.'" AND DEL_FLG=0';                   
-                    $this->result = $this->dbConnect->query($sql);
-                    if (!empty($this->dbConnect->error)) {
-                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                    }
-        
+
                     if ($this->result && $this->result->num_rows > 0) {
                         // output data of each row
                         while ($row = $this->result->fetch_assoc()) {
@@ -2898,11 +2881,27 @@ class Schedule
                     }
                 }
 
+                if (in_array($TANT_KBN_CD, ["02", "04"])) {
+                    $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME                    
+                    FROM M_GYOSYA 
+                    WHERE KOJIGYOSYA_CD="' . $SYOZOKU_CD . '" AND DEL_FLG=0';
+                    $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+
+                    if ($this->result && $this->result->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $this->result->fetch_assoc()) {
+                            $resultSet[] = $row;
+                        }
+                    }
+                }
             } else {
                 $errors['msg'][] = 'Missing parameter TANT_KBN_CD or SYOZOKU_CD';
             }
 
-            
+
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));

@@ -4173,7 +4173,7 @@ class Schedule
 
     /* ==================================================================== メモ更新 END */
 
-    /* ==================================================================== 休日確認  START*/
+    /* ==================================================================== 休日確認  START*/   
     function getShowHoliday()
     {
         $this->dbReference = new systemConfig();
@@ -4181,78 +4181,108 @@ class Schedule
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            if (
-                isset($_GET['TANT_CD']) &&
-                isset($_GET['HOLIDAY_YEAR']) &&
-                isset($_GET['GET_MONTH']) &&
-                isset($_GET['GET_YEAR'])
-            ) {
-                $tantCd = $_GET['TANT_CD'];
-                $holidayYear = $_GET['HOLIDAY_YEAR'];
+            $errors = [];
+            $resultSet = array();
 
-                //Get data T_KOJI
-                $sql = 'SELECT HOLIDAY_JAN, HOLIDAY_FEB, HOIDAY_MAR, HOIDAY_APR, HOIDAY_MAY, HOIDAY_JUN, 
-                            HOIDAY_JUL, HOIDAY_AUG, HOIDAY_SEP, HOIDAY_OCT, HOIDAY_NOV, HOIDAY_DEC 
-                            FROM T_TANTHOLIDAY 
-                            WHERE TANT_CD="' . $tantCd . '" 
-                                AND HOLIDAY_YEAR="' . $holidayYear . '"';
+            if (isset($_GET['TANT_CD']) && $_GET['TANT_CD'] != "") {
+                $TANT_CD = $_GET['TANT_CD'];
+                $PRESENT_MONTH_ = strtoupper(date('M'));
+                $column_name = 'HOLIDAY_' . $PRESENT_MONTH_;
+        
+                $FIRST_DATE_OF_MONTH = date('Y-m-01');
+                $LAST_DATE_OF_MONTH = date('Y-m-t');
+
+                $FIRST_DATE_OF_YEAR = date('Y-01-01');
+                $LAST_DATE_OF_YEAR = date('Y-12-t');
+                
+                $available_days = 0;
+                $day_offs = 0;
+
+                $available_days_year = 0;
+                $day_offs_year = 0;
+
+                $sql = 'SELECT ' . $column_name . '
+                FROM T_TANTHOLIDAY 
+                WHERE TANT_CD="' . $TANT_CD . '"';
                 $this->result = $this->dbConnect->query($sql);
-
-                $resultSet = array();
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
                 if ($this->result && $this->result->num_rows > 0) {
-                    // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $resultSet[] = $row;
-                        $totalHolidays = 0;
-                        foreach ($row as $value) {
-                            $totalHolidays = $totalHolidays + $value;
-                        }
-                        $resultSet['totalHolidays'] = $totalHolidays;
+                        $available_days = $row[$column_name];
+                        $resultSet['MONTH']['AVAILABLE_DAYS'][] = (int)$row[$column_name];
                     }
-                } else {
-                    $resultSet['0']['HOLIDAY_JAN'] = "0";
-                    $resultSet['0']['HOLIDAY_FEB'] = "0";
-                    $resultSet['0']['HOIDAY_MAR'] = "0";
-                    $resultSet['0']['HOIDAY_APR'] = "0";
-                    $resultSet['0']['HOIDAY_MAY'] = "0";
-                    $resultSet['0']['HOIDAY_JUN'] = "0";
-                    $resultSet['0']['HOIDAY_JUL'] = "0";
-                    $resultSet['0']['HOIDAY_AUG'] = "0";
-                    $resultSet['0']['HOIDAY_SEP'] = "0";
-                    $resultSet['0']['HOIDAY_OCT'] = "0";
-                    $resultSet['0']['HOIDAY_NOV'] = "0";
-                    $resultSet['0']['HOIDAY_DEC'] = "0";
-                    $resultSet['totalHolidays'] = 0;
                 }
 
-                $sqlGetHolidayMonth = 'SELECT TAN_CAL_ID 
-                                FROM T_TBETUCALENDAR 
-                                WHERE JYOKEN_CD="' . $tantCd . '" 
-                                    AND MEMO_CD="04" 
-                                    AND MONTH(`YMD`)="' . $_GET['GET_MONTH'] . '"
-                                    AND DEL_FLG=0
-                                ';
-                $this->result = $this->dbConnect->query($sqlGetHolidayMonth);
-                $resultSet['totalHolidaysPerMonth'] = $this->result->num_rows;
+                $sql = 'SELECT COUNT(*)
+                FROM (SELECT DISTINCT YMD 
+                FROM T_TBETUCALENDAR A
+                WHERE A.JYOKEN_CD="' . $TANT_CD . '" 
+                AND A.JYOKEN_SYBET_FLG=0
+                AND A.TAG_KBN="04" 
+                AND A.YMD BETWEEN "' . $FIRST_DATE_OF_MONTH . '" AND "' . $LAST_DATE_OF_MONTH . '") B';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $day_offs = $row['COUNT(*)'];
+                        $resultSet['MONTH']['DAY_OFFS'][] = (int)$row['COUNT(*)'];
+                    }
+                }
 
-                $sqlGetHolidayYear = 'SELECT TAN_CAL_ID 
-                                FROM T_TBETUCALENDAR 
-                                WHERE JYOKEN_CD="' . $tantCd . '" 
-                                    AND MEMO_CD="04" 
-                                    AND YEAR(`YMD`)="' . $_GET['GET_YEAR'] . '"
-                                    AND DEL_FLG=0
-                                ';
-                $this->result = $this->dbConnect->query($sqlGetHolidayYear);
-                $resultSet['totalHolidaysPerYear'] = $this->result->num_rows;
+                $caculated_day_offs = $available_days - $day_offs;
+                $resultSet['MONTH']['THE_REST_OF_DAY_OFFS'][] =  $caculated_day_offs > 0 ? $caculated_day_offs : 0;
+                $resultSet['MONTH']['DAY_OFFS_OVER'][] =  $caculated_day_offs < 0 ? abs((int)$caculated_day_offs) : 0;
+    
+                $sql = 'SELECT SUM(HOLIDAY_JAN+HOLIDAY_FEB+HOLIDAY_MAR+HOLIDAY_APR+
+                HOLIDAY_MAY+HOLIDAY_JUN+HOLIDAY_JUL+HOLIDAY_AUG+HOLIDAY_SEP+HOLIDAY_OCT+
+                HOLIDAY_NOV+HOLIDAY_DEC) AS RESULT FROM T_TANTHOLIDAY WHERE TANT_CD="' . $TANT_CD . '"';          
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+    
+                if ($this->result && $this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $available_days_year = $row['RESULT'];
+                        $resultSet['YEAR']['AVAILABLE_DAYS'][] = (int)$row['RESULT'];
+                    }
+                }
 
+                $sql = 'SELECT COUNT(*)
+                FROM (SELECT DISTINCT YMD 
+                FROM T_TBETUCALENDAR A
+                WHERE A.JYOKEN_CD="' . $TANT_CD . '" 
+                AND A.JYOKEN_SYBET_FLG=0
+                AND A.TAG_KBN="04" 
+                AND A.YMD BETWEEN "' . $FIRST_DATE_OF_YEAR . '" AND "' . $LAST_DATE_OF_YEAR . '") B';
+                $this->result = $this->dbConnect->query($sql);
+                if (!empty($this->dbConnect->error)) {
+                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                }
+                if ($this->result && $this->result->num_rows > 0) {
+                    while ($row = $this->result->fetch_assoc()) {
+                        $day_offs_year = $row['COUNT(*)'];
+                        $resultSet['YEAR']['DAY_OFFS'][] = (int)$row['COUNT(*)'];
+                    }
+                }
+                $caculated_day_offs_of_year = $available_days_year - $day_offs_year;
+                $resultSet['YEAR']['THE_REST_OF_DAY_OFFS'][] =  $caculated_day_offs_of_year > 0 ? $caculated_day_offs_of_year : 0;
 
+            } else {
+                $errors['msg'][] = 'Missing parameter TANT_CD';
+            }
+        
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
-                $this->dbReference->sendResponse(508, '{"error_message": ' . $this->dbReference->getStatusCodeMeeage(508) . '}');
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
         }
     }
-
     /* ==================================================================== 休日確認  END*/
 
     /* * * * * * * * * *

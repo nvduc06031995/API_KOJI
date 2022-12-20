@@ -479,8 +479,8 @@ class Order
                 if (!empty($data_buzaihacyumsai_save['BUZAI_HACYUMSAI_ID'])); {
                     $list_buzai_hacyumsai_id = $data_buzaihacyumsai_save['BUZAI_HACYUMSAI_ID'];
                     foreach ($list_buzai_hacyumsai_id as $key => $value) {
-                        $sql = 'UPDATE T_BUZAIHACYUMSAI_SAVE SET
-                        DEL_FLG=1 WHERE SAVE_TANT_CD="' . $data_buzaihacyumsai_save['LOGIN_ID'] . '"
+                        $sql = 'DELETE FROM T_BUZAIHACYUMSAI_SAVE 
+                        WHERE SAVE_TANT_CD="' . $data_buzaihacyumsai_save['LOGIN_ID'] . '"
                         AND BUZAI_HACYUMSAI_ID=' . $value . '';
                         $this->result = $this->dbConnect->query($sql);
 
@@ -494,7 +494,8 @@ class Order
             }
 
             if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $data_buzaihacyumsai_save['status'] = 'success';
+                $this->dbReference->sendResponse(200, json_encode($data_buzaihacyumsai_save, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -509,15 +510,15 @@ class Order
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
             $errors = [];
-           
+
             $validate = new Validate();
-            $validated = $validate->validate($_POST,[
+            $validated = $validate->validate($_POST, [
                 'LOGIN_ID' => 'required',
             ]);
-                       
-            if ($validated) {                
-                $sql = 'UPDATE T_BUZAIHACYUMSAI_SAVE SET
-                        DEL_FLG=1 WHERE SAVE_TANT_CD="' . $validated['LOGIN_ID'] . '"';
+
+            if ($validated) {
+                $sql = 'DELETE FROM T_BUZAIHACYUMSAI_SAVE 
+                WHERE SAVE_TANT_CD="' . $validated['LOGIN_ID'] . '"';
                 $this->result = $this->dbConnect->query($sql);
 
                 if (!empty($this->dbConnect->error)) {
@@ -528,7 +529,10 @@ class Order
             }
 
             if (empty($errors['msg'])) {
-                $this->dbReference->sendResponse(200, json_encode('success', JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                $resultSet = [];
+                $validated['status'] = 'success';
+                $resultSet[] = $validated;
+                $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }
@@ -988,14 +992,13 @@ class Order
                 T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO, 
                 T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO
                 FROM T_TANAMSAI_SAVE 
-                INNER JOIN T_TANA ON T_TANA.TANT_CD = T_TANAMSAI_SAVE.SAVE_TANT_CD AND T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '" AND T_TANA.TANA_YM= "' . $YM . '" AND T_TANA.DEL_FLG=0 
-                INNER JOIN T_TANAMSAI ON T_TANA.TANA_ID=T_TANAMSAI.TANA_ID
+                INNER JOIN T_TANA ON T_TANA.TANT_CD = T_TANAMSAI_SAVE.SAVE_TANT_CD AND T_TANA.SYOZOKU_CD="' . $SYOZOKU_CD . '" AND T_TANA.TANA_YM= "' . $YM . '" AND T_TANA.DEL_FLG=0                 
                 INNER JOIN M_BUZAI ON T_TANAMSAI_SAVE.BUZAI_KANRI_NO = M_BUZAI.BUZAI_KANRI_NO
                 INNER JOIN T_SYUKKOJISEKI ON T_TANAMSAI_SAVE.JISYA_CD = T_SYUKKOJISEKI.JISYA_CD AND T_TANA.SOKO_CD = T_SYUKKOJISEKI.SOKO_CD AND T_SYUKKOJISEKI.SYUKKO_DATE <= T_TANA.TANA_YMD
                 INNER JOIN T_BUZAIHACYU ON T_TANA.SYOZOKU_CD = T_BUZAIHACYU.SYOZOKU_CD AND T_BUZAIHACYU.HACYU_YMD <= T_TANA.TANA_YMD
-                INNER JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
+                INNER JOIN T_BUZAIHACYUMSAI ON T_TANAMSAI_SAVE.JISYA_CD = T_BUZAIHACYUMSAI.JISYA_CD
                 WHERE T_TANAMSAI_SAVE.SAVE_TANT_CD="' . $LOGIN_ID . '"
-                AND T_TANAMSAI_SAVE.DEL_FLG=0';
+                AND T_TANAMSAI_SAVE.DEL_FLG=0';                
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -1034,7 +1037,7 @@ class Order
             ]);
 
             if ($validated) {
-                $sql = 'UPDATE T_TANAMSAI_SAVE SET DEL_FLG=1 
+                $sql = 'DELETE FROM T_TANAMSAI_SAVE
                     WHERE SAVE_TANT_CD="' . $_POST['LOGIN_ID'] . '"';
                 $this->result = $this->dbConnect->query($sql);
 
@@ -1048,6 +1051,50 @@ class Order
                 $validated['status'] = 'success';
                 $resultSet[] = $validated;
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            } else {
+                $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            }
+        }
+    }
+
+    function postTanamsaiSaveDeleteSelected()
+    {
+        $this->dbReference = new systemConfig();
+        $this->dbConnect = $this->dbReference->connectDB();
+        if ($this->dbConnect == NULL) {
+            $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
+        } else {
+            $errors = [];
+            $errors_validate = [];
+
+            $json_string  = file_get_contents('php://input');
+            $json_request = json_decode($json_string, true);
+            $data = (array)$json_request;
+
+            $errors_validate = $this->validateAddMaterialOrdering($data);
+
+            if (empty($errors_validate)) {
+                $data_tanamsai_save = $data['T_TANAMSAI'];
+                if (!empty($data_tanamsai_save['TANAMSAI_ID'])); {
+                    $list_tanamsai_id = $data_tanamsai_save['TANAMSAI_ID'];
+                    foreach ($list_tanamsai_id as $key => $value) {
+                        $sql = 'DELETE FROM T_TANAMSAI_SAVE 
+                        WHERE SAVE_TANT_CD="' . $data_tanamsai_save['LOGIN_ID'] . '"
+                        AND TANAMSAI_ID=' . $value . '';
+                        $this->result = $this->dbConnect->query($sql);
+
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql error : ' . $this->dbConnect->error;
+                        }
+                    }
+                }
+            } else {
+                $errors['msg'][] = $errors_validate;
+            }
+
+            if (empty($errors['msg'])) {
+                $data_tanamsai_save['status'] = 'success';
+                $this->dbReference->sendResponse(200, json_encode($data_tanamsai_save, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             }

@@ -2859,18 +2859,50 @@ class Schedule
             $errors = [];
             $resultSet = array();
 
-            $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME FROM M_GYOSYA WHERE (GYOSYA_KBN_CD="01" OR JISYA_LIKE_FLG=1) AND DEL_FLG=0';
-            $this->result = $this->dbConnect->query($sql);
-            if (!empty($this->dbConnect->error)) {
-                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+            if ((isset($_GET['TANT_KBN_CD']) && $_GET['TANT_KBN_CD'] != "") &&
+                (isset($_GET['SYOZOKU_CD']) && $_GET['SYOZOKU_CD'] != "")
+            ) {                
+                $TANT_KBN_CD = $_GET['TANT_KBN_CD'];
+                $SYOZOKU_CD = $_GET['SYOZOKU_CD'];
+
+                if(in_array($TANT_KBN_CD , ["01" , "03"])){
+                    $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME 
+                    FROM M_GYOSYA WHERE DEL_FLG=0';                 
+                    $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+        
+                    if ($this->result && $this->result->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $this->result->fetch_assoc()) {
+                            $resultSet[] = $row;
+                        }
+                    }
+                } 
+                
+                if (in_array($TANT_KBN_CD , ["02" , "04"])){
+                    $sql = ' SELECT KOJIGYOSYA_CD,KOJIGYOSYA_NAME                    
+                    FROM M_GYOSYA 
+                    WHERE KOJIGYOSYA_CD="'.$SYOZOKU_CD.'" AND DEL_FLG=0';                   
+                    $this->result = $this->dbConnect->query($sql);
+                    if (!empty($this->dbConnect->error)) {
+                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                    }
+        
+                    if ($this->result && $this->result->num_rows > 0) {
+                        // output data of each row
+                        while ($row = $this->result->fetch_assoc()) {
+                            $resultSet[] = $row;
+                        }
+                    }
+                }
+
+            } else {
+                $errors['msg'][] = 'Missing parameter TANT_KBN_CD or SYOZOKU_CD';
             }
 
-            if ($this->result && $this->result->num_rows > 0) {
-                // output data of each row
-                while ($row = $this->result->fetch_assoc()) {
-                    $resultSet[] = $row;
-                }
-            }
+            
 
             if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -3552,9 +3584,9 @@ class Schedule
                 'ALL_DAY_FLG' => 'nullable',
             ]);
 
-            if ($validated) {             
+            if ($validated) {
                 $JYUCYU_ID = '"' . $validated['JYUCYU_ID'] . '"';
-                $KBN = '"'.$validated['KBN'].'"' ;
+                $KBN = '"' . $validated['KBN'] . '"';
                 $HOMONJIKAN = '"' . $validated['HOMONJIKAN'] . '"';
                 $HOMONJIKAN_END = '"' . $validated['HOMONJIKAN_END'] . '"';
                 $JININ = '"' . $validated['JININ'] . '"';
@@ -3562,30 +3594,31 @@ class Schedule
                 $MEMO = '"' . $validated['MEMO'] . '"';
                 $HOMON_SBT = '"' . $validated['HOMON_SBT'] . '"';
                 $JIKAN = '' . $validated['JIKAN'] . '';
-                $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';               
+                $TAG_KBN = '"' . $validated['KBNMSAI_CD'] . '"';
                 $LOGIN_ID = '"' . $validated['LOGIN_ID'] . '"';
-                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0;                
+                $ALL_DAY_FLG = !is_null($validated['ALL_DAY_FLG']) ? 1 : 0;
                 $UPD_PGID = '"KOJ1110F"';
                 $PRESENT_DATE = '"' . date('Y-m-d') . '"';
-                $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';                                            
+                $PRESENT_DATETIME = '"' . date('Y-m-d H:i:s') . '"';
 
                 if ($validated['HOMON_SBT'] == "01") {
                     $sql = ' UPDATE T_KOJI
-                    SET TAG_KBN=' . $TAG_KBN. ',
-                    SITAMIAPO_KBN=' . $KBN. ',
-                    SITAMIHOMONJIKAN=' . $HOMONJIKAN. ',
-                    SITAMIHOMONJIKAN_END=' . $HOMONJIKAN_END. ',
-                    SITAMI_JININ=' . $JININ. ',
-                    SITAMI_KANSAN_POINT=' . $KANSAN_POINT. ',
-                    ALL_DAY_FLG=' . $ALL_DAY_FLG. ',
+                    SET TAG_KBN=' . $TAG_KBN . ',
+                    SITAMIAPO_KBN=' . $KBN . ',
+                    SITAMIHOMONJIKAN=' . $HOMONJIKAN . ',
+                    SITAMIHOMONJIKAN_END=' . $HOMONJIKAN_END . ',
+                    SITAMI_JININ=' . $JININ . ',
+                    SITAMI_KANSAN_POINT=' . $KANSAN_POINT . ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
                     SKJ_RENKEI_YMD=' . $PRESENT_DATE . ',
-                    SITAMI_JIKAN=' . $JIKAN. ',                 
-                    MEMO=' . $MEMO. ',
+                    SITAMI_JIKAN=' . $JIKAN . ',                 
+                    MEMO=' . $MEMO . ',
+                    READ_FLG=(SELECT IF(EXISTS(SELECT KOJI_2.MEMO FROM (SELECT * FROM T_KOJI) AS KOJI_2 WHERE KOJI_2.JYUCYU_ID=' . $JYUCYU_ID . ' AND KOJI_2.MEMO=' . $MEMO . '),1,0) AS result),
                     UPD_PGID= ' . $UPD_PGID . ',
-                    UPD_TANTCD=' . $LOGIN_ID. ',
+                    UPD_TANTCD=' . $LOGIN_ID . ',
                     UPD_YMD=' . $PRESENT_DATETIME . '
-                    WHERE JYUCYU_ID=' . $JYUCYU_ID. '
-                    AND DEL_FLG=0';                    
+                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -3594,21 +3627,22 @@ class Schedule
 
                 if ($validated['HOMON_SBT'] == "02") {
                     $sql = 'UPDATE T_KOJI 
-                    SET TAG_KBN=' . $TAG_KBN. ',
-                    KOJIAPO_KBN=' . $KBN. ',
-                    KOJIHOMONJIKAN=' . $HOMONJIKAN. ',
-                    KOJIHOMONJIKAN_END=' . $HOMONJIKAN_END. ',
-                    KOJI_JININ=' . $JININ. ',
-                    KOJI_KANSAN_POINT=' . $KANSAN_POINT. ',
-                    ALL_DAY_FLG=' . $ALL_DAY_FLG. ',
+                    SET TAG_KBN=' . $TAG_KBN . ',
+                    KOJIAPO_KBN=' . $KBN . ',
+                    KOJIHOMONJIKAN=' . $HOMONJIKAN . ',
+                    KOJIHOMONJIKAN_END=' . $HOMONJIKAN_END . ',
+                    KOJI_JININ=' . $JININ . ',
+                    KOJI_JIKAN=' . $JIKAN . ' ,      
+                    KOJI_KANSAN_POINT=' . $KANSAN_POINT . ',
+                    ALL_DAY_FLG=' . $ALL_DAY_FLG . ',
                     SKJ_RENKEI_YMD=' . $PRESENT_DATE . ',
-                    MEMO=' . $MEMO. ' ,
-                    KOJI_JIKAN=' . $JIKAN. ' ,      
+                    MEMO=' . $MEMO . ' ,
+                    READ_FLG=(SELECT IF(EXISTS(SELECT KOJI_2.MEMO FROM (SELECT * FROM T_KOJI) AS KOJI_2 WHERE KOJI_2.JYUCYU_ID=' . $JYUCYU_ID . ' AND KOJI_2.MEMO=' . $MEMO . '),1,0) AS result),
                     UPD_PGID= ' . $UPD_PGID . ',
-                    UPD_TANTCD=' . $LOGIN_ID. ',            
+                    UPD_TANTCD=' . $LOGIN_ID . ',            
                     UPD_YMD=' . $PRESENT_DATETIME . '
-                    WHERE JYUCYU_ID=' . $JYUCYU_ID. '
-                    AND DEL_FLG=0';                   
+                    WHERE JYUCYU_ID=' . $JYUCYU_ID . '
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -4044,7 +4078,7 @@ class Schedule
                     UPD_TANTCD=' . $LOGIN_ID . ', 
                     UPD_YMD=' . $PRESENT_DATETIME . ' 
                     WHERE TAN_CAL_ID=' . $TANT_CAL_ID . '                           
-                    AND DEL_FLG=0';                    
+                    AND DEL_FLG=0';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -4081,7 +4115,7 @@ class Schedule
                         ' . $MEMO_CD . ', ' . $NAIYO . ', ' . $COMMENT . ', 
                         ' . $ALL_DAY_FLG . ', ' . $PRESENT_DATE . ', 
                         0, ' . $ADD_PGID . ', ' . $LOGIN_ID . ', ' . $PRESENT_DATETIME . ', ' . $UPD_PGID . ', ' . $LOGIN_ID . ', ' . $PRESENT_DATETIME . '
-                    )';                  
+                    )';
                     $this->result = $this->dbConnect->query($sql);
                     if (!empty($this->dbConnect->error)) {
                         $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

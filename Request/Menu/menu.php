@@ -42,7 +42,7 @@ class Menu
                 FROM T_KOJI 
                 WHERE ADD_TANTCD="' . $LOGIN_ID . '" 
                 AND MEMO IS NOT NULL 
-                AND READ_FLG IS NULL';
+                AND READ_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;

@@ -88,13 +88,11 @@ class Schedule
                         M_KBN.KBNMSAI_CD,
                         M_KBN.KBNMSAI_NAME, 
                         M_KBN.KBNMSAI_BIKO,
-                        M_KBN.YOBIKOMOKU1, 
-                        M_KBN.YOBIKOMOKU2,
-                        M_KBN.YOBIKOMOKU3, 
-                        M_KBN.YOBIKOMOKU4,
-                        M_KBN.YOBIKOMOKU5
+                        M_KBN.YOBIKOMOKU1,                   
+                        M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2
                         FROM T_EIGYO_ANKEN 
-                        INNER JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"                   
+                        INNER JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                        INNER JOIN M_KBN AS M_KBN2 ON T_EIGYO_ANKEN.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="K8"                   
                         WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                             AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
                             AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="1" 
@@ -129,11 +127,8 @@ class Schedule
                         $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
-                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                        $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];                                             
+                        $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];                       
                         $data['TYPE'] = 1;
                         $resultSet['OFFICE'][$EIGYO_ANKEN_YMD][] = $data;
                     }
@@ -158,13 +153,11 @@ class Schedule
                 M_KBN.KBNMSAI_CD,
                 M_KBN.KBNMSAI_NAME, 
                 M_KBN.KBNMSAI_BIKO,
-                M_KBN.YOBIKOMOKU1, 
-                M_KBN.YOBIKOMOKU2,
-                M_KBN.YOBIKOMOKU3, 
-                M_KBN.YOBIKOMOKU4,
-                M_KBN.YOBIKOMOKU5        
+                M_KBN.YOBIKOMOKU1,                 
+                M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2      
                  FROM T_TBETUCALENDAR 
                  INNER JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
+                 INNER JOIN M_KBN AS M_KBN2 ON T_TBETUCALENDAR.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="K9" 
                  WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                     
                      AND T_TBETUCALENDAR.DEL_FLG=0 
                      AND JYOKEN_CD="' . $KOJIGYOSYA_CD . '"
@@ -198,10 +191,7 @@ class Schedule
                         $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                         $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                         $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                        $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                        $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                        $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                        $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                        $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];    
                         $data['TYPE'] = 2;
                         $resultSet['OFFICE'][$TBETUCALENDAR_YMD][] = $data;
                     }
@@ -281,17 +271,15 @@ class Schedule
                     M_KBN.KBNMSAI_CD,
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.KBNMSAI_BIKO,
-                    M_KBN.YOBIKOMOKU1, 
-                    M_KBN.YOBIKOMOKU2,
-                    M_KBN.YOBIKOMOKU3, 
-                    M_KBN.YOBIKOMOKU4,
-                    M_KBN.YOBIKOMOKU5,
+                    M_KBN.YOBIKOMOKU1,
+                    M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2,              
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME,                    
                     M_TANT.SYOZOKU_CD
                     FROM T_KOJI 
                     INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
                     INNER JOIN M_TANT ON M_TANT.TANT_CD=T_KOJI.HOMON_TANT_CD4
+                    INNER JOIN M_KBN AS M_KBN2 ON T_KOJI.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="K7" 
                     WHERE DATE_FORMAT(T_KOJI.SITAMI_YMD , "%Y-%m") = "' . $YM . '" 
                     AND M_TANT.TANT_CD="' . $TANT_CD . '"
                     AND T_KOJI.DEL_FLG=0 
@@ -362,11 +350,8 @@ class Schedule
                             $data['KBNMSAI_CD'] = $row['KBNMSAI_CD'];
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
-                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];     
+                            $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];                      
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $TANT_CD;
                             $data['SYOZOKU_CD'] = $row['SYOZOKU_CD'];
@@ -435,10 +420,7 @@ class Schedule
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.KBNMSAI_BIKO,
                     M_KBN.YOBIKOMOKU1, 
-                    M_KBN.YOBIKOMOKU2,
-                    M_KBN.YOBIKOMOKU3, 
-                    M_KBN.YOBIKOMOKU4,
-                    M_KBN.YOBIKOMOKU5,
+                    M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2,   
                     M_TANT1.TANT_CD AS TANT_CD1,
                     M_TANT1.TANT_NAME AS TANT_NAME1,
                     M_TANT2.TANT_CD AS TANT_CD2,
@@ -448,6 +430,7 @@ class Schedule
                     T_KOJI.KOJI_YMD
                     FROM T_KOJI 
                     INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="05"
+                    INNER JOIN M_KBN AS M_KBN2 ON T_KOJI.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="K7"
                     INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -524,10 +507,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['TANT_NAME'] = $row['TANT_NAME1'];
                                 $data['TANT_CD'] = $TANT_CD1;
                                 $data['TYPE'] = 2;
@@ -593,10 +573,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['TANT_CD'] =  $TANT_CD2;
                                 $data['TANT_NAME'] = $row['TANT_NAME2'];
                                 $data['TYPE'] = 2;
@@ -662,10 +639,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['TANT_CD'] =  $TANT_CD3;
                                 $data['TANT_NAME'] = $row['TANT_NAME3'];
                                 $data['TYPE'] = 2;
@@ -697,14 +671,12 @@ class Schedule
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.KBNMSAI_BIKO,
                     M_KBN.YOBIKOMOKU1, 
-                    M_KBN.YOBIKOMOKU2,
-                    M_KBN.YOBIKOMOKU3, 
-                    M_KBN.YOBIKOMOKU4,
-                    M_KBN.YOBIKOMOKU5,
+                    M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2,   
                     M_TANT.TANT_NAME, 
                     M_TANT.TANT_CD
                     FROM T_EIGYO_ANKEN 
                     INNER JOIN M_KBN ON T_EIGYO_ANKEN.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="10"
+                    INNER JOIN M_KBN AS M_KBN2 ON T_EIGYO_ANKEN.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="K8"
                     INNER JOIN M_TANT ON T_EIGYO_ANKEN.JYOKEN_CD=M_TANT.TANT_CD AND T_EIGYO_ANKEN.JYOKEN_SYBET_FLG="0"
                     WHERE DATE_FORMAT(T_EIGYO_ANKEN.YMD , "%Y-%m") = "' . $YM . '"
                     AND T_EIGYO_ANKEN.DEL_FLG=0                    
@@ -742,10 +714,7 @@ class Schedule
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                            $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                             $data['TANT_NAME'] = $row['TANT_NAME'];
                             $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 3;
@@ -773,14 +742,12 @@ class Schedule
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.KBNMSAI_BIKO,
                     M_KBN.YOBIKOMOKU1, 
-                    M_KBN.YOBIKOMOKU2,
-                    M_KBN.YOBIKOMOKU3, 
-                    M_KBN.YOBIKOMOKU4,
-                    M_KBN.YOBIKOMOKU5,                                      
+                    M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2,                                      
                     M_TANT.TANT_CD,
                     M_TANT.TANT_NAME         
                     FROM T_TBETUCALENDAR 
                     INNER JOIN M_KBN ON T_TBETUCALENDAR.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="06"
+                    INNER JOIN M_KBN AS M_KBN2 ON T_TBETUCALENDAR.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="K9" 
                     INNER JOIN M_TANT ON T_TBETUCALENDAR.JYOKEN_CD=M_TANT.TANT_CD AND T_TBETUCALENDAR.JYOKEN_SYBET_FLG=0 
                     WHERE DATE_FORMAT(T_TBETUCALENDAR.YMD , "%Y-%m") = "' . $YM . '"                  
                     AND T_TBETUCALENDAR.DEL_FLG=0                                     
@@ -815,11 +782,7 @@ class Schedule
                             $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                             $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                             $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                            $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                            $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                            $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                            $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
-                            $data['TANT_NAME'] = $row['TANT_NAME'];
+                            $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                             $data['TANT_CD'] = $row['TANT_CD'];
                             $data['TYPE'] = 4;
                             $resultSet2[$TANT_CD][$TBETUCALENDAR_YMD][] = $data;
@@ -883,10 +846,7 @@ class Schedule
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.KBNMSAI_BIKO,
                     M_KBN.YOBIKOMOKU1, 
-                    M_KBN.YOBIKOMOKU2,
-                    M_KBN.YOBIKOMOKU3, 
-                    M_KBN.YOBIKOMOKU4,
-                    M_KBN.YOBIKOMOKU5,
+                    M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2,   
                     M_TANT1.DAYLY_SALES AS DAYLY_SALES1, 
                     M_TANT2.DAYLY_SALES AS DAYLY_SALES2,  
                     M_TANT3.DAYLY_SALES AS DAYLY_SALES3,  
@@ -900,7 +860,8 @@ class Schedule
                     M_TANT4.TANT_CD AS TANT_CD4,
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
-                    INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"  
+                    INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01" 
+                    INNER JOIN M_KBN AS M_KBN2 ON T_KOJI.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="L1" 
                     INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -980,10 +941,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES1'];
                                 $data['TANT_NAME'] = $row['TANT_NAME1'];
                                 $data['TANT_CD'] = $TANT_CD1;
@@ -1050,10 +1008,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES2'];
                                 $data['TANT_NAME'] = $row['TANT_NAME2'];
                                 $data['TANT_CD1'] = $row['TANT_CD2'];
@@ -1120,10 +1075,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES3'];
                                 $data['TANT_NAME'] = $row['TANT_NAME3'];
                                 $data['TANT_CD1'] = $row['TANT_CD3'];
@@ -1190,10 +1142,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['DAYLY_SALES'] = $row['DAYLY_SALES4'];
                                 $data['TANT_NAME'] = $row['TANT_NAME4'];
                                 $data['TANT_CD1'] = $row['TANT_CD4'];
@@ -1260,10 +1209,7 @@ class Schedule
                     M_KBN.KBNMSAI_NAME, 
                     M_KBN.KBNMSAI_BIKO,
                     M_KBN.YOBIKOMOKU1, 
-                    M_KBN.YOBIKOMOKU2,
-                    M_KBN.YOBIKOMOKU3, 
-                    M_KBN.YOBIKOMOKU4,
-                    M_KBN.YOBIKOMOKU5,
+                    M_KBN2.YOBIKOMOKU1 AS YOBIKOMOKU1_KBN2,
                     M_TANT1.MONTHLY_SALES AS MONTHLY_SALES1, 
                     M_TANT2.MONTHLY_SALES AS MONTHLY_SALES2,  
                     M_TANT3.MONTHLY_SALES AS MONTHLY_SALES3,  
@@ -1278,6 +1224,7 @@ class Schedule
                     M_TANT4.TANT_NAME AS TANT_NAME4
                     FROM T_KOJI 
                     INNER JOIN M_KBN ON T_KOJI.TAG_KBN=M_KBN.KBNMSAI_CD AND M_KBN.KBN_CD="16" AND M_KBN.KBNMSAI_CD="01"
+                    INNER JOIN M_KBN AS M_KBN2 ON T_KOJI.TAG_KBN=M_KBN2.KBNMSAI_CD AND M_KBN2.KBN_CD="L1" 
                     INNER JOIN M_TANT as M_TANT1 ON M_TANT1.TANT_CD=T_KOJI.HOMON_TANT_CD1
                     INNER JOIN M_TANT as M_TANT2 ON M_TANT2.TANT_CD=T_KOJI.HOMON_TANT_CD2
                     INNER JOIN M_TANT as M_TANT3 ON M_TANT3.TANT_CD=T_KOJI.HOMON_TANT_CD3
@@ -1358,10 +1305,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES1'];
                                 $data['TANT_NAME'] = $row['TANT_NAME1'];
                                 $data['TANT_CD'] = $TANT_CD1;
@@ -1428,10 +1372,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES2'];
                                 $data['TANT_NAME'] = $row['TANT_NAME2'];
                                 $data['TANT_CD1'] = $TANT_CD2;
@@ -1498,10 +1439,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES3'];
                                 $data['TANT_NAME'] = $row['TANT_NAME3'];
                                 $data['TANT_CD1'] = $TANT_CD3;
@@ -1568,10 +1506,7 @@ class Schedule
                                 $data['KBNMSAI_NAME'] = $row['KBNMSAI_NAME'];
                                 $data['KBNMSAI_BIKO'] = $row['KBNMSAI_BIKO'];
                                 $data['YOBIKOMOKU1'] = $row['YOBIKOMOKU1'];
-                                $data['YOBIKOMOKU2'] = $row['YOBIKOMOKU2'];
-                                $data['YOBIKOMOKU3'] = $row['YOBIKOMOKU3'];
-                                $data['YOBIKOMOKU4'] = $row['YOBIKOMOKU4'];
-                                $data['YOBIKOMOKU5'] = $row['YOBIKOMOKU5'];
+                                $data['YOBIKOMOKU1_KBN2'] = $row['YOBIKOMOKU1_KBN2'];
                                 $data['MONTHLY_SALES'] = $row['MONTHLY_SALES4'];
                                 $data['TANT_NAME'] = $row['TANT_NAME4'];
                                 $data['TANT_CD1'] = $TANT_CD4;

@@ -874,11 +874,12 @@ class Order
                 T_TANAMSAI.HINBAN,
                 T_TANAMSAI.SYOHIN_NAME,              
                 T_TANAMSAI.JITUZAIKO_SU AS SENGETU_JITUZAIKO_SU, 
-                M_BUZAI.BUZAI_BUNRUI,                 
+                M_BUZAI.BUZAI_BUNRUI,  
                 M_BUZAI.MAKER_NAME AS BUZAI_MAKER_NAME,
                 M_BUZAI.SIIRE_NAME AS BUZAI_SIIRE_NAME,
                 M_BUZAI.SIIRE_TANKA AS BUZAI_SIIRE_TANKA,             
                 M_BUZAI.SORYO AS BUZAI_SORYO,                
+                M_BUZAI.HAIBAN_FLG,                 
                 T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO,               
                 T_BUZAIHACYU.BUZAI_HACYU_ID,                     
                 T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO            
@@ -938,7 +939,8 @@ class Order
                 LOT,
                 TANI,
                 SORYO,
-                BIKO
+                BIKO,
+                HAIBAN_FLG,
                 FROM M_BUZAI
                 WHERE DEL_FLG=0';
                 $this->result = $this->dbConnect->query($sql);
@@ -989,6 +991,7 @@ class Order
                 M_BUZAI.BUZAI_BUNRUI, 
                 M_BUZAI.MAKER_NAME, 
                 M_BUZAI.SIIRE_TANKA, 
+                M_BUZAI.HAIBAN_FLG,
                 T_SYUKKOJISEKI.SURYO AS SYUKKOJISEKI_SURYO, 
                 T_BUZAIHACYUMSAI.SURYO AS BUZAIHACYUMSAI_SURYO
                 FROM T_TANAMSAI_SAVE 
@@ -1358,6 +1361,7 @@ class Order
                     M_BUZAI.TANI, 
                     M_BUZAI.SORYO, 
                     M_BUZAI.BIKO,
+                    M_BUZAI.HAIBAN_FLG,
                     T_ZAIKO.ZAIKO_ID,
                     T_ZAIKO.BASYO_GYOSYA_SYBET_CD,
                     T_ZAIKO.ZAIKO_SYBET_CD,

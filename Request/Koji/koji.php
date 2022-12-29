@@ -695,7 +695,7 @@ class Koji
                         FROM T_KOJIMSAI 
                         INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
                         WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '" 
-                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>"0" 
                             AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
@@ -724,7 +724,7 @@ class Koji
                                 $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                 $data['TENPO_CD'] = $row['TENPO_CD'];
-                                $resultSet = $data;
+                                $resultSet['DATA'][] = $data;
                             }
                         }
                     } else {
@@ -751,7 +751,7 @@ class Koji
                         FROM T_KOJIMSAI 
                         INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
                         WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '" 
-                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>"0" 
                             AND T_KOJI.DEL_FLG=0';                      
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
@@ -781,7 +781,7 @@ class Koji
                                     $data['KOJI_ST'] = $row['KOJI_ST'];
                                     $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                     $data['TENPO_CD'] = $row['TENPO_CD'];
-                                    $resultSet = $data;
+                                    $resultSet['DATA'][] = $data;
                                 }
                             }
                         }
@@ -812,7 +812,7 @@ class Koji
                         FROM T_KOJIMSAI 
                         INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
                         WHERE T_KOJI.SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '" 
-                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>"0" 
                             AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
@@ -842,7 +842,7 @@ class Koji
                                 $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
                                 $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                 $data['TENPO_CD'] = $row['TENPO_CD'];
-                                $resultSet = $data;
+                                $resultSet['DATA'][] = $data;
                             }
                         }
                     } else {
@@ -870,7 +870,7 @@ class Koji
                         FROM T_KOJIMSAI 
                         INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
                         WHERE T_KOJI.SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '" 
-                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>"0" 
                             AND T_KOJI.DEL_FLG=0';                      
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
@@ -901,7 +901,7 @@ class Koji
                                     $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
                                     $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
                                     $data['TENPO_CD'] = $row['TENPO_CD'];
-                                    $resultSet = $data;
+                                    $resultSet['DATA'][] = $data;
                                 }
                             }
                         }

@@ -477,7 +477,7 @@ class Koji
                 ON DUPLICATE KEY UPDATE    
                 TANT_CD=VALUES(TANT_CD) , YMD=VALUES(YMD), 
                 KOJI_TIRASISU=VALUES(KOJI_TIRASISU) , RENKEI_YMD=VALUES(RENKEI_YMD), 
-                UPD_PGID=VALUES(UPD_PGID) , UPD_TANTCD=VALUES(UPD_TANTCD), UPD_YMD=VALUES(UPD_YMD)';              
+                UPD_PGID=VALUES(UPD_PGID) , UPD_TANTCD=VALUES(UPD_TANTCD), UPD_YMD=VALUES(UPD_YMD)';
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -583,7 +583,7 @@ class Koji
                         FROM T_KOJI
                         WHERE SYUYAKU_JYUCYU_ID= "' . $JYUCYU_ID . '"                      
                         AND T_KOJI.HOMON_SBT="01"
-                        AND T_KOJI.DEL_FLG=0';                       
+                        AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -599,7 +599,7 @@ class Koji
                                 $data['SITAMIIRAISYO_FILEPATH'] = $domain . $row['SITAMIIRAISYO_FILEPATH'];
                                 $data['JYUCYU_ID'] = $row['JYUCYU_ID'];
                                 $data['HOMON_SBT'] = $row['HOMON_SBT'];
-                                $data['KOJI_ST'] = $row['KOJI_ST'];                                
+                                $data['KOJI_ST'] = $row['KOJI_ST'];
                                 $data['SINGLE_SUMMARIZE'] = 2;
                                 $resultSet[] = $data;
                             }
@@ -659,212 +659,260 @@ class Koji
         } else {
             $errors = [];
             $resultSet = array();
-
+            $domain = $this->domain;
+            
             if (
-                isset($_GET['JYUCYU_ID']) &&
-                isset($_GET['KOJI_ST']) &&
-                isset($_GET['SINGLE_SUMMARIZE'])
+                (isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
+                (isset($_GET['KOJI_ST']) && $_GET['KOJI_ST'] != "") &&
+                (isset($_GET['SINGLE_SUMMARIZE']) && $_GET['SINGLE_SUMMARIZE'] != "")
             ) {
-                $jyucyuId = $_GET['JYUCYU_ID'];
-                $kojiSt = $_GET['KOJI_ST'];                
+                $JYUCYU_ID = $_GET['JYUCYU_ID'];
+                $KOJI_ST = $_GET['KOJI_ST'];
+                $SINGLE_SUMMARIZE = $_GET['SINGLE_SUMMARIZE'];
 
-                if (in_array($kojiSt , [1,2])) {
-                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
-                        //Get HOJIN_FLG
-                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                            FROM T_KOJI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                        ';
-                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                            }
-                        }
-
-                        $sqlNotReported = 'SELECT MAKER_CD, HINBAN 
+                if ($SINGLE_SUMMARIZE == "01") {
+                    if (in_array($KOJI_ST, [1, 2])) {
+                        $sql = 'SELECT T_KOJIMSAI.JYUCYU_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID_KIKAN,
+                        T_KOJIMSAI.HINBAN,
+                        T_KOJIMSAI.MAKER_CD, 
+                        T_KOJIMSAI.CTGORY_CD,
+                        T_KOJIMSAI.SURYO,
+                        T_KOJIMSAI.KINGAK,
+                        T_KOJIMSAI.KISETU_HINBAN,
+                        T_KOJIMSAI.KISETU_MAKER_CD,
+                        T_KOJIMSAI.KENSETU_KEITAI,
+                        T_KOJIMSAI.BEF_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.AFT_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.OTHER_PHOTO_FOLDERPATH,
+                        T_KOJIMSAI.TUIKA_JISYA_CD,
+                        T_KOJIMSAI.TUIKA_SYOHIN_NAME,
+                        T_KOJIMSAI.KOJIJITUIKA_FLG,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI.HOJIN_FLG, 
+                        T_KOJI.TENPO_CD
                         FROM T_KOJIMSAI 
-                        WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                            AND KOJIJITUIKA_FLG<>"0" 
-                            AND DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sqlNotReported);
+                        INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
+                        WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '" 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJI.DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
                         }
 
                         if ($this->result && $this->result->num_rows > 0) {
-                            // output data of each row
                             while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['constructionNotReportSINGLE'][] = $row;
+                                $data = array();
+                                $data['JYUCYUMSAI_ID'] = $row['JYUCYUMSAI_ID'];
+                                $data['JYUCYUMSAI_ID_KIKAN'] = $row['JYUCYUMSAI_ID_KIKAN'];
+                                $data['HINBAN'] = $row['HINBAN'];
+                                $data['MAKER_CD'] = $row['MAKER_CD'];
+                                $data['CTGORY_CD'] = $row['CTGORY_CD'];
+                                $data['SURYO'] = $row['SURYO'];
+                                $data['KINGAK'] = $row['KINGAK'];
+                                $data['KISETU_HINBAN'] = $row['KISETU_HINBAN'];
+                                $data['KISETU_MAKER_CD'] = $row['KISETU_MAKER_CD'];
+                                $data['KENSETU_KEITAI'] = $row['KENSETU_KEITAI'];
+                                $data['BEF_SEKO_PHOTO_FILEPATH'] = $domain . $row['BEF_SEKO_PHOTO_FILEPATH'];
+                                $data['AFT_SEKO_PHOTO_FILEPATH'] = $domain . $row['AFT_SEKO_PHOTO_FILEPATH'];
+                                $data['OTHER_PHOTO_FOLDERPATH'] = $domain . $row['OTHER_PHOTO_FOLDERPATH'];                                
+                                $data['TUIKA_JISYA_CD'] = $row['TUIKA_JISYA_CD'];
+                                $data['TUIKA_SYOHIN_NAME'] = $row['TUIKA_SYOHIN_NAME'];
+                                $data['KOJIJITUIKA_FLG'] = $row['KOJIJITUIKA_FLG'];
+                                $data['KOJI_ST'] = $row['KOJI_ST'];
+                                $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                $data['TENPO_CD'] = $row['TENPO_CD'];
+                                $resultSet = $data;
                             }
                         }
-                    }
+                    } else {
+                        $sql = 'SELECT T_KOJIMSAI.JYUCYU_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID_KIKAN,
+                        T_KOJIMSAI.HINBAN,
+                        T_KOJIMSAI.MAKER_CD, 
+                        T_KOJIMSAI.CTGORY_CD,
+                        T_KOJIMSAI.SURYO,
+                        T_KOJIMSAI.KINGAK,
+                        T_KOJIMSAI.KISETU_HINBAN,
+                        T_KOJIMSAI.KISETU_MAKER_CD,
+                        T_KOJIMSAI.KENSETU_KEITAI,
+                        T_KOJIMSAI.BEF_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.AFT_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.OTHER_PHOTO_FOLDERPATH,
+                        T_KOJIMSAI.TUIKA_JISYA_CD,
+                        T_KOJIMSAI.TUIKA_SYOHIN_NAME,
+                        T_KOJIMSAI.KOJIJITUIKA_FLG,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI.HOJIN_FLG, 
+                        T_KOJI.TENPO_CD
+                        FROM T_KOJIMSAI 
+                        INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
+                        WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '" 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJI.DEL_FLG=0';                      
+                        $this->result = $this->dbConnect->query($sql);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
 
-                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
-                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
-                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
-                            FROM T_KOJI 
-                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
-                                AND DEL_FLG=0';
-                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
-                            if (!empty($this->dbConnect->error)) {
-                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                            }
-
-                            $listJyucyuIdKoji = array();
-                            if ($this->result && $this->result->num_rows > 0) {
-                                // output data of each row
+                        if ($this->result && $this->result->num_rows > 0) {
+                            while ($row = $this->result->fetch_assoc()) {
                                 while ($row = $this->result->fetch_assoc()) {
-                                    $listJyucyuIdKoji[] = $row;
+                                    $data = array();
+                                    $data['JYUCYUMSAI_ID'] = $row['JYUCYUMSAI_ID'];
+                                    $data['JYUCYUMSAI_ID_KIKAN'] = $row['JYUCYUMSAI_ID_KIKAN'];
+                                    $data['HINBAN'] = $row['HINBAN'];
+                                    $data['MAKER_CD'] = $row['MAKER_CD'];
+                                    $data['CTGORY_CD'] = $row['CTGORY_CD'];
+                                    $data['SURYO'] = $row['SURYO'];
+                                    $data['KINGAK'] = $row['KINGAK'];
+                                    $data['KISETU_HINBAN'] = $row['KISETU_HINBAN'];
+                                    $data['KISETU_MAKER_CD'] = $row['KISETU_MAKER_CD'];
+                                    $data['KENSETU_KEITAI'] = $row['KENSETU_KEITAI'];
+                                    $data['BEF_SEKO_PHOTO_FILEPATH'] = $domain . $row['BEF_SEKO_PHOTO_FILEPATH'];
+                                    $data['AFT_SEKO_PHOTO_FILEPATH'] = $domain . $row['AFT_SEKO_PHOTO_FILEPATH'];
+                                    $data['OTHER_PHOTO_FOLDERPATH'] = $domain . $row['OTHER_PHOTO_FOLDERPATH'];
+                                    $data['TUIKA_JISYA_CD'] = $row['TUIKA_JISYA_CD'];
+                                    $data['TUIKA_SYOHIN_NAME'] = $row['TUIKA_SYOHIN_NAME'];
+                                    $data['KOJIJITUIKA_FLG'] = $row['KOJIJITUIKA_FLG'];
+                                    $data['KOJI_ST'] = $row['KOJI_ST'];
+                                    $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                    $data['TENPO_CD'] = $row['TENPO_CD'];
+                                    $resultSet = $data;
                                 }
                             }
-
-                            foreach ($listJyucyuIdKoji as $value) {
-                                //Get HOJIN_FLG
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                                    FROM T_KOJI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                ';
-                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                                    }
-                                }
-
-                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN 
-                                    FROM T_KOJIMSAI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                        AND KOJIJITUIKA_FLG<>"0" 
-                                        AND DEL_FLG=0';
-                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    // output data of each row
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['constructionNotReportSUMMARIZE'][] = $row;
-                                    }
-                                }
-                            }
-                        } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
-                            die;
-                        }
-                    }
-                } elseif ($kojiSt == 3) {
-                    if ($_GET['SINGLE_SUMMARIZE'] == 1) {
-                        //Get HOJIN_FLG
-                        $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                            FROM T_KOJI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                        ';
-                        $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                            }
-                        }
-
-                        $sqlReported = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                            FROM T_KOJIMSAI 
-                            WHERE JYUCYU_ID="' . $jyucyuId . '" 
-                            AND KOJIJITUIKA_FLG<>"0" 
-                            AND DEL_FLG=0';
-                        $this->result = $this->dbConnect->query($sqlReported);
-                        if (!empty($this->dbConnect->error)) {
-                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                        }
-
-                        if ($this->result && $this->result->num_rows > 0) {
-                            // output data of each row
-                            while ($row = $this->result->fetch_assoc()) {
-                                $resultSet['constructionReportSINGLE'][] = $row;
-                            }
-                        }
-                    }
-                    if ($_GET['SINGLE_SUMMARIZE'] == 2) {
-                        if (isset($_GET['SYUYAKU_JYUCYU_ID'])) {
-                            $sqlGetSyuyakuKoji = 'SELECT JYUCYU_ID 
-                            FROM T_KOJI 
-                            WHERE SYUYAKU_JYUCYU_ID="' . $_GET['SYUYAKU_JYUCYU_ID'] . '" 
-                                AND DEL_FLG=0';
-                            $this->result = $this->dbConnect->query($sqlGetSyuyakuKoji);
-                            if (!empty($this->dbConnect->error)) {
-                                $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                            }
-
-                            $listJyucyuIdKoji = array();
-                            if ($this->result && $this->result->num_rows > 0) {
-                                // output data of each row
-                                while ($row = $this->result->fetch_assoc()) {
-                                    $listJyucyuIdKoji[] = $row;
-                                }
-                            }
-
-                            foreach ($listJyucyuIdKoji as $value) {
-                                //Get HOJIN_FLG
-                                $sqlGetHojinFlg = 'SELECT HOJIN_FLG, TENPO_CD 
-                                    FROM T_KOJI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                ';
-                                $this->result = $this->dbConnect->query($sqlGetHojinFlg);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['HOJIN_FLG'] = $row['HOJIN_FLG'];
-                                        $resultSet['TENPO_CD'] = $row['TENPO_CD'];
-                                    }
-                                }
-
-                                $sqlNotReportedSummarize = 'SELECT MAKER_CD, HINBAN, KISETU_MAKER_CD, KISETU_HINBAN, BEF_SEKO_PHOTO_FILEPATH, AFT_SEKO_PHOTO_FILEPATH, OTHER_PHOTO_FOLDERPATH
-                                    FROM T_KOJIMSAI 
-                                    WHERE JYUCYU_ID="' . $value['JYUCYU_ID'] . '" 
-                                        AND KOJIJITUIKA_FLG<>"0" 
-                                        AND DEL_FLG=0';
-                                $this->result = $this->dbConnect->query($sqlNotReportedSummarize);
-                                if (!empty($this->dbConnect->error)) {
-                                    $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                                }
-
-                                if ($this->result && $this->result->num_rows > 0) {
-                                    // output data of each row
-                                    while ($row = $this->result->fetch_assoc()) {
-                                        $resultSet['constructionReportSUMMARIZE'][] = $row;
-                                    }
-                                }
-                            }
-                        } else {
-                            $this->dbReference->sendResponse(404, '{"error_message": SYUYAKU_JYUCYU_ID required }');
-                            die;
                         }
                     }
                 } else {
-                    $this->dbReference->sendResponse(400, json_encode(['Error_message' => "KOJI_ST_value: 1 || 2 || 3"], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                    die;
-                }
+                    if (in_array($KOJI_ST, [1, 2])) {
+                        $sql = 'SELECT T_KOJIMSAI.JYUCYU_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID_KIKAN,
+                        T_KOJIMSAI.HINBAN,
+                        T_KOJIMSAI.MAKER_CD, 
+                        T_KOJIMSAI.CTGORY_CD,
+                        T_KOJIMSAI.SURYO,
+                        T_KOJIMSAI.KINGAK,
+                        T_KOJIMSAI.KISETU_HINBAN,
+                        T_KOJIMSAI.KISETU_MAKER_CD,
+                        T_KOJIMSAI.KENSETU_KEITAI,
+                        T_KOJIMSAI.BEF_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.AFT_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.OTHER_PHOTO_FOLDERPATH,
+                        T_KOJIMSAI.TUIKA_JISYA_CD,
+                        T_KOJIMSAI.TUIKA_SYOHIN_NAME,
+                        T_KOJIMSAI.KOJIJITUIKA_FLG,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI.SYUYAKU_JYUCYU_ID,
+                        T_KOJI.HOJIN_FLG, 
+                        T_KOJI.TENPO_CD
+                        FROM T_KOJIMSAI 
+                        INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
+                        WHERE T_KOJI.SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '" 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJI.DEL_FLG=0';
+                        $this->result = $this->dbConnect->query($sql);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
 
-                $sqlGetPullDown = 'SELECT KBN_CD, KBN_NAME, KBNMSAI_CD, KBNMSAI_NAME, KBN_BIKO 
+                        if ($this->result && $this->result->num_rows > 0) {
+                            while ($row = $this->result->fetch_assoc()) {
+                                $data = array();
+                                $data['JYUCYUMSAI_ID'] = $row['JYUCYUMSAI_ID'];
+                                $data['JYUCYUMSAI_ID_KIKAN'] = $row['JYUCYUMSAI_ID_KIKAN'];
+                                $data['HINBAN'] = $row['HINBAN'];
+                                $data['MAKER_CD'] = $row['MAKER_CD'];
+                                $data['CTGORY_CD'] = $row['CTGORY_CD'];
+                                $data['SURYO'] = $row['SURYO'];
+                                $data['KINGAK'] = $row['KINGAK'];
+                                $data['KISETU_HINBAN'] = $row['KISETU_HINBAN'];
+                                $data['KISETU_MAKER_CD'] = $row['KISETU_MAKER_CD'];
+                                $data['KENSETU_KEITAI'] = $row['KENSETU_KEITAI'];
+                                $data['BEF_SEKO_PHOTO_FILEPATH'] = $domain . $row['BEF_SEKO_PHOTO_FILEPATH'];
+                                $data['AFT_SEKO_PHOTO_FILEPATH'] = $domain . $row['AFT_SEKO_PHOTO_FILEPATH'];
+                                $data['OTHER_PHOTO_FOLDERPATH'] = $domain . $row['OTHER_PHOTO_FOLDERPATH'];
+                                $data['TUIKA_JISYA_CD'] = $row['TUIKA_JISYA_CD'];
+                                $data['TUIKA_SYOHIN_NAME'] = $row['TUIKA_SYOHIN_NAME'];
+                                $data['KOJIJITUIKA_FLG'] = $row['KOJIJITUIKA_FLG'];
+                                $data['KOJI_ST'] = $row['KOJI_ST'];
+                                $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                                $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                $data['TENPO_CD'] = $row['TENPO_CD'];
+                                $resultSet = $data;
+                            }
+                        }
+                    } else {
+                        $sql = 'SELECT T_KOJIMSAI.JYUCYU_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID,
+                        T_KOJIMSAI.JYUCYUMSAI_ID_KIKAN,
+                        T_KOJIMSAI.HINBAN,
+                        T_KOJIMSAI.MAKER_CD, 
+                        T_KOJIMSAI.CTGORY_CD,
+                        T_KOJIMSAI.SURYO,
+                        T_KOJIMSAI.KINGAK,
+                        T_KOJIMSAI.KISETU_HINBAN,
+                        T_KOJIMSAI.KISETU_MAKER_CD,
+                        T_KOJIMSAI.KENSETU_KEITAI,
+                        T_KOJIMSAI.BEF_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.AFT_SEKO_PHOTO_FILEPATH,
+                        T_KOJIMSAI.OTHER_PHOTO_FOLDERPATH,
+                        T_KOJIMSAI.TUIKA_JISYA_CD,
+                        T_KOJIMSAI.TUIKA_SYOHIN_NAME,
+                        T_KOJIMSAI.KOJIJITUIKA_FLG,
+                        T_KOJI.KOJI_ST,
+                        T_KOJI.SYUYAKU_JYUCYU_ID,
+                        T_KOJI.HOJIN_FLG, 
+                        T_KOJI.TENPO_CD
+                        FROM T_KOJIMSAI 
+                        INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
+                        WHERE T_KOJI.SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '" 
+                            AND T_KOJIMSAI.KOJIJITUIKA_FLG<>0 
+                            AND T_KOJI.DEL_FLG=0';                      
+                        $this->result = $this->dbConnect->query($sql);
+                        if (!empty($this->dbConnect->error)) {
+                            $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
+                        }
+
+                        if ($this->result && $this->result->num_rows > 0) {
+                            while ($row = $this->result->fetch_assoc()) {
+                                while ($row = $this->result->fetch_assoc()) {
+                                    $data = array();
+                                    $data['JYUCYUMSAI_ID'] = $row['JYUCYUMSAI_ID'];
+                                    $data['JYUCYUMSAI_ID_KIKAN'] = $row['JYUCYUMSAI_ID_KIKAN'];
+                                    $data['HINBAN'] = $row['HINBAN'];
+                                    $data['MAKER_CD'] = $row['MAKER_CD'];
+                                    $data['CTGORY_CD'] = $row['CTGORY_CD'];
+                                    $data['SURYO'] = $row['SURYO'];
+                                    $data['KINGAK'] = $row['KINGAK'];
+                                    $data['KISETU_HINBAN'] = $row['KISETU_HINBAN'];
+                                    $data['KISETU_MAKER_CD'] = $row['KISETU_MAKER_CD'];
+                                    $data['KENSETU_KEITAI'] = $row['KENSETU_KEITAI'];
+                                    $data['BEF_SEKO_PHOTO_FILEPATH'] = $domain . $row['BEF_SEKO_PHOTO_FILEPATH'];
+                                    $data['AFT_SEKO_PHOTO_FILEPATH'] = $domain . $row['AFT_SEKO_PHOTO_FILEPATH'];
+                                    $data['OTHER_PHOTO_FOLDERPATH'] = $domain . $row['OTHER_PHOTO_FOLDERPATH'];
+                                    $data['TUIKA_JISYA_CD'] = $row['TUIKA_JISYA_CD'];
+                                    $data['TUIKA_SYOHIN_NAME'] = $row['TUIKA_SYOHIN_NAME'];
+                                    $data['KOJIJITUIKA_FLG'] = $row['KOJIJITUIKA_FLG'];
+                                    $data['KOJI_ST'] = $row['KOJI_ST'];
+                                    $data['SYUYAKU_JYUCYU_ID'] = $row['SYUYAKU_JYUCYU_ID'];
+                                    $data['HOJIN_FLG'] = $row['HOJIN_FLG'];
+                                    $data['TENPO_CD'] = $row['TENPO_CD'];
+                                    $resultSet = $data;
+                                }
+                            }
+                        }
+                    }
+                }        
+
+                $sqlGetPullDown = 'SELECT KBN_CD, 
+                KBN_NAME, 
+                KBNMSAI_CD, 
+                KBNMSAI_NAME, 
+                KBN_BIKO 
                     FROM M_KBN 
                     WHERE KBN_CD="07"';
                 $this->result = $this->dbConnect->query($sqlGetPullDown);
@@ -878,17 +926,12 @@ class Koji
                         $resultSet['PULLDOWN'][] = $row;
                     }
                 }
-
-                if (empty($errors['msg'])) {
-                    $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                } else {
-                    $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-                }
+                
             } else {
-                $errors['msg'][] = 'Missing parameter JYUCYU_ID or SINGLE_SUMMARIZE';
-            } 
-            
-            if(empty($errors['msg'])) {
+                $errors['msg'][] = 'Missing parameter JYUCYU_ID or KOJI_ST or SINGLE_SUMMARIZE';
+            }
+
+            if (empty($errors['msg'])) {
                 $this->dbReference->sendResponse(200, json_encode($resultSet, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
             } else {
                 $this->dbReference->sendResponse(400, json_encode($errors, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -1421,7 +1464,7 @@ class Koji
             }
         }
     }
-    
+
     // Construction Report
     //----未報告の場合
 

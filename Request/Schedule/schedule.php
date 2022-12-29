@@ -4047,6 +4047,7 @@ class Schedule
                 if (isset($validated['TANT_CAL_ID']) && !is_null($validated['TANT_CAL_ID'])) {
                     $TANT_CAL_ID_TEMP = $validated['TANT_CAL_ID'];
                     $TANT_CAL_ID = '"' . $validated['TANT_CAL_ID'] . '"';
+
                     $sql = 'UPDATE T_TBETUCALENDAR 
                     SET MEMO_CD=' . $MEMO_CD . ', 
                     TAG_KBN=' . $TAG_KBN . ', 
@@ -4079,7 +4080,7 @@ class Schedule
                     }
 
                     $TANT_CAL_ID_TEMP = sprintf('%010d', $num);
-                    $TAN_CAL_ID = '"' . sprintf('%010d', $num) . '"';
+                    $TAN_CAL_ID = '"' . sprintf('%010d', $num) . '"';                   
                     $sql = 'INSERT INTO T_TBETUCALENDAR 
                     (
                         TAN_CAL_ID, JYOKEN_CD, 

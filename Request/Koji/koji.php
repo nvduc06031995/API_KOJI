@@ -332,8 +332,7 @@ class Koji
         if ($this->dbConnect == NULL) {
             $this->dbReference->sendResponse(503, '{"error_message":' . $this->dbReference->getStatusCodeMeeage(503) . '}');
         } else {
-            $errors = [];
-            $count_jyucyu = null;
+            $errors = [];           
             $count_syuyaku_jyucyu = null;
 
             if ((isset($_GET['YMD']) && $_GET['YMD'] != "") && (isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
@@ -343,12 +342,12 @@ class Koji
                 $SETSAKI_ADDRESS = $_GET['SETSAKI_ADDRESS'];
                 $JYUCYU_ID = $_GET['JYUCYU_ID'];
 
-                // Check exists
-                $sql = 'SELECT COUNT(*) 
-                    FROM T_KOJI 
-                    WHERE JYUCYU_ID="' . $JYUCYU_ID . '"
-                    AND KOJI_YMD="' . $YMD . '"                    
-                    AND DEL_FLG= 0 ';
+                $sql = 'SELECT COUNT(*) FROM T_KOJI                 
+                WHERE KOJI_YMD="' . $YMD . '"
+                AND SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
+                AND JYUCYU_ID <>"' . $JYUCYU_ID . '"
+                AND DEL_FLG=0';
+              
                 $this->result = $this->dbConnect->query($sql);
                 if (!empty($this->dbConnect->error)) {
                     $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -356,27 +355,10 @@ class Koji
                 if ($this->result && $this->result->num_rows > 0) {
                     // output data of each row
                     while ($row = $this->result->fetch_assoc()) {
-                        $count_jyucyu = $row["COUNT(*)"];
+                        $count_syuyaku_jyucyu = $row["COUNT(*)"];
                     }
                 }
-
-                if ($count_jyucyu > 0) {
-                    $sql = 'SELECT COUNT(*) 
-                    FROM T_KOJI 
-                    WHERE SETSAKI_ADDRESS="' . $SETSAKI_ADDRESS . '"
-                    AND KOJI_YMD="' . $YMD . '"                    
-                    AND DEL_FLG= 0 ';
-                    $this->result = $this->dbConnect->query($sql);
-                    if (!empty($this->dbConnect->error)) {
-                        $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
-                    }
-                    if ($this->result && $this->result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $this->result->fetch_assoc()) {
-                            $count_syuyaku_jyucyu = $row["COUNT(*)"];
-                        }
-                    }
-                }
+               
             } else {
                 $errors['msg'][] = 'Missing parameter YMD or JYUCYU_ID or SETSAKI_ADDRESS';
             }
@@ -660,7 +642,7 @@ class Koji
             $errors = [];
             $resultSet = array();
             $domain = $this->domain;
-            
+
             if (
                 (isset($_GET['JYUCYU_ID']) && $_GET['JYUCYU_ID'] != "") &&
                 (isset($_GET['KOJI_ST']) && $_GET['KOJI_ST'] != "") &&
@@ -717,7 +699,7 @@ class Koji
                                 $data['KENSETU_KEITAI'] = $row['KENSETU_KEITAI'];
                                 $data['BEF_SEKO_PHOTO_FILEPATH'] = $domain . $row['BEF_SEKO_PHOTO_FILEPATH'];
                                 $data['AFT_SEKO_PHOTO_FILEPATH'] = $domain . $row['AFT_SEKO_PHOTO_FILEPATH'];
-                                $data['OTHER_PHOTO_FOLDERPATH'] = $domain . $row['OTHER_PHOTO_FOLDERPATH'];                                
+                                $data['OTHER_PHOTO_FOLDERPATH'] = $domain . $row['OTHER_PHOTO_FOLDERPATH'];
                                 $data['TUIKA_JISYA_CD'] = $row['TUIKA_JISYA_CD'];
                                 $data['TUIKA_SYOHIN_NAME'] = $row['TUIKA_SYOHIN_NAME'];
                                 $data['KOJIJITUIKA_FLG'] = $row['KOJIJITUIKA_FLG'];
@@ -752,7 +734,7 @@ class Koji
                         INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
                         WHERE T_KOJI.JYUCYU_ID="' . $JYUCYU_ID . '" 
                             AND T_KOJIMSAI.KOJIJITUIKA_FLG<>"0" 
-                            AND T_KOJI.DEL_FLG=0';                      
+                            AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -871,7 +853,7 @@ class Koji
                         INNER JOIN T_KOJI ON T_KOJIMSAI.JYUCYU_ID=T_KOJI.JYUCYU_ID
                         WHERE T_KOJI.SYUYAKU_JYUCYU_ID="' . $JYUCYU_ID . '" 
                             AND T_KOJIMSAI.KOJIJITUIKA_FLG<>"0" 
-                            AND T_KOJI.DEL_FLG=0';                      
+                            AND T_KOJI.DEL_FLG=0';
                         $this->result = $this->dbConnect->query($sql);
                         if (!empty($this->dbConnect->error)) {
                             $errors['msg'][] = 'sql errors : ' . $this->dbConnect->error;
@@ -906,7 +888,7 @@ class Koji
                             }
                         }
                     }
-                }        
+                }
 
                 $sqlGetPullDown = 'SELECT KBN_CD, 
                 KBN_NAME, 
@@ -926,7 +908,6 @@ class Koji
                         $resultSet['PULLDOWN'][] = $row;
                     }
                 }
-                
             } else {
                 $errors['msg'][] = 'Missing parameter JYUCYU_ID or KOJI_ST or SINGLE_SUMMARIZE';
             }
